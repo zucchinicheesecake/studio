@@ -1,3 +1,137 @@
+"use client";
+
+import { useState } from "react";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Loader2 } from "lucide-react";
+
+import { formSchema, generateCrypto, GenerationResult } from "@/app/actions";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Stepper } from "@/components/crypto-forge/stepper";
+import { Step1Consensus } from "@/components/crypto-forge/step-1-consensus";
+import { Step2BasicInfo } from "@/components/crypto-forge/step-2-basic-info";
+import { Step3Economics } from "@/components/crypto-forge/step-3-economics";
+import { Step4Network } from "@/components/crypto-forge/step-4-network";
+import { ResultsDisplay } from "@/components/crypto-forge/results-display";
+
+type FormValues = z.infer<typeof formSchema>;
+
+const steps = [
+  { id: 1, name: "Consensus", component: <Step1Consensus />, fields: ["consensusMechanism"] },
+  { id: 2, name: "Basics", component: <Step2BasicInfo />, fields: ["coinName", "coinAbbreviation", "addressLetter", "coinUnit", "timestamp", "websiteUrl", "githubUrl"] },
+  { id: 3, name: "Economics", component: <Step3Economics />, fields: ["blockReward", "blockHalving", "coinSupply"] },
+  { id: 4, name: "Network", component: <Step4Network />, fields: ["coinbaseMaturity", "numberOfConfirmations", "targetSpacingInMinutes", "targetTimespanInMinutes"] },
+];
+
 export default function Home() {
-  return <></>;
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [results, setResults] = useState<GenerationResult | null>(null);
+  const { toast } = useToast();
+
+  const methods = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      consensusMechanism: "",
+      coinName: "",
+      coinAbbreviation: "",
+      addressLetter: "",
+      coinUnit: "",
+      timestamp: "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks",
+      websiteUrl: "",
+      githubUrl: "",
+      blockReward: 50,
+      blockHalving: 210000,
+      coinSupply: 21000000,
+      coinbaseMaturity: 100,
+      numberOfConfirmations: 6,
+      targetSpacingInMinutes: 10,
+      targetTimespanInMinutes: 1440,
+    },
+  });
+
+  const { trigger, handleSubmit } = methods;
+
+  const handleNext = async () => {
+    const fields = steps[currentStep - 1].fields;
+    const output = await trigger(fields as any, { shouldFocus: true });
+    if (!output) return;
+
+    if (currentStep < steps.length) {
+      setCurrentStep(step => step + 1);
+    } else {
+        handleSubmit(onSubmit)();
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentStep > 1) {
+      setCurrentStep(step => step - 1);
+    }
+  };
+  
+  const onSubmit = async (data: FormValues) => {
+    setIsLoading(true);
+    try {
+        const resultData = await generateCrypto(data);
+        setResults(resultData);
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Generation Failed",
+            description: "There was an error generating your cryptocurrency. Please try again.",
+        })
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+  const resetForm = () => {
+    setResults(null);
+    setCurrentStep(1);
+    methods.reset();
+  }
+
+  if (isLoading) {
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen text-center">
+            <Loader2 className="h-16 w-16 animate-spin text-primary mb-4" />
+            <h1 className="text-3xl font-headline font-bold text-primary">Forging Your Crypto...</h1>
+            <p className="text-muted-foreground mt-2">The AI is generating your genesis block, configuration, and instructions.</p>
+        </div>
+    );
+  }
+
+  if (results) {
+    return <ResultsDisplay results={results} onReset={resetForm} />;
+  }
+
+  return (
+    <FormProvider {...methods}>
+        <main className="container mx-auto px-4 py-12 flex flex-col items-center justify-center min-h-screen">
+          <div className="text-center mb-4">
+              <h1 className="text-5xl font-headline font-bold text-primary">CryptoForge AI</h1>
+              <p className="mt-2 text-lg text-muted-foreground">Your personal AI assistant for creating cryptocurrencies.</p>
+          </div>
+          <div className="w-full max-w-3xl">
+            <Stepper currentStep={currentStep} steps={steps.map(s => s.name)} />
+          </div>
+          <div className="w-full max-w-3xl mt-8">
+            <form onSubmit={handleSubmit(onSubmit)}>
+                {steps[currentStep-1].component}
+            </form>
+          </div>
+          <div className="w-full max-w-3xl flex justify-between mt-8">
+            <Button variant="outline" onClick={handlePrev} disabled={currentStep === 1}>
+              Previous
+            </Button>
+            <Button onClick={handleNext}>
+              {currentStep === steps.length ? "Forge My Coin" : "Next Step"}
+            </Button>
+          </div>
+        </main>
+    </FormProvider>
+  );
 }
