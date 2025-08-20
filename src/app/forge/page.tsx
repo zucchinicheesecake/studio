@@ -133,7 +133,7 @@ export default function ForgePage() {
     <FormProvider {...methods}>
         <main className="container mx-auto px-4 py-12 flex flex-col items-center justify-center min-h-screen">
           <div className="text-center mb-4">
-              <h1 className="text-5xl font-headline font-bold text-primary">CoinGenius AI</h1>
+              <h1 className="text-5xl font-headline font-bold text-primary">CryptoForge</h1>
               <p className="mt-2 text-lg text-muted-foreground">Your AI partner for creating custom cryptocurrencies.</p>
           </div>
           <div className="w-full max-w-5xl">

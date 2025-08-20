@@ -1,11 +1,9 @@
+
 "use client";
 import { useFormContext } from "react-hook-form";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "../ui/button";
-import { HelpCircle } from "lucide-react";
-import { useExplanation } from "@/app/page";
 import { LabelWithExplain } from "./label-with-explain";
 
 export function Step3Economics() {
