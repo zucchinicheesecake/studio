@@ -3,8 +3,8 @@
 import { useFormContext } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 import { LabelWithExplain } from "./label-with-explain";
+import { AIInput } from "./ai-input";
 
 export function Step4TokenStrategy() {
   const { control } = useFormContext();
@@ -23,7 +23,8 @@ export function Step4TokenStrategy() {
             <FormItem>
               <LabelWithExplain label="Token Utility" concept="Token Utility" />
               <FormControl>
-                <Textarea
+                <AIInput
+                  label="Token Utility"
                   placeholder="What is the token used for? (e.g., Governance votes, paying transaction fees, staking for rewards, accessing exclusive features)."
                   className="resize-y"
                   {...field}
@@ -40,7 +41,8 @@ export function Step4TokenStrategy() {
             <FormItem>
               <LabelWithExplain label="Initial Distribution Plan" concept="Token Distribution" />
               <FormControl>
-                <Textarea
+                <AIInput
+                  label="Initial Distribution Plan"
                   placeholder="How will the tokens be allocated at launch? (e.g., 50% to the community treasury, 20% to the team (vested), 20% to early investors, 10% for an airdrop)."
                   className="resize-y"
                   {...field}

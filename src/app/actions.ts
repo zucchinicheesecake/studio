@@ -14,6 +14,7 @@ import { generateSocialCampaign } from "@/ai/flows/generate-social-campaign";
 import { generatePitchDeck } from "@/ai/flows/generate-pitch-deck";
 import { generateTokenomicsModel } from "@/ai/flows/generate-tokenomics-model";
 import { generateCommunityStrategy } from "@/ai/flows/generate-community-strategy";
+import { suggestTextForField as suggestTextForFieldFlow, type SuggestTextForFieldInput } from "@/ai/flows/suggest-text";
 import type { FormValues, GenerationResult, Project } from "@/app/types";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp, getDocs, query, orderBy, doc, getDoc } from "firebase/firestore";
@@ -47,8 +48,6 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
     const derivedParams = deriveTechnicalParams(values);
     const fullFormParams = { ...values, ...derivedParams };
 
-    const tokenomicsSummary = `Based on the project's utility and distribution plan: ${values.initialDistribution}`;
-
     const technicalSummary = `**${fullFormParams.coinName} (${fullFormParams.coinAbbreviation})** is a new cryptocurrency protocol driven by the mission: *"${values.missionStatement}"*. It uses the **${values.consensusMechanism}** consensus mechanism. The network is designed for a **${fullFormParams.targetSpacingInMinutes}-minute** block time. This project is tailored for **${values.targetAudience.toLowerCase()}** with a brand voice that is **${values.brandVoice.toLowerCase()}**.`;
 
     const results = await Promise.allSettled([
@@ -70,15 +69,12 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
         }),
         generateWhitepaper({
             ...fullFormParams,
-            tokenomics: tokenomicsSummary,
-            keyFeatures: derivedParams.keyFeatures
         }),
         generateAudioSummary({
             summary: technicalSummary.replace(/\*\*/g, '').replace(/\*/g, ''), // remove markdown for TTS
         }),
         generateLandingPage({
             ...fullFormParams,
-            tokenomics: tokenomicsSummary,
         }),
         generateSocialCampaign({
             ...fullFormParams
@@ -168,6 +164,19 @@ export async function explainConcept(concept: string): Promise<string> {
     } catch (error) {
         console.error("Error explaining concept:", error);
         return "Sorry, I couldn't fetch an explanation at this time. Please try again later.";
+    }
+}
+
+export async function suggestTextForField(input: SuggestTextForFieldInput): Promise<string> {
+    try {
+        const result = await suggestTextForFieldFlow(input);
+        return result.suggestion;
+    } catch (error) {
+        console.error("Error suggesting text for field:", error);
+        if (error instanceof Error) {
+            return `AI suggestion failed: ${error.message}`;
+        }
+        return "AI suggestion failed. Please try again.";
     }
 }
 

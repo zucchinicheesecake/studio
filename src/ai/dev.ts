@@ -15,3 +15,4 @@ import '@/ai/flows/generate-social-campaign.ts';
 import '@/ai/flows/generate-pitch-deck.ts';
 import '@/ai/flows/generate-tokenomics-model.ts';
 import '@/ai/flows/generate-community-strategy.ts';
+import '@/ai/flows/suggest-text.ts';

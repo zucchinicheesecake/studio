@@ -3,8 +3,9 @@
 import { useFormContext } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 import { LabelWithExplain } from "./label-with-explain";
+import { AIInput } from "./ai-input";
+
 
 export function Step2TargetAudience() {
   const { control } = useFormContext();
@@ -23,7 +24,8 @@ export function Step2TargetAudience() {
             <FormItem>
               <LabelWithExplain label="Audience Profile" concept="Target Audience" />
               <FormControl>
-                <Textarea
+                <AIInput
+                  label="Audience Profile"
                   placeholder="e.g., DeFi power users who are frustrated with high gas fees. Or, artists and creators who want to monetize their work through NFTs."
                   className="resize-y h-36"
                   {...field}

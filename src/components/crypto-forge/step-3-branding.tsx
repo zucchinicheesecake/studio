@@ -3,7 +3,7 @@
 import { useFormContext } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
+import { AIInput } from "./ai-input";
 
 export function Step3Branding() {
   const { control } = useFormContext();
@@ -22,7 +22,8 @@ export function Step3Branding() {
             <FormItem>
               <FormLabel>Brand Voice & Tone</FormLabel>
               <FormControl>
-                <Textarea
+                <AIInput
+                  label="Brand Voice & Tone"
                   placeholder="e.g., Professional and trustworthy, aiming to attract institutional investors. Or, fun, quirky, and meme-friendly to build a viral community."
                   className="resize-y"
                   {...field}
@@ -39,7 +40,8 @@ export function Step3Branding() {
             <FormItem>
               <FormLabel>Logo Description</FormLabel>
               <FormControl>
-                <Textarea
+                <AIInput
+                  label="Logo Description"
                   placeholder="e.g., A minimalist geometric shape, like a stylized eagle, in shades of blue and silver."
                   className="resize-y"
                   {...field}

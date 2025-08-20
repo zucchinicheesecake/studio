@@ -5,7 +5,7 @@ import { useFormContext } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
+import { AIInput } from "./ai-input";
 
 export function Step1CoreConcept() {
   const { control } = useFormContext();
@@ -40,7 +40,8 @@ export function Step1CoreConcept() {
             <FormItem>
               <FormLabel>Mission Statement</FormLabel>
               <FormControl>
-                <Textarea
+                <AIInput
+                  label="Mission Statement"
                   placeholder="What is the ultimate goal of your project? What problem are you solving?"
                   className="resize-y"
                   {...field}
