@@ -3,6 +3,10 @@ import { useFormContext } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "../ui/button";
+import { HelpCircle } from "lucide-react";
+import { useExplanation } from "@/app/page";
+import { LabelWithExplain } from "./label-with-explain";
 
 export function Step3Economics() {
   const { control } = useFormContext();
@@ -16,21 +20,21 @@ export function Step3Economics() {
       <CardContent className="space-y-4">
         <FormField control={control} name="blockReward" render={({ field }) => (
             <FormItem>
-                <FormLabel>Block Reward</FormLabel>
+                <LabelWithExplain label="Block Reward" concept="Block Reward" />
                 <FormControl><Input type="number" placeholder="e.g., 50" {...field} /></FormControl>
                 <FormMessage />
             </FormItem>
         )} />
         <FormField control={control} name="blockHalving" render={({ field }) => (
             <FormItem>
-                <FormLabel>Block Halving Interval</FormLabel>
+                <LabelWithExplain label="Block Halving Interval" concept="Block Halving" />
                 <FormControl><Input type="number" placeholder="e.g., 210000" {...field} /></FormControl>
                 <FormMessage />
             </FormItem>
         )} />
         <FormField control={control} name="coinSupply" render={({ field }) => (
             <FormItem>
-                <FormLabel>Total Coin Supply</FormLabel>
+                <LabelWithExplain label="Total Coin Supply" concept="Total Coin Supply" />
                 <FormControl><Input type="number" placeholder="e.g., 21000000" {...field} /></FormControl>
                 <FormMessage />
             </FormItem>

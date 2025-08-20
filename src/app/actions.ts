@@ -8,6 +8,7 @@ import { provideNodeSetupMiningInstructions } from "@/ai/flows/provide-node-setu
 import { generateLogo } from "@/ai/flows/generate-logo";
 import { generateWhitepaper } from "@/ai/flows/generate-whitepaper";
 import { generateAudioSummary } from "@/ai/flows/generate-audio-summary";
+import { explainConcept as explainConceptFlow } from "@/ai/flows/explain-concept";
 import type { FormValues, GenerationResult } from "@/app/types";
 
 
@@ -99,6 +100,17 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
         audioDataUri: audioSummary.audioDataUri,
     };
 }
+
+export async function explainConcept(concept: string): Promise<string> {
+    try {
+        const result = await explainConceptFlow({ concept });
+        return result.explanation;
+    } catch (error) {
+        console.error("Error explaining concept:", error);
+        return "Sorry, I couldn't fetch an explanation at this time. Please try again later.";
+    }
+}
+
 
 // Helper type for Promise.allSettled
 type PromiseFulfillment<T> = {

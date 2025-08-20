@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, createContext, useContext } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { generateCrypto } from "@/app/actions";
+import { generateCrypto, explainConcept } from "@/app/actions";
 import { formSchema, type FormValues, type GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +17,7 @@ import { Step5Logo } from "@/components/crypto-forge/step-5-logo";
 import { Step6Whitepaper } from "@/components/crypto-forge/step-6-whitepaper";
 import { ResultsDisplay } from "@/components/crypto-forge/results-display";
 import { Loader2 } from "lucide-react";
+import { ExplanationDialog } from "@/components/crypto-forge/explanation-dialog";
 
 
 const steps = [
@@ -32,6 +33,8 @@ export default function Home() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<GenerationResult | null>(null);
+  const [explanation, setExplanation] = useState({ title: "", content: "", isLoading: false });
+
   const { toast } = useToast();
 
   const methods = useForm<FormValues>({
@@ -103,6 +106,13 @@ export default function Home() {
     methods.reset();
   }
 
+  const handleExplain = async (concept: string) => {
+    setExplanation({ title: concept, content: "", isLoading: true });
+    const explanationText = await explainConcept(concept);
+    setExplanation({ title: concept, content: explanationText, isLoading: false });
+  };
+
+
   if (isLoading) {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen text-center">
@@ -129,8 +139,13 @@ export default function Home() {
             <Stepper currentStep={currentStep} steps={steps.map(s => s.name)} />
           </div>
           <div className="w-full max-w-3xl mt-8">
-            <form onSubmit={handleSubmit(onSubmit)}>
-                {steps[currentStep-1].component}
+            <form onSubmit={handleSubmit(onSubmit)}
+                // By wrapping the component in a new context provider, we can pass down the `handleExplain` function
+                // to any of the step components without prop drilling.
+                >
+                <ExplanationContext.Provider value={{ handleExplain }}>
+                    {steps[currentStep-1].component}
+                </ExplanationContext.Provider>
             </form>
           </div>
           <div className="w-full max-w-3xl flex justify-between mt-8">
@@ -142,6 +157,24 @@ export default function Home() {
             </Button>
           </div>
         </main>
+        <ExplanationDialog
+            isOpen={!!explanation.title}
+            onOpenChange={(isOpen) => !isOpen && setExplanation({ title: "", content: "", isLoading: false })}
+            title={explanation.title}
+            content={explanation.content}
+            isLoading={explanation.isLoading}
+        />
     </FormProvider>
   );
 }
+
+
+type ExplanationContextType = {
+  handleExplain: (concept: string) => void;
+};
+// Create a context to hold the handleExplain function.
+// This avoids prop-drilling it down through multiple layers.
+const ExplanationContext = createContext<ExplanationContextType>({ handleExplain: () => {} });
+
+// Custom hook to easily access the context
+export const useExplanation = () => useContext(ExplanationContext);

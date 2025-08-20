@@ -8,3 +8,4 @@ import '@/ai/flows/provide-node-setup-mining-instructions.ts';
 import '@/ai/flows/generate-logo.ts';
 import '@/ai/flows/generate-whitepaper.ts';
 import '@/ai/flows/generate-audio-summary.ts';
+import '@/ai/flows/explain-concept.ts';

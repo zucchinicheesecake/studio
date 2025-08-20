@@ -3,7 +3,9 @@ import { useFormContext } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ShieldCheck, Layers, Cpu, Server } from "lucide-react";
+import { ShieldCheck, Layers, Cpu, Server, HelpCircle } from "lucide-react";
+import { useExplanation } from "@/app/page";
+import { Button } from "@/components/ui/button";
 
 const consensusOptions = [
   { value: "Scrypt - Proof of Work and Proof of Stake", label: "Scrypt - PoW & PoS", description: "A hybrid system combining mining and staking for network security.", icon: ShieldCheck },
@@ -15,11 +17,18 @@ const consensusOptions = [
 export function Step1Consensus() {
   const { control, watch } = useFormContext();
   const selectedMechanism = watch("consensusMechanism");
+  const { handleExplain } = useExplanation();
 
   return (
     <Card className="w-full bg-card/50">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl">Consensus Mechanism</CardTitle>
+        <div className="flex justify-between items-center">
+            <CardTitle className="font-headline text-2xl">Consensus Mechanism</CardTitle>
+            <Button variant="ghost" size="sm" onClick={() => handleExplain("Consensus Mechanism")}>
+                <HelpCircle className="mr-2 h-4 w-4"/>
+                Explain
+            </Button>
+        </div>
         <CardDescription>Choose the core engine that secures your cryptocurrency network.</CardDescription>
       </CardHeader>
       <CardContent>
