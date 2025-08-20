@@ -15,9 +15,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { HappyCoinIcon } from "@/components/icons/happy-coin-icon";
 import { Step1CoreConcept } from "@/components/crypto-forge/step-1-core-concept";
 import { Stepper } from "@/components/crypto-forge/stepper";
-import { Step2NetworkParameters } from "@/components/crypto-forge/step-2-network-parameters";
-import { Step3TechnicalDetails } from "@/components/crypto-forge/step-3-technical-details";
-import { Step4Consensus } from "@/components/crypto-forge/step-4-consensus";
+import { Step2BrandingAudience } from "@/components/crypto-forge/step-2-branding-audience";
+import { Step3Tokenomics } from "@/components/crypto-forge/step-3-tokenomics";
+import { Step4DistributionCommunity } from "@/components/crypto-forge/step-4-distribution-community";
+import { Step5TechnicalDetails } from "@/components/crypto-forge/step-5-technical-details";
+import { Step6NetworkParameters } from "@/components/crypto-forge/step-6-network-parameters";
 import { ExplanationContext } from "@/hooks/use-explanation";
 import { ExplanationDialog } from "@/components/crypto-forge/explanation-dialog";
 
@@ -27,9 +29,11 @@ type GenerationStep = { name: string; status: GenerationStepStatus; error?: stri
 
 const steps: { title: string, component: ReactNode }[] = [
     { title: "Core Concept", component: <Step1CoreConcept /> },
-    { title: "Network Parameters", component: <Step2NetworkParameters /> },
-    { title: "Technical Details", component: <Step3TechnicalDetails /> },
-    { title: "Consensus", component: <Step4Consensus /> },
+    { title: "Branding & Audience", component: <Step2BrandingAudience /> },
+    { title: "Tokenomics", component: <Step3Tokenomics /> },
+    { title: "Distribution & Community", component: <Step4DistributionCommunity /> },
+    { title: "Technical Details", component: <Step5TechnicalDetails /> },
+    { title: "Network Parameters", component: <Step6NetworkParameters /> },
 ];
 
 export default function ForgePage() {
@@ -50,7 +54,12 @@ export default function ForgePage() {
         projectName: "NovaNet",
         ticker: "NOV",
         missionStatement: "To build a decentralized, censorship-resistant internet for the next generation of web applications.",
+        targetAudience: "Developers and privacy advocates looking for a censorship-resistant platform.",
+        brandVoice: "Empowering, secure, and futuristic.",
         tagline: "The web, rebuilt.",
+        tokenUtility: "Governance, staking for network security, and paying for decentralized storage.",
+        initialDistribution: "50% to community treasury, 20% to team, 20% to early investors, 10% airdrop.",
+        communityStrategy: "Engage developers via hackathons, provide grants for dApp development, and maintain an active presence on tech forums.",
         logoDescription: "A stylized 'N' that looks like a shield or a network node, with circuit-like patterns. Colors should be electric blue and dark purple.",
         timestamp: `The Times 03/Jan/2009 Chancellor on brink of second bailout for banks`,
         blockReward: 50,
@@ -152,7 +161,7 @@ export default function ForgePage() {
 
   const handleBack = () => {
     if (currentStep > 0) {
-        setCurrentStep(prev => prev + 1);
+        setCurrentStep(prev => prev - 1);
     }
   };
 

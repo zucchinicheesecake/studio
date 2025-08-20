@@ -7,15 +7,28 @@ const numberField = z.preprocess(
 );
 
 export const formSchema = z.object({
-  // Step 1: Project Identity
+  // Step 1: Core Concept
   projectName: z.string().min(1, "Project name is required."),
   ticker: z.string().min(1, "Ticker is required.").max(5, "Ticker is too long."),
   missionStatement: z.string().min(1, "Mission statement is required."),
+
+  // Step 2: Branding & Audience
+  targetAudience: z.string().min(1, "Target audience is required."),
+  brandVoice: z.string().min(1, "Brand voice is required."),
   tagline: z.string().min(1, "A tagline is required."),
+
+  // Step 3: Tokenomics
+  tokenUtility: z.string().min(1, "Token utility is required."),
+
+  // Step 4: Distribution & Community
+  initialDistribution: z.string().min(1, "Initial distribution plan is required."),
+  communityStrategy: z.string().min(1, "Community strategy is required."),
+  
+  // Step 5: Technical Details
   logoDescription: z.string().min(1, "Please provide a logo description."),
   timestamp: z.string().min(1, "Genesis block timestamp message is required."),
   
-  // Step 2: Blockchain Parameters
+  // Step 6: Network Parameters
   blockReward: numberField.describe('The number of coins received for mining a block.'),
   blockHalving: numberField.describe('The block number at which the block reward is halved.'),
   coinSupply: numberField.describe('The total number of coins that will be created.'),
