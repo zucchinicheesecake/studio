@@ -11,68 +11,96 @@ import { generateAudioSummary } from "@/ai/flows/generate-audio-summary";
 import { explainConcept as explainConceptFlow } from "@/ai/flows/explain-concept";
 import { generateLandingPage } from "@/ai/flows/generate-landing-page";
 import { generateSocialCampaign } from "@/ai/flows/generate-social-campaign";
+import { generatePitchDeck } from "@/ai/flows/generate-pitch-deck";
+import { generateTokenomicsModel } from "@/ai/flows/generate-tokenomics-model";
+import { generateCommunityStrategy } from "@/ai/flows/generate-community-strategy";
 import type { FormValues, GenerationResult, Project } from "@/app/types";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp, getDocs, query, orderBy, doc, getDoc } from "firebase/firestore";
 
 
+// Helper function to derive technical parameters from strategic inputs
+const deriveTechnicalParams = (values: FormValues) => {
+    // This is a simplified derivation. A real implementation could involve a separate AI call
+    // or more complex logic to determine these values based on the project's mission and utility.
+    return {
+        coinName: values.projectName,
+        coinAbbreviation: values.ticker,
+        addressLetter: values.ticker.charAt(0).toUpperCase(),
+        coinUnit: "sats", // a common default
+        blockReward: 50,
+        blockHalving: 210000,
+        coinSupply: 100000000,
+        coinbaseMaturity: 100,
+        numberOfConfirmations: 6,
+        targetSpacingInMinutes: 10,
+        targetTimespanInMinutes: 1440, // 1 day
+        problemStatement: `The current market lacks a solution for: ${values.missionStatement}`,
+        solutionStatement: `${values.projectName} addresses this by providing a platform that is ${values.brandVoice.toLowerCase()}.`,
+        keyFeatures: `- Core Utility: ${values.tokenUtility}\n- Target Audience Focus: ${values.targetAudience}\n- Decentralized Governance`,
+    };
+};
+
+
 export async function generateCrypto(values: FormValues): Promise<GenerationResult> {
-    const tokenomicsSummary = `Initial block reward of ${values.blockReward} ${values.coinAbbreviation}, halving every ${values.blockHalving} blocks, with a total supply of ${values.coinSupply} coins.`;
     
-    const technicalSummary = `You've chosen to build **${values.coinName} (${values.coinAbbreviation})**. It will use the **${values.consensusMechanism}** consensus mechanism. The network is designed for a **${values.targetSpacingInMinutes}-minute** block time, with a difficulty readjustment every **${values.targetTimespanInMinutes} minutes**. Miners will initially receive a reward of **${values.blockReward} ${values.coinAbbreviation}** per block, which will halve every **${values.blockHalving}** blocks, leading to a total supply of **${values.coinSupply} ${values.coinAbbreviation}**. Transactions will be considered confirmed after **${values.numberOfConfirmations}** blocks, and mined coins will mature after **${values.coinbaseMaturity}** blocks.`;
+    const derivedParams = deriveTechnicalParams(values);
+    const fullFormParams = { ...values, ...derivedParams };
+
+    const tokenomicsSummary = `Based on the project's utility and distribution plan: ${values.initialDistribution}`;
+
+    const technicalSummary = `**${fullFormParams.coinName} (${fullFormParams.coinAbbreviation})** is a new cryptocurrency protocol driven by the mission: *"${values.missionStatement}"*. It uses the **${values.consensusMechanism}** consensus mechanism. The network is designed for a **${fullFormParams.targetSpacingInMinutes}-minute** block time. This project is tailored for **${values.targetAudience.toLowerCase()}** with a brand voice that is **${values.brandVoice.toLowerCase()}**.`;
 
     const results = await Promise.allSettled([
         provideCompilationGuidance({
-            coinName: values.coinName,
-            consensusMechanism: values.consensusMechanism,
-            targetSpacing: values.targetSpacingInMinutes,
+            coinName: fullFormParams.coinName,
+            consensusMechanism: values.consensusMechanism!,
+            targetSpacing: fullFormParams.targetSpacingInMinutes,
         }),
         generateGenesisBlockCode({
-            coinName: values.coinName,
-            coinAbbreviation: values.coinAbbreviation,
-            addressLetter: values.addressLetter,
-            coinUnit: values.coinUnit,
-            timestamp: values.timestamp,
-            blockReward: values.blockReward,
-            blockHalving: values.blockHalving,
-            coinSupply: values.coinSupply,
+            ...derivedParams,
+            timestamp: values.timestamp!,
         }),
         createNetworkConfigurationFile({
-            ...values,
-            targetSpacingInMinutes: values.targetSpacingInMinutes,
-            targetTimespanInMinutes: values.targetTimespanInMinutes,
+            ...derivedParams,
         }),
         generateLogo({
-            coinName: values.coinName,
+            coinName: fullFormParams.coinName,
             logoDescription: values.logoDescription,
         }),
         generateWhitepaper({
-            coinName: values.coinName,
-            coinAbbreviation: values.coinAbbreviation,
-            problemStatement: values.problemStatement,
-            solutionStatement: values.solutionStatement,
-            keyFeatures: values.keyFeatures,
-            consensusMechanism: values.consensusMechanism,
+            ...fullFormParams,
             tokenomics: tokenomicsSummary,
+            keyFeatures: derivedParams.keyFeatures
         }),
         generateAudioSummary({
-            summary: technicalSummary.replace(/\*\*/g, ''), // remove markdown for TTS
+            summary: technicalSummary.replace(/\*\*/g, '').replace(/\*/g, ''), // remove markdown for TTS
         }),
         generateLandingPage({
-            ...values,
+            ...fullFormParams,
             tokenomics: tokenomicsSummary,
         }),
         generateSocialCampaign({
-            coinName: values.coinName,
-            coinAbbreviation: values.coinAbbreviation,
-            problemStatement: values.problemStatement,
-            solutionStatement: values.solutionStatement,
-            keyFeatures: values.keyFeatures,
-            websiteUrl: values.websiteUrl,
+            ...fullFormParams
         }),
+        generatePitchDeck({ ...values }),
+        generateTokenomicsModel({ ...values }),
+        generateCommunityStrategy({ ...values }),
     ]);
 
-    const [compilationGuidanceResult, genesisBlockResult, networkConfigResult, logoResult, whitepaperResult, audioSummaryResult, landingPageResult, socialCampaignResult] = results;
+    const [
+        compilationGuidanceResult, 
+        genesisBlockResult, 
+        networkConfigResult, 
+        logoResult, 
+        whitepaperResult, 
+        audioSummaryResult, 
+        landingPageResult, 
+        socialCampaignResult,
+        pitchDeckResult,
+        tokenomicsModelResult,
+        communityStrategyResult
+    ] = results;
 
     const failedSteps = results
         .map((result, index) => (result.status === 'rejected' ? [
@@ -84,6 +112,9 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
             'Audio Summary',
             'Landing Page',
             'Social Campaign',
+            'Pitch Deck',
+            'Tokenomics Model',
+            'Community Strategy',
         ][index] : null))
         .filter(Boolean);
 
@@ -99,11 +130,14 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
     const audioSummary = (audioSummaryResult as PromiseFulfillment<any>).value;
     const landingPage = (landingPageResult as PromiseFulfillment<any>).value;
     const socialCampaign = (socialCampaignResult as PromiseFulfillment<any>).value;
+    const pitchDeck = (pitchDeckResult as PromiseFulfillment<any>).value;
+    const tokenomicsModel = (tokenomicsModelResult as PromiseFulfillment<any>).value;
+    const communityStrategy = (communityStrategyResult as PromiseFulfillment<any>).value;
 
 
     const nodeSetupInstructions = await provideNodeSetupMiningInstructions({
-        coinName: values.coinName,
-        coinSymbol: values.coinAbbreviation,
+        coinName: fullFormParams.coinName,
+        coinSymbol: fullFormParams.coinAbbreviation,
         genesisBlockCode: genesisBlock.genesisBlockCode,
         networkParameters: networkConfig.networkConfigurationFile,
         compilationInstructions: compilationGuidance.compilationInstructions,
@@ -120,6 +154,9 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
         whitepaperContent: whitepaper.whitepaperContent,
         audioDataUri: audioSummary.audioDataUri,
         landingPageCode: landingPage.landingPageCode,
+        pitchDeckContent: pitchDeck.pitchDeckContent,
+        tokenomicsModelContent: tokenomicsModel.tokenomicsModelContent,
+        communityStrategyContent: communityStrategy.communityStrategyContent,
         ...socialCampaign,
     };
 }

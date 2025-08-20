@@ -2,31 +2,27 @@
 import { z } from "zod";
 
 export const formSchema = z.object({
-  // Step 1
-  consensusMechanism: z.string().min(1, "Please select a consensus mechanism."),
-  // Step 2
-  coinName: z.string().min(1, "Coin name is required."),
-  coinAbbreviation: z.string().min(1, "Abbreviation is required.").max(5, "Abbreviation is too long."),
-  addressLetter: z.string().min(1, "Address letter is required."),
-  coinUnit: z.string().min(1, "Coin unit is required."),
-  timestamp: z.string().min(1, "Timestamp is required."),
+  // Step 1: Core Concept
+  projectName: z.string().min(1, "Project name is required."),
+  ticker: z.string().min(1, "Ticker is required.").max(5, "Ticker is too long."),
+  missionStatement: z.string().min(1, "Mission statement is required."),
+  
+  // Step 2: Target Audience
+  targetAudience: z.string().min(1, "Please describe your target audience."),
+  
+  // Step 3: Branding
+  brandVoice: z.string().min(1, "Please describe your brand voice."),
+  logoDescription: z.string().min(1, "Please provide a logo description."),
+  
+  // Step 4: Token Strategy
+  tokenUtility: z.string().min(1, "Please describe the token's utility."),
+  initialDistribution: z.string().min(1, "Please describe the initial token distribution plan."),
+  
+  // Implicitly derived or default values, no longer in the form
   websiteUrl: z.string().url().optional().or(z.literal('')),
   githubUrl: z.string().url().optional().or(z.literal('')),
-  // Step 3
-  blockReward: z.coerce.number().min(0, "Block reward must be a positive number."),
-  blockHalving: z.coerce.number().min(1, "Block halving must be at least 1."),
-  coinSupply: z.coerce.number().min(1, "Coin supply must be at least 1."),
-  // Step 4
-  coinbaseMaturity: z.coerce.number().min(1, "Coinbase maturity must be at least 1."),
-  numberOfConfirmations: z.coerce.number().min(1, "Number of confirmations must be at least 1."),
-  targetSpacingInMinutes: z.coerce.number().min(1, "Target spacing must be at least 1 minute."),
-  targetTimespanInMinutes: z.coerce.number().min(1, "Target timespan must be at least 1 minute."),
-  // Step 5
-  logoDescription: z.string().min(1, "Please provide a logo description."),
-  // Step 6
-  problemStatement: z.string().min(1, "Problem statement is required."),
-  solutionStatement: z.string().min(1, "Solution statement is required."),
-  keyFeatures: z.string().min(1, "Key features are required."),
+  consensusMechanism: z.string().optional().default("Scrypt - Proof of Work and Proof of Stake"),
+  timestamp: z.string().optional().default("The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"),
 });
 
 export type FormValues = z.infer<typeof formSchema>;
@@ -45,6 +41,10 @@ export type GenerationResult = {
     twitterCampaign: string;
     linkedInPost: string;
     communityWelcome: string;
+    // New strategic assets
+    pitchDeckContent: string;
+    tokenomicsModelContent: string;
+    communityStrategyContent: string;
 };
 
 // This represents a project as it is stored in and retrieved from Firestore

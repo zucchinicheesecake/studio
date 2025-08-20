@@ -1,3 +1,4 @@
+
 import { config } from 'dotenv';
 config();
 
@@ -11,3 +12,6 @@ import '@/ai/flows/generate-audio-summary.ts';
 import '@/ai/flows/explain-concept.ts';
 import '@/ai/flows/generate-landing-page.ts';
 import '@/ai/flows/generate-social-campaign.ts';
+import '@/ai/flows/generate-pitch-deck.ts';
+import '@/ai/flows/generate-tokenomics-model.ts';
+import '@/ai/flows/generate-community-strategy.ts';

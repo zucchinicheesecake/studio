@@ -1,53 +1,55 @@
 
 "use client";
 import { useFormContext } from "react-hook-form";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import { LabelWithExplain } from "./label-with-explain";
 
-export function Step4Network() {
+export function Step4TokenStrategy() {
   const { control } = useFormContext();
 
   return (
     <Card className="w-full bg-card/50">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl">Network Configuration</CardTitle>
-        <CardDescription>Fine-tune the technical parameters that govern network operations.</CardDescription>
+        <CardTitle className="font-headline text-2xl">Token Strategy</CardTitle>
+        <CardDescription>Define the purpose and economic design of your project's token.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField control={control} name="coinbaseMaturity" render={({ field }) => (
-                <FormItem>
-                    <LabelWithExplain label="Coinbase Maturity" concept="Coinbase Maturity" />
-                    <FormControl><Input type="number" placeholder="e.g., 100" {...field} /></FormControl>
-                    <FormMessage />
-                </FormItem>
-            )} />
-            <FormField control={control} name="numberOfConfirmations" render={({ field }) => (
-                <FormItem>
-                    <LabelWithExplain label="Transaction Confirmations" concept="Number of Confirmations" />
-                    <FormControl><Input type="number" placeholder="e.g., 6" {...field} /></FormControl>
-                    <FormMessage />
-                </FormItem>
-            )} />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField control={control} name="targetSpacingInMinutes" render={({ field }) => (
-                <FormItem>
-                    <LabelWithExplain label="Target Spacing (Minutes)" concept="Target Spacing" />
-                    <FormControl><Input type="number" placeholder="e.g., 10" {...field} /></FormControl>
-                    <FormMessage />
-                </FormItem>
-            )} />
-            <FormField control={control} name="targetTimespanInMinutes" render={({ field }) => (
-                <FormItem>
-                    <LabelWithExplain label="Target Timespan (Minutes)" concept="Target Timespan" />
-                    <FormControl><Input type="number" placeholder="e.g., 1440" {...field} /></FormControl>
-                    <FormMessage />
-                </FormItem>
-            )} />
-        </div>
+        <FormField
+          control={control}
+          name="tokenUtility"
+          render={({ field }) => (
+            <FormItem>
+              <LabelWithExplain label="Token Utility" concept="Token Utility" />
+              <FormControl>
+                <Textarea
+                  placeholder="What is the token used for? (e.g., Governance votes, paying transaction fees, staking for rewards, accessing exclusive features)."
+                  className="resize-y"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="initialDistribution"
+          render={({ field }) => (
+            <FormItem>
+              <LabelWithExplain label="Initial Distribution Plan" concept="Token Distribution" />
+              <FormControl>
+                <Textarea
+                  placeholder="How will the tokens be allocated at launch? (e.g., 50% to the community treasury, 20% to the team (vested), 20% to early investors, 10% for an airdrop)."
+                  className="resize-y"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </CardContent>
     </Card>
   );

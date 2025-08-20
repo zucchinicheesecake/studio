@@ -19,18 +19,18 @@ export function ProjectCard({ project }: ProjectCardProps) {
             <CardHeader className="flex-row gap-4 items-center">
                 <Image 
                     src={logoDataUri}
-                    alt={`${formValues.coinName} logo`}
+                    alt={`${formValues.projectName} logo`}
                     width={50}
                     height={50}
                     className="rounded-full border-2 border-primary/50"
                 />
                 <div>
-                    <CardTitle className="font-headline text-xl">{formValues.coinName}</CardTitle>
-                    <CardDescription>{formValues.coinAbbreviation}</CardDescription>
+                    <CardTitle className="font-headline text-xl">{formValues.projectName}</CardTitle>
+                    <CardDescription>{formValues.ticker}</CardDescription>
                 </div>
             </CardHeader>
             <CardContent className="flex-grow">
-                 <p className="text-sm text-muted-foreground line-clamp-3">{project.formValues.problemStatement}</p>
+                 <p className="text-sm text-muted-foreground line-clamp-3">{project.formValues.missionStatement}</p>
             </CardContent>
             <CardFooter className="flex justify-between items-center">
                 <p className="text-xs text-muted-foreground">

@@ -12,13 +12,14 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateWhitepaperInputSchema = z.object({
-  coinName: z.string().describe('The name of the cryptocurrency.'),
-  coinAbbreviation: z.string().describe('The abbreviation for the cryptocurrency (e.g., BTC).'),
-  problemStatement: z.string().describe('The problem the cryptocurrency aims to solve.'),
-  solutionStatement: z.string().describe('How the cryptocurrency solves the problem.'),
-  keyFeatures: z.string().describe('A summary of the key features of the cryptocurrency.'),
+  projectName: z.string().describe('The name of the cryptocurrency project.'),
+  ticker: z.string().describe('The ticker symbol for the cryptocurrency (e.g., BTC).'),
+  missionStatement: z.string().describe("The project's core mission statement."),
+  targetAudience: z.string().describe('The target audience for the project.'),
+  brandVoice: z.string().describe('The brand voice and tone.'),
+  tokenUtility: z.string().describe("The utility of the project's token."),
+  initialDistribution: z.string().describe('The plan for initial token distribution.'),
   consensusMechanism: z.string().describe('The consensus mechanism used.'),
-  tokenomics: z.string().describe('A summary of the coin\'s tokenomics (supply, distribution, etc.).'),
 });
 
 export type GenerateWhitepaperInput = z.infer<
@@ -45,28 +46,29 @@ const prompt = ai.definePrompt({
   output: {schema: GenerateWhitepaperOutputSchema},
   prompt: `You are an expert in writing compelling and professional cryptocurrency whitepapers.
 
-  Based on the following parameters, generate a detailed whitepaper in Markdown format for the new cryptocurrency, {{{coinName}}} ({{{coinAbbreviation}}}).
+  Based on the following strategic inputs, generate a detailed whitepaper in Markdown format for the new project, {{{projectName}}} ({{{ticker}}}).
 
   ## Core Concepts
-  - **Problem Statement:** {{{problemStatement}}}
-  - **Proposed Solution:** {{{solutionStatement}}}
-  - **Key Features:** {{{keyFeatures}}}
+  - **Mission:** {{{missionStatement}}}
+  - **Target Audience:** {{{targetAudience}}}
 
-  ## Technical Details
+  ## Technical & Economic Details
   - **Consensus Mechanism:** {{{consensusMechanism}}}
-  - **Tokenomics Summary:** {{{tokenomics}}}
+  - **Token Utility:** {{{tokenUtility}}}
+  - **Initial Distribution:** {{{initialDistribution}}}
 
   Structure the whitepaper with the following sections:
   1.  **Abstract:** A brief summary of the entire paper.
-  2.  **Introduction:** Elaborate on the problem statement. Discuss the current landscape and the opportunity for {{{coinName}}}.
-  3.  **Solution: The {{{coinName}}} Protocol:** Detail the proposed solution. Explain the architecture and how it works.
-  4.  **Key Features:** Describe the key features in detail.
-  5.  **Tokenomics:** Provide a detailed breakdown of the {{{coinAbbreviation}}} tokenomics, including total supply, distribution plan, and utility.
-  6.  **Consensus:** Explain the chosen consensus mechanism ({{{consensusMechanism}}}) and why it was selected.
-  7.  **Roadmap:** Create a plausible future roadmap with milestones (e.g., Mainnet Launch, Wallet Development, Exchange Listings, Community Growth).
-  8.  **Conclusion:** Summarize the paper and reiterate the vision for {{{coinName}}}.
+  2.  **Introduction:** Elaborate on the problem {{{projectName}}} solves, derived from its mission. Discuss the current landscape and the opportunity.
+  3.  **Vision & Mission:** Detail the project's long-term vision and core mission.
+  4.  **The {{{projectName}}} Protocol:** Explain the architecture and how it works, tying it back to the mission.
+  5.  **Target Audience Analysis:** Describe the target audience and why {{{projectName}}} is valuable to them.
+  6.  **Tokenomics: The {{{ticker}}} Token:** Provide a detailed breakdown of the token model, including utility, supply, and the distribution plan.
+  7.  **Consensus:** Explain the chosen consensus mechanism ({{{consensusMechanism}}}) and why it fits the project's goals.
+  8.  **Roadmap:** Create a plausible future roadmap with milestones (e.g., Testnet Launch, Mainnet Launch, dApp Ecosystem Growth, DAO Formation).
+  9.  **Conclusion:** Summarize the paper and reiterate the transformative potential of {{{projectName}}}.
 
-  The tone should be professional, authoritative, and optimistic. The content should be well-organized and easy to read. Ensure the output is valid Markdown.
+  The tone should reflect the specified brand voice: '{{{brandVoice}}}'. The content must be well-organized, professional, and easy to read. Ensure the output is valid Markdown.
   `,
 });
 

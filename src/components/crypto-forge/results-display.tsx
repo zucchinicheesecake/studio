@@ -7,11 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CodeBlock } from "@/components/crypto-forge/code-block";
 import type { GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
-import { Download, Linkedin, MessageSquare, Twitter, TrendingUp, Save, Loader2, CheckCircle, ArrowLeft, FileCode, Presentation } from "lucide-react";
+import { Download, Linkedin, MessageSquare, Twitter, TrendingUp, Save, Loader2, CheckCircle, ArrowLeft, FileCode, Presentation, Briefcase, Users } from "lucide-react";
 import Image from "next/image";
 import { LandingPage } from "@/components/crypto-forge/landing-page";
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
-import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { saveProject } from "@/app/actions";
@@ -57,57 +55,12 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
     }
   };
 
-  const tokenomicsData = useMemo(() => {
-    const { blockReward, blockHalving, coinSupply } = results.formValues;
-    const data = [];
-    let currentSupply = 0;
-    let currentReward = blockReward;
-    let blocks = 0;
-    let halvings = 0;
-
-    const HALVING_LIMIT = 10; // Show first 10 halving events
-
-    // Initial state
-    data.push({ name: `Year 0`, 'Total Supply': 0 });
-
-    while (currentSupply < coinSupply && halvings < HALVING_LIMIT) {
-        currentSupply += currentReward * blockHalving;
-        blocks += blockHalving;
-        halvings++;
-        
-        data.push({
-            name: `Halving ${halvings}`,
-            'Total Supply': Math.min(currentSupply, coinSupply),
-        });
-
-        currentReward /= 2;
-    }
-    
-    // Ensure final supply is shown
-    if (data[data.length -1]['Total Supply'] < coinSupply) {
-        data.push({
-            name: 'Max Supply',
-            'Total Supply': coinSupply
-        });
-    }
-
-    return data;
-
-  }, [results.formValues]);
-
-  const chartConfig = {
-    supply: {
-      label: "Total Supply",
-      color: "hsl(var(--primary))",
-    },
-  };
-
   return (
     <div className="w-full max-w-7xl mx-auto py-12 px-4">
       <div className="text-center mb-8">
-        <h1 className="text-5xl font-headline font-bold text-primary">{isSavedProject ? results.formValues.coinName : "Your Cryptocurrency is Ready!"}</h1>
+        <h1 className="text-5xl font-headline font-bold text-primary">{isSavedProject ? results.formValues.projectName : "Your Crypto Project is Ready!"}</h1>
         <p className="text-muted-foreground mt-2 text-lg">
-          {isSavedProject ? `Viewing saved project details for ${results.formValues.coinAbbreviation}.` : "Congratulations! Below are the generated assets for your new coin."}
+          {isSavedProject ? `Viewing saved project details for ${results.formValues.ticker}.` : "Congratulations! Below are the generated assets for your new project."}
         </p>
       </div>
       
@@ -123,8 +76,8 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
                 />
             </div>
             <div className="flex-grow">
-                <CardTitle className="font-headline text-3xl">{isSavedProject ? "Project Overview" : "Launch Your Coin!"}</CardTitle>
-                <CardDescription className="mt-2 text-base">{isSavedProject ? `Created on ${new Date(results.createdAt!).toLocaleDateString()}` : "You have everything you need. Follow the compilation and node setup guides to bring your cryptocurrency to life."}</CardDescription>
+                <CardTitle className="font-headline text-3xl">{isSavedProject ? "Project Overview" : "Launch Your Project!"}</CardTitle>
+                <CardDescription className="mt-2 text-base">{isSavedProject ? `Created on ${new Date(results.createdAt!).toLocaleDateString()}` : "You have everything you need. Follow the guides to bring your project to life."}</CardDescription>
             </div>
              {user && !isSavedProject && (
                 <div className="flex-shrink-0">
@@ -143,15 +96,49 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
       </Card>
 
 
-      <Tabs defaultValue="brand-assets" className="w-full">
+      <Tabs defaultValue="strategy-assets" className="w-full">
         <TabsList className="grid w-full grid-cols-1 md:grid-cols-3">
-          <TabsTrigger value="brand-assets"><Presentation className="mr-2" /> Brand & Marketing</TabsTrigger>
-          <TabsTrigger value="tokenomics"><TrendingUp className="mr-2"/> Tokenomics</TabsTrigger>
+          <TabsTrigger value="strategy-assets"><Briefcase className="mr-2" /> Strategic Assets</TabsTrigger>
+          <TabsTrigger value="marketing-assets"><Presentation className="mr-2" /> Brand & Marketing</TabsTrigger>
           <TabsTrigger value="developer-assets"><FileCode className="mr-2" /> Developer Assets</TabsTrigger>
         </TabsList>
 
-        <TabContentCard value="brand-assets">
-            <CardHeader className="flex flex-row justify-between items-start">
+        <TabContentCard value="strategy-assets">
+            <CardHeader>
+              <div>
+                <CardTitle>Go-to-Market Strategy</CardTitle>
+                <CardDescription>Your strategic documents for investors, partners, and your community.</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-8">
+                <ResultSection
+                    title="Investor Pitch Deck"
+                    filename="PitchDeck.md"
+                    content={results.pitchDeckContent}
+                >
+                    <CodeBlock code={results.pitchDeckContent} language="markdown" />
+                </ResultSection>
+                <Separator />
+                <ResultSection
+                    title="Tokenomics Model"
+                    filename="Tokenomics.md"
+                    content={results.tokenomicsModelContent}
+                >
+                    <CodeBlock code={results.tokenomicsModelContent} language="markdown" />
+                </ResultSection>
+                <Separator />
+                <ResultSection
+                    title="Community Building Strategy"
+                    filename="CommunityStrategy.md"
+                    content={results.communityStrategyContent}
+                >
+                    <CodeBlock code={results.communityStrategyContent} language="markdown" />
+                </ResultSection>
+            </CardContent>
+        </TabContentCard>
+
+        <TabContentCard value="marketing-assets">
+            <CardHeader>
               <div>
                 <CardTitle>Landing Page & Marketing Kit</CardTitle>
                 <CardDescription>Your public-facing assets. Use these to build your brand and community.</CardDescription>
@@ -202,67 +189,12 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
                         </div>
                     </div>
                 </div>
-
             </CardContent>
         </TabContentCard>
         
-        <TabContentCard value="tokenomics">
-            <CardHeader>
-                <CardTitle className="flex items-center">Tokenomics & Technical Summary</CardTitle>
-                <CardDescription>The economic model and technical parameters of your cryptocurrency.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-8">
-                <div>
-                     <h3 className="font-headline text-xl text-primary mb-4">Supply Projection</h3>
-                    <ChartContainer config={chartConfig} className="h-[400px] w-full">
-                        <LineChart data={tokenomicsData} margin={{ top: 20, right: 40, bottom: 20, left: 20 }}>
-                            <CartesianGrid vertical={false} />
-                            <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} />
-                            <YAxis 
-                                tickFormatter={(value) => typeof value === 'number' ? value.toLocaleString() : value}
-                                tickLine={false}
-                                axisLine={false}
-                                tickMargin={8}
-                                width={80}
-                             />
-                            <Tooltip
-                                cursor={false}
-                                content={<ChartTooltipContent
-                                    indicator="dot"
-                                    formatter={(value) => typeof value === 'number' ? value.toLocaleString() : value}
-                                />}
-                            />
-                            <Line
-                                dataKey="Total Supply"
-                                type="monotone"
-                                stroke="var(--color-supply)"
-                                strokeWidth={2}
-                                dot={true}
-                            />
-                        </LineChart>
-                    </ChartContainer>
-                </div>
-                 <div>
-                    <div className="flex justify-between items-start mb-4">
-                        <div>
-                             <h3 className="font-headline text-xl text-primary">Technical Summary</h3>
-                             <p className="text-muted-foreground">A recap of your coin's key parameters.</p>
-                        </div>
-                        {results.audioDataUri && (
-                            <audio controls src={results.audioDataUri} className="max-h-10">
-                                Your browser does not support the audio element.
-                            </audio>
-                        )}
-                    </div>
-                    <div className="prose prose-invert max-w-none prose-p:text-base prose-strong:text-primary p-4 bg-black/30 rounded-lg" dangerouslySetInnerHTML={{ __html: results.technicalSummary.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}></div>
-                 </div>
-
-            </CardContent>
-        </TabContentCard>
-
         <TabContentCard value="developer-assets">
            <CardHeader>
-                <CardTitle>Developer Assets</CardTitle>
+                <CardTitle>Developer Assets & Technical Summary</CardTitle>
                 <CardDescription>The core code and instructions needed to compile, run, and maintain your network.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-8">
@@ -303,6 +235,24 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
                 >
                     <CodeBlock code={results.nodeSetupInstructions} language="markdown" />
                 </ResultSection>
+
+                <Separator />
+
+                 <div>
+                    <div className="flex justify-between items-start mb-4">
+                        <div>
+                             <h3 className="font-headline text-xl text-primary">Technical Summary</h3>
+                             <p className="text-muted-foreground">A recap of your coin's key parameters.</p>
+                        </div>
+                        {results.audioDataUri && (
+                            <audio controls src={results.audioDataUri} className="max-h-10">
+                                Your browser does not support the audio element.
+                            </audio>
+                        )}
+                    </div>
+                    <div className="prose prose-invert max-w-none prose-p:text-base prose-strong:text-primary p-4 bg-black/30 rounded-lg" dangerouslySetInnerHTML={{ __html: results.technicalSummary.replace(/\*\*/g, '<strong>').replace(/\*/g, '</strong>') }}></div>
+                 </div>
+
             </CardContent>
         </TabContentCard>
 
@@ -314,7 +264,7 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
             <Link href="/dashboard"><ArrowLeft className="mr-2" /> Back to Dashboard</Link>
           </Button>
         ) : (
-          <Button onClick={onReset} size="lg">Create Another Coin</Button>
+          <Button onClick={onReset} size="lg">Create Another Project</Button>
         )}
       </div>
     </div>
@@ -363,5 +313,3 @@ const downloadFile = (filename: string, content: string) => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 };
-
-    

@@ -1,42 +1,54 @@
 
 "use client";
 import { useFormContext } from "react-hook-form";
-import { FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LabelWithExplain } from "./label-with-explain";
+import { Textarea } from "@/components/ui/textarea";
 
-export function Step3Economics() {
+export function Step3Branding() {
   const { control } = useFormContext();
 
   return (
     <Card className="w-full bg-card/50">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl">Economic Parameters</CardTitle>
-        <CardDescription>Set the rules for coin creation, rewards, and total supply.</CardDescription>
+        <CardTitle className="font-headline text-2xl">Brand & Identity</CardTitle>
+        <CardDescription>Define the personality of your project. How should it look, feel, and sound?</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <FormField control={control} name="blockReward" render={({ field }) => (
+         <FormField
+          control={control}
+          name="brandVoice"
+          render={({ field }) => (
             <FormItem>
-                <LabelWithExplain label="Block Reward" concept="Block Reward" />
-                <FormControl><Input type="number" placeholder="e.g., 50" {...field} /></FormControl>
-                <FormMessage />
+              <FormLabel>Brand Voice & Tone</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="e.g., Professional and trustworthy, aiming to attract institutional investors. Or, fun, quirky, and meme-friendly to build a viral community."
+                  className="resize-y"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
             </FormItem>
-        )} />
-        <FormField control={control} name="blockHalving" render={({ field }) => (
+          )}
+        />
+        <FormField
+          control={control}
+          name="logoDescription"
+          render={({ field }) => (
             <FormItem>
-                <LabelWithExplain label="Block Halving Interval" concept="Block Halving" />
-                <FormControl><Input type="number" placeholder="e.g., 210000" {...field} /></FormControl>
-                <FormMessage />
+              <FormLabel>Logo Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="e.g., A minimalist geometric shape, like a stylized eagle, in shades of blue and silver."
+                  className="resize-y"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
             </FormItem>
-        )} />
-        <FormField control={control} name="coinSupply" render={({ field }) => (
-            <FormItem>
-                <LabelWithExplain label="Total Coin Supply" concept="Total Coin Supply" />
-                <FormControl><Input type="number" placeholder="e.g., 21000000" {...field} /></FormControl>
-                <FormMessage />
-            </FormItem>
-        )} />
+          )}
+        />
       </CardContent>
     </Card>
   );
