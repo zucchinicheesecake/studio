@@ -46,3 +46,10 @@ export type GenerationResult = {
     linkedInPost: string;
     communityWelcome: string;
 };
+
+// This represents a project as it is stored in and retrieved from Firestore
+export type Project = GenerationResult & {
+    id: string;
+    userId: string;
+    createdAt: string; // Stored as a Timestamp, but converted to ISO string for client
+};

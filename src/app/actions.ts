@@ -11,9 +11,9 @@ import { generateAudioSummary } from "@/ai/flows/generate-audio-summary";
 import { explainConcept as explainConceptFlow } from "@/ai/flows/explain-concept";
 import { generateLandingPage } from "@/ai/flows/generate-landing-page";
 import { generateSocialCampaign } from "@/ai/flows/generate-social-campaign";
-import type { FormValues, GenerationResult } from "@/app/types";
+import type { FormValues, GenerationResult, Project } from "@/app/types";
 import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, getDocs, query, orderBy } from "firebase/firestore";
 
 
 export async function generateCrypto(values: FormValues): Promise<GenerationResult> {
@@ -154,6 +154,42 @@ export async function saveProject(projectData: GenerationResult, userId: string)
         throw new Error("An unknown error occurred while saving the project.");
     }
 }
+
+
+export async function getProjectsForUser(userId: string): Promise<Project[]> {
+    if (!userId) {
+        throw new Error("User must be logged in to view projects.");
+    }
+    try {
+        const projectCollection = collection(db, "users", userId, "projects");
+        const q = query(projectCollection, orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        
+        const projects: Project[] = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            // The `createdAt` field is a Firestore Timestamp object.
+            // We need to convert it to a serializable format (e.g., ISO string)
+            // for it to be passed from a server component to a client component.
+            const createdAt = (data.createdAt?.toDate?.() || new Date()).toISOString();
+
+            return {
+                id: doc.id,
+                ...data,
+                createdAt,
+            } as Project;
+        });
+
+        return projects;
+
+    } catch (error) {
+        console.error("Error fetching projects from Firestore:", error);
+        if (error instanceof Error) {
+            throw new Error(`Failed to fetch projects: ${error.message}`);
+        }
+        throw new Error("An unknown error occurred while fetching projects.");
+    }
+}
+
 
 
 // Helper type for Promise.allSettled

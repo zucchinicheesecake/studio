@@ -17,25 +17,53 @@ import { Label } from "@/components/ui/label";
 import { PlusCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import { getProjectsForUser } from "@/app/actions";
+import type { Project } from "@/app/types";
+import { useToast } from "@/hooks/use-toast";
+import { ProjectCard } from "@/components/dashboard/project-card";
 
 export default function DashboardPage() {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [authLoading, setAuthLoading] = useState(true);
+    const [projectsLoading, setProjectsLoading] = useState(false);
+    const [projects, setProjects] = useState<Project[]>([]);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
-
-    // This is a placeholder page. In the future, it will list the user's saved projects.
-    const projects = []; // Placeholder for saved projects
+    const { toast } = useToast();
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setUser(user);
-            setLoading(false);
+            setAuthLoading(false);
         });
         return () => unsubscribe();
     }, []);
+
+    useEffect(() => {
+        if (user) {
+            const fetchProjects = async () => {
+                setProjectsLoading(true);
+                try {
+                    const userProjects = await getProjectsForUser(user.uid);
+                    setProjects(userProjects);
+                } catch (err) {
+                    const errorMessage = err instanceof Error ? err.message : "Could not fetch projects.";
+                    toast({
+                        variant: "destructive",
+                        title: "Error",
+                        description: errorMessage
+                    });
+                } finally {
+                    setProjectsLoading(false);
+                }
+            };
+            fetchProjects();
+        } else {
+            // Clear projects if user logs out
+            setProjects([]);
+        }
+    }, [user, toast]);
 
     const handleAuthAction = async (action: 'signIn' | 'signUp', e: React.FormEvent) => {
         e.preventDefault();
@@ -56,7 +84,7 @@ export default function DashboardPage() {
         await signOut(auth);
     };
 
-    if (loading) {
+    if (authLoading) {
         return (
             <div className="flex h-screen w-full items-center justify-center">
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -107,7 +135,7 @@ export default function DashboardPage() {
                             <CardHeader>
                                 <CardTitle>Sign Up</CardTitle>
                                 <CardDescription>Create a new account to start building.</CardDescription>
-                            </CardHeader>
+                            </Header>
                             <CardContent>
                                 <form onSubmit={(e) => handleAuthAction('signUp', e)} className="space-y-4">
                                     <div className="space-y-2">
@@ -153,7 +181,11 @@ export default function DashboardPage() {
                     </Button>
                 </div>
 
-                {projects.length === 0 ? (
+                {projectsLoading ? (
+                     <div className="flex h-64 w-full items-center justify-center">
+                        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                    </div>
+                ) : projects.length === 0 ? (
                     <div className="text-center py-20 border-2 border-dashed border-border rounded-lg">
                         <h3 className="text-xl font-semibold text-muted-foreground">You haven't created any projects yet.</h3>
                         <p className="text-muted-foreground mt-2">Get started by creating your first cryptocurrency.</p>
@@ -163,7 +195,9 @@ export default function DashboardPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                       {/* Saved project cards will go here in a future update */}
+                       {projects.map((project) => (
+                           <ProjectCard key={project.id} project={project} />
+                       ))}
                     </div>
                 )}
             </main>
