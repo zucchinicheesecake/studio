@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Bot, Cpu, FileText } from "lucide-react";
 import Link from "next/link";
 import { HappyCoinIcon } from "@/components/icons/happy-coin-icon";
+import { EngineBotIcon } from "@/components/icons/engine-bot-icon";
 
 export default function LandingPage() {
   return (
@@ -45,7 +46,7 @@ export default function LandingPage() {
             <div className="max-w-4xl mx-auto bg-card/50 rounded-xl p-8 border border-border">
                 <div className="flex flex-col md:flex-row gap-8 items-center">
                     <div className="p-4 bg-primary/10 rounded-full">
-                         <Bot className="h-16 w-16 text-primary"/>
+                         <EngineBotIcon className="h-16 w-16 text-primary"/>
                     </div>
                     <div className="text-center md:text-left">
                         <h3 className="text-2xl font-bold font-headline">From Idea to Install Script, All Through Chat</h3>
