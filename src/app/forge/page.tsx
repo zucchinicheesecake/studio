@@ -96,72 +96,42 @@ export default function ForgePage() {
     setGenerationSteps(initialSteps);
 
     try {
-        const generatedAssets: Partial<GenerationResult> = { formValues: data };
-        
-        const updateStepStatus = (index: number, status: GenerationStepStatus, error?: string) => {
-            setGenerationSteps(prev => {
-                const newSteps = [...prev];
-                newSteps[index] = { ...newSteps[index], status, error };
-                return newSteps;
-            });
-        };
-        
-        // Step 1: Logo
-        updateStepStatus(0, 'generating');
-        try {
-            const logo = await actions.generateLogo({ coinName: data.projectName, logoDescription: data.logoDescription });
-            generatedAssets.logoDataUri = logo.logoDataUri;
-            updateStepStatus(0, 'success');
-        } catch(e: any) {
-            updateStepStatus(0, 'error', e.message);
-            throw new Error("Logo generation failed.");
-        }
+      const generationPromises = {
+        logo: actions.generateLogo({ coinName: data.projectName, logoDescription: data.logoDescription }),
+        genesis: actions.generateGenesisBlockCode({ coinName: data.projectName, ticker: data.ticker, timestamp: data.timestamp }),
+        networkConfig: actions.createNetworkConfigurationFile(data),
+        readme: actions.generateReadme({ projectName: data.projectName, ticker: data.ticker, missionStatement: data.missionStatement }),
+        installScript: actions.generateInstallScript({ projectName: data.projectName, ticker: data.ticker }),
+      };
+      
+      const updateStepStatus = (index: number, status: GenerationStepStatus, error?: string) => {
+          setGenerationSteps(prev => {
+              const newSteps = [...prev];
+              newSteps[index] = { ...newSteps[index], status, error };
+              return newSteps;
+          });
+      };
 
-        // Step 2: Genesis Block
-        updateStepStatus(1, 'generating');
-        try {
-            const genesis = await actions.generateGenesisBlockCode({ coinName: data.projectName, ticker: data.ticker, timestamp: data.timestamp });
-            generatedAssets.genesisBlockCode = genesis.genesisBlockCode;
-            updateStepStatus(1, 'success');
-        } catch(e: any) {
-            updateStepStatus(1, 'error', e.message);
-            throw new Error("Genesis block generation failed.");
-        }
+      // We'll update statuses manually as promises resolve or reject
+      generationPromises.logo.then(() => updateStepStatus(0, 'success')).catch(e => updateStepStatus(0, 'error', e.message));
+      generationPromises.genesis.then(() => updateStepStatus(1, 'success')).catch(e => updateStepStatus(1, 'error', e.message));
+      generationPromises.networkConfig.then(() => updateStepStatus(2, 'success')).catch(e => updateStepStatus(2, 'error', e.message));
+      generationPromises.readme.then(() => updateStepStatus(3, 'success')).catch(e => updateStepStatus(3, 'error', e.message));
+      generationPromises.installScript.then(() => updateStepStatus(4, 'success')).catch(e => updateStepStatus(4, 'error', e.message));
 
-        // Step 3: Network Config
-        updateStepStatus(2, 'generating');
-        try {
-            const networkConfig = await actions.createNetworkConfigurationFile(data);
-            generatedAssets.networkConfigurationFile = networkConfig.networkConfigurationFile;
-            updateStepStatus(2, 'success');
-        } catch(e: any) {
-            updateStepStatus(2, 'error', e.message);
-            throw new Error("Network config generation failed.");
-        }
+      // Visually indicate that all are generating
+      setGenerationSteps(initialSteps.map(step => ({...step, status: 'generating'})));
+      
+      const [logo, genesis, networkConfig, readme, installScript] = await Promise.all(Object.values(generationPromises));
 
-        // Step 4: README
-        updateStepStatus(3, 'generating');
-        try {
-            const readme = await actions.generateReadme({ projectName: data.projectName, ticker: data.ticker, missionStatement: data.missionStatement });
-            generatedAssets.readmeContent = readme.readmeContent;
-            updateStepStatus(3, 'success');
-        } catch(e: any) {
-            updateStepStatus(3, 'error', e.message);
-            throw new Error("README generation failed.");
-        }
-        
-        // Step 5: Install Script
-        updateStepStatus(4, 'generating');
-        try {
-            const installScript = await actions.generateInstallScript({ projectName: data.projectName, ticker: data.ticker });
-            generatedAssets.installScript = installScript.installScript;
-            updateStepStatus(4, 'success');
-        } catch(e: any) {
-            updateStepStatus(4, 'error', e.message);
-            throw new Error("Install script generation failed.");
-        }
-        
-        setResults(generatedAssets as GenerationResult);
+      setResults({
+        formValues: data,
+        logoDataUri: logo.logoDataUri,
+        genesisBlockCode: genesis.genesisBlockCode,
+        networkConfigurationFile: networkConfig.networkConfigurationFile,
+        readmeContent: readme.readmeContent,
+        installScript: installScript.installScript,
+      });
 
     } catch (e: any) {
         toast({

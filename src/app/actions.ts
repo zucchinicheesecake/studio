@@ -72,7 +72,6 @@ export async function generateInstallScript(input: GenerateInstallScriptInput) {
      try {
         return await generateInstallScriptFlow(input);
     } catch (error) {
-        console.error("Error in generateInstallScript:", error);
         if (error instanceof Error) {
             throw new Error(`Failed to generate installation script: ${error.message}`);
         }
