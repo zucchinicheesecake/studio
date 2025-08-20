@@ -10,3 +10,4 @@ import '@/ai/flows/generate-whitepaper.ts';
 import '@/ai/flows/generate-audio-summary.ts';
 import '@/ai/flows/explain-concept.ts';
 import '@/ai/flows/generate-landing-page.ts';
+import '@/ai/flows/generate-social-campaign.ts';

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CodeBlock } from "@/components/crypto-forge/code-block";
 import type { GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
-import { Download, Rocket, Volume2, Globe } from "lucide-react";
+import { Download, Rocket, Volume2, Globe, MessageSquare, Linkedin, Twitter } from "lucide-react";
 import Image from "next/image";
 import { LandingPage } from "@/components/crypto-forge/landing-page";
 
@@ -44,8 +44,9 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
 
 
       <Tabs defaultValue="landing-page" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-7 bg-card border-b">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-8 bg-card border-b">
           <TabsTrigger value="landing-page">Landing Page</TabsTrigger>
+          <TabsTrigger value="marketing-kit">Marketing Kit</TabsTrigger>
           <TabsTrigger value="summary">Summary</TabsTrigger>
           <TabsTrigger value="whitepaper">Whitepaper</TabsTrigger>
           <TabsTrigger value="genesis">Genesis Block</TabsTrigger>
@@ -67,6 +68,27 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
                             generatedCode={results.landingPageCode}
                         />
                     </div>
+                </div>
+            </CardContent>
+        </TabContentCard>
+
+        <TabContentCard value="marketing-kit">
+            <CardHeader>
+                <CardTitle>Marketing Kit</CardTitle>
+                <CardDescription>Use this content to announce your project and build a community.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div>
+                    <h3 className="font-headline text-xl text-primary mb-2 flex items-center"><Twitter className="mr-2 h-5 w-5" /> X (Twitter) Thread</h3>
+                    <CodeBlock code={results.twitterCampaign} language="markdown" />
+                </div>
+                <div>
+                    <h3 className="font-headline text-xl text-primary mb-2 flex items-center"><Linkedin className="mr-2 h-5 w-5" /> LinkedIn Post</h3>
+                    <CodeBlock code={results.linkedInPost} language="markdown" />
+                </div>
+                <div>
+                    <h3 className="font-headline text-xl text-primary mb-2 flex items-center"><MessageSquare className="mr-2 h-5 w-5" /> Discord/Telegram Welcome</h3>
+                    <CodeBlock code={results.communityWelcome} language="markdown" />
                 </div>
             </CardContent>
         </TabContentCard>

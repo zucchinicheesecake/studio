@@ -10,6 +10,7 @@ import { generateWhitepaper } from "@/ai/flows/generate-whitepaper";
 import { generateAudioSummary } from "@/ai/flows/generate-audio-summary";
 import { explainConcept as explainConceptFlow } from "@/ai/flows/explain-concept";
 import { generateLandingPage } from "@/ai/flows/generate-landing-page";
+import { generateSocialCampaign } from "@/ai/flows/generate-social-campaign";
 import type { FormValues, GenerationResult } from "@/app/types";
 
 
@@ -59,9 +60,17 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
             ...values,
             tokenomics: tokenomicsSummary,
         }),
+        generateSocialCampaign({
+            coinName: values.coinName,
+            coinAbbreviation: values.coinAbbreviation,
+            problemStatement: values.problemStatement,
+            solutionStatement: values.solutionStatement,
+            keyFeatures: values.keyFeatures,
+            websiteUrl: values.websiteUrl,
+        }),
     ]);
 
-    const [compilationGuidanceResult, genesisBlockResult, networkConfigResult, logoResult, whitepaperResult, audioSummaryResult, landingPageResult] = results;
+    const [compilationGuidanceResult, genesisBlockResult, networkConfigResult, logoResult, whitepaperResult, audioSummaryResult, landingPageResult, socialCampaignResult] = results;
 
     const failedSteps = results
         .map((result, index) => (result.status === 'rejected' ? [
@@ -72,6 +81,7 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
             'Whitepaper',
             'Audio Summary',
             'Landing Page',
+            'Social Campaign',
         ][index] : null))
         .filter(Boolean);
 
@@ -86,6 +96,7 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
     const whitepaper = (whitepaperResult as PromiseFulfillment<any>).value;
     const audioSummary = (audioSummaryResult as PromiseFulfillment<any>).value;
     const landingPage = (landingPageResult as PromiseFulfillment<any>).value;
+    const socialCampaign = (socialCampaignResult as PromiseFulfillment<any>).value;
 
 
     const nodeSetupInstructions = await provideNodeSetupMiningInstructions({
@@ -106,6 +117,7 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
         whitepaperContent: whitepaper.whitepaperContent,
         audioDataUri: audioSummary.audioDataUri,
         landingPageCode: landingPage.landingPageCode,
+        ...socialCampaign,
     };
 }
 

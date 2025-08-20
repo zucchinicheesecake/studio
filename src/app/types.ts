@@ -41,4 +41,7 @@ export type GenerationResult = {
     whitepaperContent: string;
     audioDataUri: string;
     landingPageCode: string;
+    twitterCampaign: string;
+    linkedInPost: string;
+    communityWelcome: string;
 };
