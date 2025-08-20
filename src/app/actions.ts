@@ -1,21 +1,13 @@
 
 "use server";
 
-import { provideCompilationGuidance } from "@/ai/flows/provide-compilation-guidance";
 import { generateGenesisBlockCode } from "@/ai/flows/generate-genesis-block-code";
 import { createNetworkConfigurationFile } from "@/ai/flows/create-network-configuration-file";
-import { provideNodeSetupMiningInstructions } from "@/ai/flows/provide-node-setup-mining-instructions";
 import { generateLogo } from "@/ai/flows/generate-logo";
-import { generateWhitepaper } from "@/ai/flows/generate-whitepaper";
-import { generateAudioSummary } from "@/ai/flows/generate-audio-summary";
 import { explainConcept as explainConceptFlow } from "@/ai/flows/explain-concept";
-import { generateLandingPage } from "@/ai/flows/generate-landing-page";
-import { generateSocialCampaign } from "@/ai/flows/generate-social-campaign";
-import { generatePitchDeck } from "@/ai/flows/generate-pitch-deck";
-import { generateTokenomicsModel } from "@/ai/flows/generate-tokenomics-model";
-import { generateCommunityStrategy } from "@/ai/flows/generate-community-strategy";
 import { suggestTextForField as suggestTextForFieldFlow, type SuggestTextForFieldInput } from "@/ai/flows/suggest-text";
-import type { FormValues, GenerationResult, Project } from "@/app/types";
+import { generateReadme } from "@/ai/flows/generate-readme";
+import type { GenerationResult, Project } from "@/app/types";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp, getDocs, query, orderBy, doc, getDoc } from "firebase/firestore";
 
@@ -24,18 +16,10 @@ import { collection, addDoc, serverTimestamp, getDocs, query, orderBy, doc, getD
 // The main orchestration logic has been moved to the client in `forge/page.tsx`.
 
 export { 
-    provideCompilationGuidance,
     generateGenesisBlockCode,
     createNetworkConfigurationFile,
-    provideNodeSetupMiningInstructions,
     generateLogo,
-    generateWhitepaper,
-    generateAudioSummary,
-    generateLandingPage,
-    generateSocialCampaign,
-    generatePitchDeck,
-    generateTokenomicsModel,
-    generateCommunityStrategy
+    generateReadme
 };
 
 

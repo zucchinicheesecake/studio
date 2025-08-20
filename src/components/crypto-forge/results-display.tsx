@@ -2,14 +2,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CodeBlock } from "@/components/crypto-forge/code-block";
 import type { GenerationResult, Project } from "@/app/types";
 import { Button } from "@/components/ui/button";
-import { Download, Linkedin, MessageSquare, Twitter, Save, Loader2, CheckCircle, ArrowLeft, FileCode, Presentation, Briefcase } from "lucide-react";
+import { Download, Save, Loader2, CheckCircle, ArrowLeft } from "lucide-react";
 import Image from "next/image";
-import { LandingPage } from "@/components/crypto-forge/landing-page";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { saveProject } from "@/app/actions";
@@ -57,9 +55,8 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
 
   const projectDate = isSavedProject && 'createdAt' in results ? new Date((results as Project).createdAt).toLocaleDateString() : new Date().toLocaleDateString();
 
-
   return (
-    <div className="w-full max-w-7xl mx-auto py-12 px-4">
+    <div className="w-full max-w-5xl mx-auto py-12 px-4">
       <div className="text-center mb-8">
         <h1 className="text-5xl font-headline font-bold text-primary">{isSavedProject ? results.formValues.projectName : "Your Crypto Project is Ready!"}</h1>
         <p className="text-muted-foreground mt-2 text-lg">
@@ -79,8 +76,8 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
                 />
             </div>
             <div className="flex-grow">
-                <CardTitle className="font-headline text-3xl">{isSavedProject ? "Project Overview" : "Launch Your Project!"}</CardTitle>
-                <CardDescription className="mt-2 text-base">{isSavedProject ? `Created on ${projectDate}` : "You have everything you need. Follow the guides to bring your project to life."}</CardDescription>
+                <CardTitle className="font-headline text-3xl">{results.formValues.projectName} ({results.formValues.ticker})</CardTitle>
+                <CardDescription className="mt-2 text-base">{isSavedProject ? `Created on ${projectDate}` : "Your developer toolkit is ready. Follow the README to get started."}</CardDescription>
             </div>
              {user && !isSavedProject && (
                 <div className="flex-shrink-0">
@@ -98,168 +95,35 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
         </CardHeader>
       </Card>
 
+      <div className="space-y-8">
+            <ResultSection
+                title="Genesis Block"
+                filename="genesis_block.cpp"
+                content={results.genesisBlockCode}
+            >
+                <CodeBlock code={results.genesisBlockCode} language="cpp" />
+            </ResultSection>
 
-      <Tabs defaultValue="strategy-assets" className="w-full">
-        <TabsList className="grid w-full grid-cols-1 md:grid-cols-3">
-          <TabsTrigger value="strategy-assets"><Briefcase className="mr-2" /> Strategic Assets</TabsTrigger>
-          <TabsTrigger value="marketing-assets"><Presentation className="mr-2" /> Brand & Marketing</TabsTrigger>
-          <TabsTrigger value="developer-assets"><FileCode className="mr-2" /> Developer Assets</TabsTrigger>
-        </TabsList>
+            <Separator />
 
-        <TabContentCard value="strategy-assets">
-            <CardHeader>
-              <div>
-                <CardTitle>Go-to-Market Strategy</CardTitle>
-                <CardDescription>Your strategic documents for investors, partners, and your community.</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-8">
-                <ResultSection
-                    title="Investor Pitch Deck"
-                    filename="PitchDeck.md"
-                    content={results.pitchDeckContent}
-                >
-                    <CodeBlock code={results.pitchDeckContent} language="markdown" />
-                </ResultSection>
-                <Separator />
-                <ResultSection
-                    title="Tokenomics Model"
-                    filename="Tokenomics.md"
-                    content={results.tokenomicsModelContent}
-                >
-                    <CodeBlock code={results.tokenomicsModelContent} language="markdown" />
-                </ResultSection>
-                <Separator />
-                <ResultSection
-                    title="Community Building Strategy"
-                    filename="CommunityStrategy.md"
-                    content={results.communityStrategyContent}
-                >
-                    <CodeBlock code={results.communityStrategyContent} language="markdown" />
-                </ResultSection>
-            </CardContent>
-        </TabContentCard>
+            <ResultSection
+                title="Network Configuration"
+                filename={`${results.formValues.projectName.toLowerCase()}.conf`}
+                content={results.networkConfigurationFile}
+            >
+                <CodeBlock code={results.networkConfigurationFile} language="ini" />
+            </ResultSection>
 
-        <TabContentCard value="marketing-assets">
-            <CardHeader>
-              <div>
-                <CardTitle>Landing Page & Marketing Kit</CardTitle>
-                <CardDescription>Your public-facing assets. Use these to build your brand and community.</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-8">
-                <ResultSection
-                    title="Landing Page Preview"
-                    filename="LandingPage.tsx"
-                    content={results.landingPageCode}
-                >
-                    <div className="w-full h-[600px] bg-background rounded-lg border overflow-hidden">
-                        <div className="h-full w-full overflow-y-auto">
-                            <LandingPage
-                                logoUrl={results.logoDataUri}
-                                generatedCode={results.landingPageCode}
-                            />
-                        </div>
-                    </div>
-                </ResultSection>
-
-                <Separator />
-
-                <ResultSection
-                    title="Whitepaper"
-                    filename="whitepaper.md"
-                    content={results.whitepaperContent}
-                >
-                    <CodeBlock code={results.whitepaperContent} language="markdown" />
-                </ResultSection>
-
-                <Separator />
-                
-                <div>
-                    <h3 className="font-headline text-xl text-primary mb-4">Social Media Kit</h3>
-                    <div className="space-y-6">
-                        <div>
-                            <h4 className="font-semibold text-lg mb-2 flex items-center"><Twitter className="mr-2 h-5 w-5" /> X (Twitter) Thread</h4>
-                            <CodeBlock code={results.twitterCampaign} language="markdown" />
-                        </div>
-                        <div>
-                            <h4 className="font-semibold text-lg mb-2 flex items-center"><Linkedin className="mr-2 h-5 w-5" /> LinkedIn Post</h4>
-                            <CodeBlock code={results.linkedInPost} language="markdown" />
-                        </div>
-                        <div>
-                            <h4 className="font-semibold text-lg mb-2 flex items-center"><MessageSquare className="mr-2 h-5 w-5" /> Discord/Telegram Welcome</h4>
-                            <CodeBlock code={results.communityWelcome} language="markdown" />
-                        </div>
-                    </div>
-                </div>
-            </CardContent>
-        </TabContentCard>
-        
-        <TabContentCard value="developer-assets">
-           <CardHeader>
-                <CardTitle>Developer Assets & Technical Summary</CardTitle>
-                <CardDescription>The core code and instructions needed to compile, run, and maintain your network.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-8">
-                <ResultSection
-                    title="Genesis Block"
-                    filename="genesis_block.cpp"
-                    content={results.genesisBlockCode}
-                >
-                    <CodeBlock code={results.genesisBlockCode} language="cpp" />
-                </ResultSection>
-
-                <Separator />
-
-                <ResultSection
-                    title="Network Configuration"
-                    filename="config.txt"
-                    content={results.networkConfigurationFile}
-                >
-                    <CodeBlock code={results.networkConfigurationFile} language="ini" />
-                </ResultSection>
-
-                <Separator />
-                
-                <ResultSection
-                    title="Compilation Guide"
-                    filename="compilation_guide.md"
-                    content={results.compilationInstructions}
-                >
-                    <CodeBlock code={results.compilationInstructions} language="markdown" />
-                </ResultSection>
-
-                <Separator />
-
-                <ResultSection
-                    title="Node Setup & Mining Guide"
-                    filename="node_setup_guide.md"
-                    content={results.nodeSetupInstructions}
-                >
-                    <CodeBlock code={results.nodeSetupInstructions} language="markdown" />
-                </ResultSection>
-
-                <Separator />
-
-                 <div>
-                    <div className="flex justify-between items-start mb-4">
-                        <div>
-                             <h3 className="font-headline text-xl text-primary">Technical Summary</h3>
-                             <p className="text-muted-foreground">A recap of your coin's key parameters.</p>
-                        </div>
-                        {results.audioDataUri && (
-                            <audio controls src={results.audioDataUri} className="max-h-10">
-                                Your browser does not support the audio element.
-                            </audio>
-                        )}
-                    </div>
-                    <div className="prose prose-invert max-w-none prose-p:text-base prose-strong:text-primary p-4 bg-black/30 rounded-lg" dangerouslySetInnerHTML={{ __html: results.technicalSummary.replace(/\*\*/g, '<strong>').replace(/\*/g, '</strong>') }}></div>
-                 </div>
-
-            </CardContent>
-        </TabContentCard>
-
-      </Tabs>
+            <Separator />
+            
+            <ResultSection
+                title="README"
+                filename="README.md"
+                content={results.readmeContent}
+            >
+                <CodeBlock code={results.readmeContent} language="markdown" />
+            </ResultSection>
+        </div>
       
        <div className="text-center mt-12">
        {isSavedProject ? (
@@ -272,17 +136,6 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
       </div>
     </div>
   );
-}
-
-
-function TabContentCard({ value, children }: { value: string, children: React.ReactNode }) {
-    return (
-        <TabsContent value={value} className="mt-4">
-            <Card className="bg-card/70 border-border/50">
-                {children}
-            </Card>
-        </TabsContent>
-    )
 }
 
 function ResultSection({ title, filename, content, children }: { title: string, filename: string, content: string, children: React.ReactNode }) {

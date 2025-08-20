@@ -29,22 +29,10 @@ export type FormValues = z.infer<typeof formSchema>;
 
 export type GenerationResult = {
     formValues: FormValues;
-    technicalSummary: string;
     genesisBlockCode: string;
     networkConfigurationFile: string;
-    compilationInstructions: string;
-    nodeSetupInstructions: string;
+    readmeContent: string;
     logoDataUri: string;
-    whitepaperContent: string;
-    audioDataUri: string;
-    landingPageCode: string;
-    twitterCampaign: string;
-    linkedInPost: string;
-    communityWelcome: string;
-    // New strategic assets
-    pitchDeckContent: string;
-    tokenomicsModelContent: string;
-    communityStrategyContent: string;
 };
 
 // This represents a project as it is stored in and retrieved from Firestore

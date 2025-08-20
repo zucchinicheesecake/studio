@@ -79,18 +79,10 @@ export default function ForgePage() {
     setResults(null);
 
     const initialSteps: GenerationStep[] = [
-        { name: 'Investor Pitch Deck', status: 'pending' },
-        { name: 'Tokenomics Model', status: 'pending' },
-        { name: 'Community Strategy', status: 'pending' },
         { name: 'Logo Generation', status: 'pending' },
-        { name: 'Whitepaper', status: 'pending' },
-        { name: 'Audio Summary', status: 'pending' },
-        { name: 'Landing Page', status: 'pending' },
-        { name: 'Social Campaign', status: 'pending' },
         { name: 'Genesis Block', status: 'pending' },
         { name: 'Network Config', status: 'pending' },
-        { name: 'Compilation Guidance', status: 'pending' },
-        { name: 'Node Setup Instructions', status: 'pending' },
+        { name: 'README File', status: 'pending' },
     ];
     setGenerationSteps(initialSteps);
 
@@ -107,12 +99,8 @@ export default function ForgePage() {
             numberOfConfirmations: 6,
             targetSpacingInMinutes: 10,
             targetTimespanInMinutes: 1440,
-            problemStatement: `The current market lacks a solution for: ${data.missionStatement}`,
-            solutionStatement: `${data.projectName} addresses this by providing a platform that is ${data.brandVoice.toLowerCase()}.`,
-            keyFeatures: `- Core Utility: ${data.tokenUtility}\n- Target Audience Focus: ${data.targetAudience}\n- Decentralized Governance`,
         };
         const fullFormParams = { ...data, ...derivedParams };
-        const technicalSummary = `**${fullFormParams.coinName} (${fullFormParams.coinAbbreviation})** is a new cryptocurrency protocol driven by the mission: *"${data.missionStatement}"*. It uses the **${data.consensusMechanism}** consensus mechanism. The network is designed for a **${fullFormParams.targetSpacingInMinutes}-minute** block time. This project is tailored for **${data.targetAudience.toLowerCase()}** with a brand voice that is **${data.brandVoice.toLowerCase()}**.`;
 
         const generatedAssets: any = {};
         
@@ -134,60 +122,33 @@ export default function ForgePage() {
         };
 
         // Parallelize independent generation tasks
-        const parallelPromises = [
-            runStep('Investor Pitch Deck', () => actions.generatePitchDeck({ ...data })),
-            runStep('Tokenomics Model', () => actions.generateTokenomicsModel({ ...data })),
-            runStep('Community Strategy', () => actions.generateCommunityStrategy({ ...data })),
+        const [
+            logo,
+            genesis,
+            networkConfig,
+        ] = await Promise.all([
             runStep('Logo Generation', () => actions.generateLogo({ coinName: fullFormParams.coinName, logoDescription: data.logoDescription })),
-            runStep('Whitepaper', () => actions.generateWhitepaper({ ...fullFormParams })),
-            runStep('Audio Summary', () => actions.generateAudioSummary({ summary: technicalSummary.replace(/\*\*/g, '').replace(/\*/g, '') })),
-            runStep('Landing Page', () => actions.generateLandingPage({ ...fullFormParams })),
-            runStep('Social Campaign', () => actions.generateSocialCampaign({ ...fullFormParams })),
             runStep('Genesis Block', () => actions.generateGenesisBlockCode({ ...derivedParams, timestamp: data.timestamp! })),
             runStep('Network Config', () => actions.createNetworkConfigurationFile({ ...derivedParams })),
-            runStep('Compilation Guidance', () => actions.provideCompilationGuidance({ coinName: fullFormParams.coinName, consensusMechanism: data.consensusMechanism!, targetSpacing: fullFormParams.targetSpacingInMinutes })),
-        ];
+        ]);
 
-        const [
-            pitchDeck, tokenomics, community, logo, whitepaper, audio, landingPage, social, genesis, networkConfig, compilation
-        ] = await Promise.all(parallelPromises);
-
-        generatedAssets.pitchDeck = pitchDeck;
-        generatedAssets.tokenomics = tokenomics;
-        generatedAssets.community = community;
         generatedAssets.logo = logo;
-        generatedAssets.whitepaper = whitepaper;
-        generatedAssets.audio = audio;
-        generatedAssets.landingPage = landingPage;
-        generatedAssets.social = social;
         generatedAssets.genesis = genesis;
         generatedAssets.networkConfig = networkConfig;
-        generatedAssets.compilation = compilation;
-
+        
         // Dependent step
-        generatedAssets.nodeSetup = await runStep('Node Setup Instructions', () => actions.provideNodeSetupMiningInstructions({
-            coinName: fullFormParams.coinName,
-            coinSymbol: fullFormParams.coinAbbreviation,
-            genesisBlockCode: generatedAssets.genesis.genesisBlockCode,
-            networkParameters: generatedAssets.networkConfig.networkConfigurationFile,
-            compilationInstructions: generatedAssets.compilation.compilationInstructions,
+        generatedAssets.readme = await runStep('README File', () => actions.generateReadme({
+            projectName: data.projectName,
+            ticker: data.ticker,
+            missionStatement: data.missionStatement,
         }));
         
         setResults({
             formValues: data,
-            technicalSummary,
             genesisBlockCode: generatedAssets.genesis.genesisBlockCode,
             networkConfigurationFile: generatedAssets.networkConfig.networkConfigurationFile,
-            compilationInstructions: generatedAssets.compilation.compilationInstructions,
-            nodeSetupInstructions: generatedAssets.nodeSetup.instructions,
+            readmeContent: generatedAssets.readme.readmeContent,
             logoDataUri: generatedAssets.logo.logoDataUri,
-            whitepaperContent: generatedAssets.whitepaper.whitepaperContent,
-            audioDataUri: generatedAssets.audio.audioDataUri,
-            landingPageCode: generatedAssets.landingPage.landingPageCode,
-            pitchDeckContent: generatedAssets.pitchDeck.pitchDeckContent,
-            tokenomicsModelContent: generatedAssets.tokenomics.tokenomicsModelContent,
-            communityStrategyContent: generatedAssets.community.communityStrategyContent,
-            ...generatedAssets.social,
         });
 
     } catch (e: any) {
@@ -316,4 +277,3 @@ export default function ForgePage() {
     </FormProvider>
   );
 }
-
