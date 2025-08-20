@@ -13,7 +13,7 @@ import { generateLandingPage } from "@/ai/flows/generate-landing-page";
 import { generateSocialCampaign } from "@/ai/flows/generate-social-campaign";
 import type { FormValues, GenerationResult, Project } from "@/app/types";
 import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp, getDocs, query, orderBy } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, getDocs, query, orderBy, doc, getDoc } from "firebase/firestore";
 
 
 export async function generateCrypto(values: FormValues): Promise<GenerationResult> {
@@ -190,6 +190,32 @@ export async function getProjectsForUser(userId: string): Promise<Project[]> {
     }
 }
 
+
+export async function getProjectById(userId: string, projectId: string): Promise<Project | null> {
+    if (!userId) {
+      throw new Error('User must be logged in to view a project.');
+    }
+    try {
+      const docRef = doc(db, 'users', userId, 'projects', projectId);
+      const docSnap = await getDoc(docRef);
+  
+      if (!docSnap.exists()) {
+        return null;
+      }
+  
+      const data = docSnap.data();
+      const createdAt = (data.createdAt?.toDate?.() || new Date()).toISOString();
+  
+      return {
+        id: docSnap.id,
+        ...data,
+        createdAt,
+      } as Project;
+    } catch (error) {
+      console.error('Error fetching project from Firestore:', error);
+      throw new Error('Failed to fetch project.');
+    }
+}
 
 
 // Helper type for Promise.allSettled

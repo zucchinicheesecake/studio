@@ -5,6 +5,7 @@ import type { Project } from "@/app/types";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 interface ProjectCardProps {
     project: Project;
@@ -35,8 +36,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
                 <p className="text-xs text-muted-foreground">
                     Created: {new Date(createdAt).toLocaleDateString()}
                 </p>
-                <Button variant="secondary" size="sm" disabled>
-                    View Project
+                <Button variant="secondary" size="sm" asChild>
+                    <Link href={`/project/${project.id}`}>View Project</Link>
                 </Button>
             </CardFooter>
         </Card>

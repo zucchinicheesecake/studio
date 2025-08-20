@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CodeBlock } from "@/components/crypto-forge/code-block";
 import type { GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
-import { Download, Linkedin, MessageSquare, Twitter, TrendingUp, Save, Loader2, CheckCircle } from "lucide-react";
+import { Download, Linkedin, MessageSquare, Twitter, TrendingUp, Save, Loader2, CheckCircle, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import { LandingPage } from "@/components/crypto-forge/landing-page";
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
@@ -16,14 +16,16 @@ import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { saveProject } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 
 interface ResultsDisplayProps {
   results: GenerationResult;
-  onReset: () => void;
+  onReset?: () => void;
+  isSavedProject?: boolean;
 }
 
-export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
+export function ResultsDisplay({ results, onReset, isSavedProject = false }: ResultsDisplayProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -102,9 +104,9 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
   return (
     <div className="w-full max-w-7xl mx-auto py-12 px-4">
       <div className="text-center mb-8">
-        <h1 className="text-5xl font-headline font-bold text-primary">Your Cryptocurrency is Ready!</h1>
+        <h1 className="text-5xl font-headline font-bold text-primary">{isSavedProject ? results.formValues.coinName : "Your Cryptocurrency is Ready!"}</h1>
         <p className="text-muted-foreground mt-2 text-lg">
-          Congratulations! Below are the generated assets for your new coin.
+          {isSavedProject ? `Viewing saved project details for ${results.formValues.coinAbbreviation}.` : "Congratulations! Below are the generated assets for your new coin."}
         </p>
       </div>
       
@@ -120,10 +122,10 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
                 />
             </div>
             <div className="flex-grow">
-                <CardTitle className="font-headline text-3xl">Launch Your Coin!</CardTitle>
-                <CardDescription className="mt-2 text-base">You have everything you need. Follow the compilation and node setup guides to bring your cryptocurrency to life.</CardDescription>
+                <CardTitle className="font-headline text-3xl">{isSavedProject ? "Project Overview" : "Launch Your Coin!"}</CardTitle>
+                <CardDescription className="mt-2 text-base">{isSavedProject ? `Created on ${new Date(results.createdAt!).toLocaleDateString()}` : "You have everything you need. Follow the compilation and node setup guides to bring your cryptocurrency to life."}</CardDescription>
             </div>
-             {user && (
+             {user && !isSavedProject && (
                 <div className="flex-shrink-0">
                     <Button onClick={handleSaveProject} disabled={isSaving || isSaved}>
                         {isSaving ? (
@@ -304,7 +306,13 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
       </Tabs>
       
        <div className="text-center mt-12">
-        <Button onClick={onReset} size="lg">Create Another Coin</Button>
+       {isSavedProject ? (
+          <Button asChild size="lg">
+            <Link href="/dashboard"><ArrowLeft className="mr-2" /> Back to Dashboard</Link>
+          </Button>
+        ) : (
+          <Button onClick={onReset} size="lg">Create Another Coin</Button>
+        )}
       </div>
     </div>
   );
