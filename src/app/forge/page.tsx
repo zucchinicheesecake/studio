@@ -204,7 +204,7 @@ export default function ForgePage() {
                                 <div className="ml-4">
                                     <p className={`font-medium ${step.status === 'error' ? 'text-destructive' : ''}`}>{step.name}</p>
                                     {step.status === 'error' && (
-                                        <p className="text-xs text-destructive/80 mt-1 font-code">{step.error}</p>
+                                        <p className="text-xs text-destructive/80 mt-1 font-code break-words">{step.error}</p>
                                     )}
                                 </div>
                             </li>
