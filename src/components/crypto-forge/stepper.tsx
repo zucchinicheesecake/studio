@@ -7,48 +7,34 @@ interface StepperProps {
 export function Stepper({ currentStep, steps }: StepperProps) {
   return (
     <nav aria-label="Progress">
-      <ol role="list" className="flex items-center">
-        {steps.map((step, stepIdx) => (
-          <li key={step.name} className="relative flex-1">
+      <ol role="list" className="space-y-4 md:flex md:space-x-8 md:space-y-0">
+        {steps.map((step) => (
+          <li key={step.name} className="md:flex-1">
             {step.id < currentStep ? (
-              <>
-                <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                  <div className="h-0.5 w-full bg-primary" />
-                </div>
-                <div
-                  className="relative flex h-8 w-8 items-center justify-center rounded-full bg-primary"
-                >
-                  <span className="text-primary-foreground font-bold text-lg">✓</span>
-                </div>
-              </>
+              <div className="group flex w-full flex-col border-l-4 border-primary py-2 pl-4 transition-colors">
+                <span className="text-sm font-medium text-primary transition-colors">
+                  {`Step ${step.id}`}
+                </span>
+                <span className="text-sm font-medium">{step.name}</span>
+              </div>
             ) : step.id === currentStep ? (
-              <>
-                <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                  <div className="h-0.5 w-full bg-border" />
-                </div>
-                <div
-                  className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-card"
-                  aria-current="step"
-                >
-                  <span className="h-2.5 w-2.5 rounded-full bg-primary" />
-                </div>
-              </>
+              <div
+                className="flex w-full flex-col border-l-4 border-primary py-2 pl-4"
+                aria-current="step"
+              >
+                <span className="text-sm font-medium text-primary">
+                   {`Step ${step.id}`}
+                </span>
+                <span className="text-sm font-medium">{step.name}</span>
+              </div>
             ) : (
-              <>
-                <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                  <div className="h-0.5 w-full bg-border" />
-                </div>
-                <div
-                  className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-border bg-card"
-                >
-                </div>
-              </>
+              <div className="group flex w-full flex-col border-l-4 border-border py-2 pl-4 transition-colors">
+                <span className="text-sm font-medium text-muted-foreground transition-colors">
+                   {`Step ${step.id}`}
+                </span>
+                <span className="text-sm font-medium">{step.name}</span>
+              </div>
             )}
-             <p className={`absolute -bottom-7 left-1/2 -translate-x-1/2 text-center text-sm font-medium transition-colors duration-300 w-28 ${
-                step.id === currentStep ? 'text-primary' : 'text-muted-foreground'
-              }`}>
-              {step.name}
-            </p>
           </li>
         ))}
       </ol>

@@ -1,28 +1,30 @@
 
 import { z } from "zod";
 
+const numberField = z.preprocess(
+  (a) => (a ? parseFloat(String(a)) : undefined),
+  z.number().positive()
+);
+
 export const formSchema = z.object({
-  // Step 1: Core Concept
+  // Step 1: Project Identity
   projectName: z.string().min(1, "Project name is required."),
   ticker: z.string().min(1, "Ticker is required.").max(5, "Ticker is too long."),
   missionStatement: z.string().min(1, "Mission statement is required."),
-  
-  // Step 2: Target Audience
-  targetAudience: z.string().min(1, "Target audience is required."),
-  brandVoice: z.string().min(1, "Brand voice is required."),
-
-  // Step 3: Branding
   tagline: z.string().min(1, "A tagline is required."),
   logoDescription: z.string().min(1, "Please provide a logo description."),
-
-  // Step 4: Tokenomics
-  tokenUtility: z.string().min(1, "Token utility is required."),
-
-  // Step 5: Distribution
-  initialDistribution: z.string().min(1, "Initial distribution plan is required."),
-
-  // Step 6: Community
-  communityStrategy: z.string().min(1, "A community strategy is required."),
+  timestamp: z.string().min(1, "Genesis block timestamp message is required."),
+  
+  // Step 2: Blockchain Parameters
+  blockReward: numberField.describe('The number of coins received for mining a block.'),
+  blockHalving: numberField.describe('The block number at which the block reward is halved.'),
+  coinSupply: numberField.describe('The total number of coins that will be created.'),
+  addressLetter: z.string().min(1, "Address letter is required").max(1, "Address letter must be a single character."),
+  coinUnit: z.string().min(1, "Coin unit is required."),
+  coinbaseMaturity: numberField.describe('The number of blocks that must pass before a mined block can be spent.'),
+  numberOfConfirmations: numberField.describe('The number of blocks that must pass before a transaction is considered confirmed.'),
+  targetSpacingInMinutes: numberField.describe('The target time in minutes to mine each block.'),
+  targetTimespanInMinutes: numberField.describe('The target time in minutes before the network difficulty is readjusted.'),
 });
 
 export type FormValues = z.infer<typeof formSchema>;

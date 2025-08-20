@@ -1,8 +1,8 @@
 
 "use server";
 
-import { generateGenesisBlockCode } from "@/ai/flows/generate-genesis-block-code";
-import { createNetworkConfigurationFile } from "@/ai/flows/create-network-configuration-file";
+import { generateGenesisBlockCode as generateGenesisBlockCodeFlow, type GenesisBlockCodeInput } from "@/ai/flows/generate-genesis-block-code";
+import { createNetworkConfigurationFile as createNetworkConfigurationFileFlow, type CreateNetworkConfigurationFileInput } from "@/ai/flows/create-network-configuration-file";
 import { generateLogo } from "@/ai/flows/generate-logo";
 import { explainConcept as explainConceptFlow } from "@/ai/flows/explain-concept";
 import { suggestTextForField as suggestTextForFieldFlow, type SuggestTextForFieldInput } from "@/ai/flows/suggest-text";
@@ -16,9 +16,16 @@ import { collection, addDoc, serverTimestamp, getDocs, query, orderBy, doc, getD
 // This file now only contains individual server actions that can be called from the client.
 // The main orchestration logic has been moved to the client in `forge/page.tsx`.
 
+export async function generateGenesisBlockCode(input: GenesisBlockCodeInput) {
+    return await generateGenesisBlockCodeFlow(input);
+}
+
+export async function createNetworkConfigurationFile(input: CreateNetworkConfigurationFileInput) {
+    return await createNetworkConfigurationFileFlow(input);
+}
+
+
 export { 
-    generateGenesisBlockCode,
-    createNetworkConfigurationFile,
     generateLogo,
     generateReadme,
     generateInstallScript

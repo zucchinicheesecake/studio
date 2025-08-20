@@ -13,13 +13,8 @@ import {z} from 'genkit';
 
 const GenesisBlockCodeInputSchema = z.object({
   coinName: z.string().describe('The name of the cryptocurrency.'),
-  coinAbbreviation: z.string().describe('The abbreviation for the cryptocurrency (e.g., BTC).'),
-  addressLetter: z.string().describe('The starting letter for public addresses.'),
-  coinUnit: z.string().describe('The name of the smallest unit for the coin (e.g., Satoshi).'),
+  ticker: z.string().describe('The abbreviation for the cryptocurrency (e.g., BTC).'),
   timestamp: z.string().describe('A unique sentence to store inside the genesis block.'),
-  blockReward: z.number().describe('The number of coins received for mining a block.'),
-  blockHalving: z.number().describe('The block number at which the block reward is cut in half.'),
-  coinSupply: z.number().describe('The total number of coins the cryptocurrency will create.'),
 });
 
 export type GenesisBlockCodeInput = z.infer<typeof GenesisBlockCodeInputSchema>;
@@ -42,7 +37,7 @@ const generateGenesisBlockCodeFlow = ai.defineFlow(
   },
   async (input) => {
     const genesisBlockCode = `
-// Genesis Block for ${input.coinName} (${input.coinAbbreviation})
+// Genesis Block for ${input.coinName} (${input.ticker})
 static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
     const char* pszTimestamp = "${input.timestamp}";

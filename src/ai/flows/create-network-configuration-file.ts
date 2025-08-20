@@ -12,7 +12,7 @@ import {z} from 'genkit';
 
 const CreateNetworkConfigurationFileInputSchema = z.object({
   coinName: z.string().describe('The name of the cryptocurrency.'),
-  coinAbbreviation: z.string().describe('The abbreviation for the cryptocurrency (e.g., BTC).'),
+  ticker: z.string().describe('The abbreviation for the cryptocurrency (e.g., BTC).'),
   addressLetter: z.string().describe('The starting letter for public addresses.'),
   coinUnit: z.string().describe('The name of the smallest unit of the coin (e.g., Satoshi).'),
   blockReward: z.number().describe('The number of coins received for mining a block.'),
@@ -52,7 +52,7 @@ const createNetworkConfigurationFileFlow = ai.defineFlow(
     const content = `
 # Network configuration for ${input.coinName}
 coin.name=${input.coinName}
-coin.abbreviation=${input.coinAbbreviation}
+coin.abbreviation=${input.ticker}
 address.letter=${input.addressLetter}
 coin.unit=${input.coinUnit}
 block.reward=${input.blockReward}
