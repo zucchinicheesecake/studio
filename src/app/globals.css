@@ -5,25 +5,25 @@
 
 @layer base {
   :root {
-    --background: 222 83% 4%; /* Deep Space Blue - fallback */
-    --foreground: 210 40% 98%;
-    --card: 222 83% 6%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 83% 4%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 51 98% 50%; /* Pixel Yellow */
-    --primary-foreground: 222 83% 4%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 262 83% 58%; /* Electric Purple */
-    --accent-foreground: 210 40% 98%;
+    --background: 224 71% 4%; /* Deep Space Blue - fallback */
+    --foreground: 213 31% 91%;
+    --card: 224 71% 6%;
+    --card-foreground: 213 31% 91%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 213 31% 91%;
+    --primary: 45 93% 47%; /* Gold */
+    --primary-foreground: 224 71% 4%;
+    --secondary: 215 28% 17%;
+    --secondary-foreground: 213 31% 91%;
+    --muted: 215 28% 17%;
+    --muted-foreground: 218 24% 57%;
+    --accent: 211 92% 58%; /* Electric Blue */
+    --accent-foreground: 213 31% 91%;
     --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 27%;
-    --input: 217 33% 27%;
-    --ring: 51 98% 50%;
+    --destructive-foreground: 213 31% 91%;
+    --border: 215 28% 22%;
+    --input: 215 28% 22%;
+    --ring: 45 93% 47%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -34,25 +34,25 @@
 
   .dark {
     /* Keep dark theme consistent with root for this design */
-    --background: 222 83% 4%;
-    --foreground: 210 40% 98%;
-    --card: 222 83% 6%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 83% 4%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 51 98% 50%;
-    --primary-foreground: 222 83% 4%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 262 83% 58%;
-    --accent-foreground: 210 40% 98%;
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+    --card: 224 71% 6%;
+    --card-foreground: 213 31% 91%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 213 31% 91%;
+    --primary: 45 93% 47%;
+    --primary-foreground: 224 71% 4%;
+    --secondary: 215 28% 17%;
+    --secondary-foreground: 213 31% 91%;
+    --muted: 215 28% 17%;
+    --muted-foreground: 218 24% 57%;
+    --accent: 211 92% 58%;
+    --accent-foreground: 213 31% 91%;
     --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 27%;
-    --input: 217 33% 27%;
-    --ring: 51 98% 50%;
+    --destructive-foreground: 213 31% 91%;
+    --border: 215 28% 22%;
+    --input: 215 28% 22%;
+    --ring: 45 93% 47%;
   }
 }
 
@@ -62,6 +62,5 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: linear-gradient(to bottom right, hsl(222, 83%, 4%), hsl(262, 73%, 8%));
   }
 }

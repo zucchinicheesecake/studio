@@ -11,7 +11,7 @@ export function Step1CoreConcept() {
   const { control } = useFormContext();
 
   return (
-    <Card className="w-full bg-card border-border">
+    <Card className="w-full bg-card/50">
       <CardHeader>
         <CardTitle className="font-headline text-2xl text-primary">Core Concept</CardTitle>
         <CardDescription>Define the fundamental identity and mission of your project. This is the foundation of everything.</CardDescription>

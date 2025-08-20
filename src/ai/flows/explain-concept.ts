@@ -26,6 +26,9 @@ export async function explainConcept(input: ExplainConceptInput): Promise<Explai
 }
 
 const predefinedExplanations: Record<string, string> = {
+    'Target Audience': 'The specific group of people you are trying to reach and serve with your project. Defining this helps tailor your messaging, features, and overall strategy. For example, are you building for developers, gamers, artists, or financial institutions?',
+    'Token Utility': "The specific purpose or use case of your cryptocurrency within its ecosystem. What can you do with it? Common utilities include governance (voting on proposals), paying transaction fees, staking for network security, or accessing exclusive features.",
+    'Token Distribution': 'The plan for how the initial supply of your cryptocurrency will be allocated. This is crucial for transparency and demonstrating the long-term vision of the project. A typical distribution might allocate percentages to the community, development team, early investors, and a public sale.',
     'Block Reward': 'The number of new coins that are "minted" and awarded to a miner for successfully validating a new block of transactions.',
     'Block Halving': 'A pre-programmed event that cuts the block reward in half. It happens at a specific block number to create scarcity and control inflation over time.',
     'Total Coin Supply': 'The absolute maximum number of coins that will ever be created for this cryptocurrency. Once this number is reached, no new coins can be minted.',

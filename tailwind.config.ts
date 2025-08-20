@@ -11,8 +11,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['"VT323"', 'monospace'],
-        headline: ['"Press Start 2P"', 'cursive'],
+        body: ['"Inter"', 'sans-serif'],
+        headline: ['"Space Grotesk"', 'sans-serif'],
         code: ['"Source Code Pro"', 'monospace'],
       },
       colors: {

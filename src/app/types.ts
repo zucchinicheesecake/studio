@@ -7,22 +7,16 @@ export const formSchema = z.object({
   ticker: z.string().min(1, "Ticker is required.").max(5, "Ticker is too long."),
   missionStatement: z.string().min(1, "Mission statement is required."),
   
-  // Step 2: Network Parameters
-  blockReward: z.coerce.number().min(1, "Block reward must be at least 1."),
-  blockHalving: z.coerce.number().min(1, "Block halving must be at least 1."),
-  coinSupply: z.coerce.number().min(1, "Coin supply must be at least 1."),
+  // Step 2: Target Audience
+  targetAudience: z.string().min(1, "Target audience is required."),
   
-  // Step 3: Technical Details
-  timestamp: z.string().min(1, "Genesis timestamp message is required."),
+  // Step 3: Branding
+  brandVoice: z.string().min(1, "Brand voice is required."),
   logoDescription: z.string().min(1, "Please provide a logo description."),
 
-  // Step 4: Consensus & Addressing
-  addressLetter: z.string().min(1, "Address letter is required.").max(1, "Address letter must be a single character."),
-  coinUnit: z.string().min(1, "Coin unit is required."),
-  coinbaseMaturity: z.coerce.number().min(1, "Coinbase maturity must be at least 1."),
-  numberOfConfirmations: z.coerce.number().min(1, "Number of confirmations must be at least 1."),
-  targetSpacingInMinutes: z.coerce.number().min(1, "Target spacing must be at least 1 minute."),
-  targetTimespanInMinutes: z.coerce.number().min(1, "Target timespan must be at least 1 minute."),
+  // Step 4: Token Strategy
+  tokenUtility: z.string().min(1, "Token utility is required."),
+  initialDistribution: z.string().min(1, "Initial distribution plan is required."),
 });
 
 export type FormValues = z.infer<typeof formSchema>;

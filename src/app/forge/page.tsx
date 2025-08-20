@@ -11,22 +11,21 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Stepper } from "@/components/crypto-forge/stepper";
 import { Step1CoreConcept } from "@/components/crypto-forge/step-1-core-concept";
-import { Step2NetworkParameters } from "@/components/crypto-forge/step-2-network-parameters";
-import { Step3TechnicalDetails } from "@/components/crypto-forge/step-3-technical-details";
-import { Step4Consensus } from "@/components/crypto-forge/step-4-consensus";
 import { ResultsDisplay } from "@/components/crypto-forge/results-display";
 import { AlertCircle, CheckCircle, CircleDashed, Loader2 } from "lucide-react";
 import { ExplanationDialog } from "@/components/crypto-forge/explanation-dialog";
 import { ExplanationContext } from "@/hooks/use-explanation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Step2TargetAudience } from "@/components/crypto-forge/step-2-target-audience";
+import { Step3Branding } from "@/components/crypto-forge/step-3-branding";
+import { Step4TokenStrategy } from "@/components/crypto-forge/step-4-token-strategy";
 import { HappyCoinIcon } from "@/components/icons/happy-coin-icon";
-
 
 const steps = [
   { id: 1, name: "Core Concept", component: <Step1CoreConcept />, fields: ["projectName", "ticker", "missionStatement"] },
-  { id: 2, name: "Network", component: <Step2NetworkParameters />, fields: ["blockReward", "blockHalving", "coinSupply"] },
-  { id: 3, name: "Technical", component: <Step3TechnicalDetails />, fields: ["timestamp", "logoDescription"] },
-  { id: 4, name: "Consensus", component: <Step4Consensus />, fields: ["addressLetter", "coinUnit", "coinbaseMaturity", "numberOfConfirmations", "targetSpacingInMinutes", "targetTimespanInMinutes"] },
+  { id: 2, name: "Audience", component: <Step2TargetAudience />, fields: ["targetAudience"] },
+  { id: 3, name: "Branding", component: <Step3Branding />, fields: ["brandVoice", "logoDescription"] },
+  { id: 4, name: "Tokenomics", component: <Step4TokenStrategy />, fields: ["tokenUtility", "initialDistribution"] },
 ];
 
 type GenerationStepStatus = 'pending' | 'generating' | 'success' | 'error';
@@ -50,21 +49,15 @@ export default function ForgePage() {
       missionStatement: "To build a decentralized, censorship-resistant internet for the next generation of web applications.",
       
       // Step 2
-      blockReward: 50,
-      blockHalving: 210000,
-      coinSupply: 100000000,
+      targetAudience: "Developers and privacy advocates looking for a scalable and secure alternative to the traditional web infrastructure.",
       
       // Step 3
-      timestamp: "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks",
+      brandVoice: "Authoritative, forward-thinking, and slightly rebellious. The tone should inspire confidence and a sense of being part of a movement.",
       logoDescription: "A stylized 'N' that looks like a shield or a network node, with circuit-like patterns. Colors should be electric blue and dark purple.",
       
       // Step 4
-      addressLetter: "N",
-      coinUnit: "sats",
-      coinbaseMaturity: 100,
-      numberOfConfirmations: 6,
-      targetSpacingInMinutes: 10,
-      targetTimespanInMinutes: 1440,
+      tokenUtility: "The token is used for network governance, staking to secure the network, and as the primary medium of exchange for services within the NovaNet ecosystem.",
+      initialDistribution: "40% to the community treasury (DAO-controlled), 25% to the core development team (4-year vesting), 20% to early backers and partners, and 15% reserved for a public sale.",
     },
   });
 
@@ -102,9 +95,18 @@ export default function ForgePage() {
 
     try {
         const fullFormParams = { 
-            ...data, 
             coinName: data.projectName,
-            coinAbbreviation: data.ticker
+            coinAbbreviation: data.ticker,
+            addressLetter: data.ticker.charAt(0) || "X",
+            coinUnit: "satoshi",
+            blockReward: 50,
+            blockHalving: 210000,
+            coinSupply: 21000000,
+            coinbaseMaturity: 100,
+            numberOfConfirmations: 6,
+            targetSpacingInMinutes: 10,
+            targetTimespanInMinutes: 1440,
+            timestamp: `Forge: ${data.projectName} - ${new Date().toISOString()}`,
         };
 
         const generatedAssets: any = {};
