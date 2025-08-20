@@ -4,16 +4,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { EngineBotIcon } from '@/components/icons/engine-bot-icon';
-import { Terminal } from 'lucide-react';
+import { Terminal, Sparkles } from 'lucide-react';
 import type { FormValues } from '@/app/types';
+import { AIChatInput } from './ai-chat-input';
+
 
 interface ChatInterfaceProps {
     onComplete: (data: FormValues) => void;
 }
 
-type Question = {
+export type Question = {
     key: keyof FormValues;
     label: string;
     question: string;
@@ -41,11 +42,9 @@ const questions: Question[] = [
 
 
 export function ChatInterface({ onComplete }: ChatInterfaceProps) {
-    const { control, setValue, getValues, trigger } = useFormContext<FormValues>();
+    const { control, setValue, getValues, trigger, watch } = useFormContext<FormValues>();
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [history, setHistory] = useState<{ type: 'bot' | 'user'; content: React.ReactNode }[]>([]);
-    const [inputValue, setInputValue] = useState('');
-    const inputRef = useRef<HTMLInputElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
     
 
@@ -62,43 +61,29 @@ export function ChatInterface({ onComplete }: ChatInterfaceProps) {
       }
     }, [history]);
     
-    useEffect(() => {
-      // Focus the input when a new question is asked
-      inputRef.current?.focus();
-    }, [currentQuestionIndex]);
-
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInputValue(e.target.value);
-    };
-
-    const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (!inputValue.trim()) return;
+    const handleAnswerSubmit = async (value: string) => {
+        if (!value.trim()) return;
 
         const currentQuestion = questions[currentQuestionIndex];
         const fieldName = currentQuestion.key;
 
         // Update react-hook-form state
-        setValue(fieldName, inputValue as any);
+        setValue(fieldName, value as any, { shouldValidate: true, shouldDirty: true });
         const isValid = await trigger(fieldName);
         
         // Add to chat history
-        setHistory(prev => [...prev, { type: 'user', content: inputValue }]);
+        setHistory(prev => [...prev, { type: 'user', content: value }]);
 
         if (!isValid) {
             const error = control.getFieldState(fieldName).error;
             setHistory(prev => [...prev, { type: 'bot', content: <span className="text-destructive">{error?.message || "Invalid input. Please try again."}</span> }]);
-            setInputValue('');
             return;
         }
-
 
         if (currentQuestionIndex < questions.length - 1) {
             const nextQuestionIndex = currentQuestionIndex + 1;
             setCurrentQuestionIndex(nextQuestionIndex);
             setHistory(prev => [...prev, { type: 'bot', content: questions[nextQuestionIndex].question }]);
-            setInputValue(''); // Clear input for next question
         } else {
             // End of questions, submit the form
             setHistory(prev => [...prev, { type: 'bot', content: "Excellent. All parameters received. Initiating generation sequence..." }]);
@@ -131,17 +116,10 @@ export function ChatInterface({ onComplete }: ChatInterfaceProps) {
             </div>
 
             <div className="flex-shrink-0 p-3 bg-black/50 border-t border-border">
-                <form onSubmit={handleFormSubmit} className="flex items-center gap-2">
-                    <span className="text-primary font-bold pl-2">$</span>
-                     <Input
-                        ref={inputRef}
-                        value={inputValue}
-                        onChange={handleInputChange}
-                        placeholder={currentQuestion?.placeholder || "Type your answer..."}
-                        autoComplete="off"
-                    />
-                    <Button type="submit" variant="secondary" size="sm">Send</Button>
-                </form>
+                <AIChatInput
+                    question={currentQuestion}
+                    onSubmit={handleAnswerSubmit}
+                />
             </div>
         </div>
     );
