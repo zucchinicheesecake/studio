@@ -27,6 +27,7 @@ export type GenerationResult = {
     networkConfigurationFile: string;
     readmeContent: string;
     logoDataUri: string;
+    installScript: string;
 };
 
 // This represents a project as it is stored in and retrieved from Firestore

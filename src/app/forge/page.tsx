@@ -90,6 +90,7 @@ export default function ForgePage() {
         { name: 'Genesis Block', status: 'pending' },
         { name: 'Network Config', status: 'pending' },
         { name: 'README File', status: 'pending' },
+        { name: 'Install Script', status: 'pending' },
     ];
     setGenerationSteps(initialSteps);
 
@@ -133,15 +134,18 @@ export default function ForgePage() {
             logo,
             genesis,
             networkConfig,
+            installScript
         ] = await Promise.all([
             runStep('Logo Generation', () => actions.generateLogo({ coinName: fullFormParams.coinName, logoDescription: data.logoDescription })),
             runStep('Genesis Block', () => actions.generateGenesisBlockCode(fullFormParams)),
             runStep('Network Config', () => actions.createNetworkConfigurationFile(fullFormParams)),
+            runStep('Install Script', () => actions.generateInstallScript({ projectName: data.projectName, ticker: data.ticker })),
         ]);
 
         generatedAssets.logo = logo;
         generatedAssets.genesis = genesis;
         generatedAssets.networkConfig = networkConfig;
+        generatedAssets.installScript = installScript;
         
         // Dependent step
         generatedAssets.readme = await runStep('README File', () => actions.generateReadme({
@@ -156,6 +160,7 @@ export default function ForgePage() {
             networkConfigurationFile: generatedAssets.networkConfig.networkConfigurationFile,
             readmeContent: generatedAssets.readme.readmeContent,
             logoDataUri: generatedAssets.logo.logoDataUri,
+            installScript: generatedAssets.installScript.installScript,
         });
 
     } catch (e: any) {

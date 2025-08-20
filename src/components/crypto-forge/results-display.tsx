@@ -104,6 +104,16 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
 
       <div className="space-y-8">
             <ResultSection
+                title="Installation Script"
+                filename="install.sh"
+                content={results.installScript}
+            >
+                <CodeBlock code={results.installScript} language="bash" />
+            </ResultSection>
+
+            <Separator />
+
+            <ResultSection
                 title="Genesis Block"
                 filename="genesis_block.cpp"
                 content={results.genesisBlockCode}

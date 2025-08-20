@@ -7,6 +7,7 @@ import { generateLogo } from "@/ai/flows/generate-logo";
 import { explainConcept as explainConceptFlow } from "@/ai/flows/explain-concept";
 import { suggestTextForField as suggestTextForFieldFlow, type SuggestTextForFieldInput } from "@/ai/flows/suggest-text";
 import { generateReadme } from "@/ai/flows/generate-readme";
+import { generateInstallScript } from "@/ai/flows/generate-install-script";
 import type { GenerationResult, Project } from "@/app/types";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp, getDocs, query, orderBy, doc, getDoc } from "firebase/firestore";
@@ -19,7 +20,8 @@ export {
     generateGenesisBlockCode,
     createNetworkConfigurationFile,
     generateLogo,
-    generateReadme
+    generateReadme,
+    generateInstallScript
 };
 
 
