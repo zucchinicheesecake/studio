@@ -9,6 +9,7 @@ import { generateLogo } from "@/ai/flows/generate-logo";
 import { generateWhitepaper } from "@/ai/flows/generate-whitepaper";
 import { generateAudioSummary } from "@/ai/flows/generate-audio-summary";
 import { explainConcept as explainConceptFlow } from "@/ai/flows/explain-concept";
+import { generateLandingPage } from "@/ai/flows/generate-landing-page";
 import type { FormValues, GenerationResult } from "@/app/types";
 
 
@@ -52,11 +53,15 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
             tokenomics: tokenomicsSummary,
         }),
         generateAudioSummary({
-            summary: technicalSummary.replace(/\\*\\*/g, ''), // remove markdown for TTS
-        })
+            summary: technicalSummary.replace(/\*\*/g, ''), // remove markdown for TTS
+        }),
+        generateLandingPage({
+            ...values,
+            tokenomics: tokenomicsSummary,
+        }),
     ]);
 
-    const [compilationGuidanceResult, genesisBlockResult, networkConfigResult, logoResult, whitepaperResult, audioSummaryResult] = results;
+    const [compilationGuidanceResult, genesisBlockResult, networkConfigResult, logoResult, whitepaperResult, audioSummaryResult, landingPageResult] = results;
 
     const failedSteps = results
         .map((result, index) => (result.status === 'rejected' ? [
@@ -65,7 +70,8 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
             'Network Config', 
             'Logo Generation',
             'Whitepaper',
-            'Audio Summary'
+            'Audio Summary',
+            'Landing Page',
         ][index] : null))
         .filter(Boolean);
 
@@ -79,6 +85,7 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
     const logo = (logoResult as PromiseFulfillment<any>).value;
     const whitepaper = (whitepaperResult as PromiseFulfillment<any>).value;
     const audioSummary = (audioSummaryResult as PromiseFulfillment<any>).value;
+    const landingPage = (landingPageResult as PromiseFulfillment<any>).value;
 
 
     const nodeSetupInstructions = await provideNodeSetupMiningInstructions({
@@ -98,6 +105,7 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
         logoDataUri: logo.logoDataUri,
         whitepaperContent: whitepaper.whitepaperContent,
         audioDataUri: audioSummary.audioDataUri,
+        landingPageCode: landingPage.landingPageCode,
     };
 }
 

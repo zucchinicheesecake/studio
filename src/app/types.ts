@@ -40,4 +40,5 @@ export type GenerationResult = {
     logoDataUri: string;
     whitepaperContent: string;
     audioDataUri: string;
+    landingPageCode: string;
 };

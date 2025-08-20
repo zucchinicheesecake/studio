@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CodeBlock } from "@/components/crypto-forge/code-block";
 import type { GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
-import { Download, Rocket, Volume2 } from "lucide-react";
+import { Download, Rocket, Volume2, Globe } from "lucide-react";
 import Image from "next/image";
+import { LandingPage } from "@/components/crypto-forge/landing-page";
 
 interface ResultsDisplayProps {
   results: GenerationResult;
@@ -15,7 +16,7 @@ interface ResultsDisplayProps {
 
 export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
   return (
-    <div className="w-full max-w-4xl mx-auto py-12 px-4">
+    <div className="w-full max-w-7xl mx-auto py-12 px-4">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-headline font-bold text-primary">Your Cryptocurrency is Ready!</h1>
         <p className="text-muted-foreground mt-2">
@@ -42,8 +43,9 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
       </Card>
 
 
-      <Tabs defaultValue="summary" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-6 bg-card border-b">
+      <Tabs defaultValue="landing-page" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-7 bg-card border-b">
+          <TabsTrigger value="landing-page">Landing Page</TabsTrigger>
           <TabsTrigger value="summary">Summary</TabsTrigger>
           <TabsTrigger value="whitepaper">Whitepaper</TabsTrigger>
           <TabsTrigger value="genesis">Genesis Block</TabsTrigger>
@@ -51,6 +53,23 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
           <TabsTrigger value="compile">Compilation</TabsTrigger>
           <TabsTrigger value="setup">Node Setup</TabsTrigger>
         </TabsList>
+
+        <TabContentCard value="landing-page" filename="LandingPage.tsx" content={results.landingPageCode} preview>
+            <CardHeader>
+              <CardTitle>Landing Page</CardTitle>
+              <CardDescription>A preview of your generated landing page. Download the code to get started!</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="w-full h-[600px] bg-background rounded-lg border overflow-hidden">
+                    <div className="h-full w-full overflow-y-auto">
+                        <LandingPage
+                            logoUrl={results.logoDataUri}
+                            generatedCode={results.landingPageCode}
+                        />
+                    </div>
+                </div>
+            </CardContent>
+        </TabContentCard>
 
         <TabContentCard value="summary">
           <CardHeader>
@@ -67,7 +86,7 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-invert max-w-none leading-relaxed" dangerouslySetInnerHTML={{ __html: results.technicalSummary.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>') }}></div>
+            <div className="prose prose-invert max-w-none leading-relaxed" dangerouslySetInnerHTML={{ __html: results.technicalSummary.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}></div>
           </CardContent>
         </TabContentCard>
 
@@ -130,7 +149,7 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
 }
 
 
-function TabContentCard({ value, filename, content, children }: { value: string, filename?: string, content?: string, children: React.ReactNode }) {
+function TabContentCard({ value, filename, content, children, preview = false }: { value: string, filename?: string, content?: string, children: React.ReactNode, preview?: boolean }) {
     const handleDownload = () => {
         if(!content || !filename) return;
         const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
@@ -148,10 +167,11 @@ function TabContentCard({ value, filename, content, children }: { value: string,
         <TabsContent value={value}>
             <Card className="mt-4 border-0 shadow-none relative bg-transparent">
                 {filename && content && (
-                    <div className="absolute top-4 right-4 z-10">
+                    <div className="absolute top-4 right-4 z-10 flex gap-2">
+                         {preview && <CodeBlock code={content} language="tsx" />}
                         <Button variant="outline" size="sm" onClick={handleDownload}>
                             <Download className="mr-2 h-4 w-4" />
-                            Download
+                            Download Code
                         </Button>
                     </div>
                 )}
