@@ -9,77 +9,48 @@ import * as actions from "@/app/actions";
 import { formSchema, type FormValues, type GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Stepper } from "@/components/crypto-forge/stepper";
 import { ResultsDisplay } from "@/components/crypto-forge/results-display";
 import { AlertCircle, CheckCircle, CircleDashed, Loader2 } from "lucide-react";
-import { ExplanationDialog } from "@/components/crypto-forge/explanation-dialog";
-import { ExplanationContext } from "@/hooks/use-explanation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { HappyCoinIcon } from "@/components/icons/happy-coin-icon";
-import { Step1ProjectIdentity } from "@/components/crypto-forge/step-1-project-identity";
-import { Step2BlockchainParameters } from "@/components/crypto-forge/step-2-blockchain-parameters";
+import { ChatInterface } from "@/components/crypto-forge/chat-interface";
 
-
-const steps = [
-  { id: 1, name: "Project Identity", component: <Step1ProjectIdentity />, fields: ["projectName", "ticker", "missionStatement", "tagline", "logoDescription", "timestamp"] },
-  { id: 2, name: "Blockchain Parameters", component: <Step2BlockchainParameters />, fields: ["blockReward", "blockHalving", "coinSupply", "addressLetter", "coinUnit", "coinbaseMaturity", "numberOfConfirmations", "targetSpacingInMinutes", "targetTimespanInMinutes"] },
-];
 
 type GenerationStepStatus = 'pending' | 'generating' | 'success' | 'error';
 type GenerationStep = { name: string; status: GenerationStepStatus; error?: string };
 
 export default function ForgePage() {
-  const [currentStep, setCurrentStep] = useState(1);
   const [generationSteps, setGenerationSteps] = useState<GenerationStep[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [results, setResults] = useState<GenerationResult | null>(null);
-  const [explanation, setExplanation] = useState({ title: "", content: "", isLoading: false });
   
   const { toast } = useToast();
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      // Step 1
-      projectName: "NovaNet",
-      ticker: "NOV",
-      missionStatement: "To build a decentralized, censorship-resistant internet for the next generation of web applications.",
-      tagline: "The web, rebuilt.",
-      logoDescription: "A stylized 'N' that looks like a shield or a network node, with circuit-like patterns. Colors should be electric blue and dark purple.",
-      timestamp: `The Times 03/Jan/2009 Chancellor on brink of second bailout for banks`,
-
-      // Step 2
-      blockReward: 50,
-      blockHalving: 210000,
-      coinSupply: 21000000,
-      addressLetter: "N",
-      coinUnit: "satoshi",
-      coinbaseMaturity: 100,
-      numberOfConfirmations: 6,
-      targetSpacingInMinutes: 10,
-      targetTimespanInMinutes: 1440,
+        // Step 1
+        projectName: "NovaNet",
+        ticker: "NOV",
+        missionStatement: "To build a decentralized, censorship-resistant internet for the next generation of web applications.",
+        tagline: "The web, rebuilt.",
+        logoDescription: "A stylized 'N' that looks like a shield or a network node, with circuit-like patterns. Colors should be electric blue and dark purple.",
+        timestamp: `The Times 03/Jan/2009 Chancellor on brink of second bailout for banks`,
+  
+        // Step 2
+        blockReward: 50,
+        blockHalving: 210000,
+        coinSupply: 21000000,
+        addressLetter: "N",
+        coinUnit: "satoshi",
+        coinbaseMaturity: 100,
+        numberOfConfirmations: 6,
+        targetSpacingInMinutes: 10,
+        targetTimespanInMinutes: 1440,
     },
   });
 
-  const { trigger, handleSubmit, getValues } = methods;
-
-  const handleNext = async () => {
-    const fields = steps[currentStep - 1].fields;
-    const output = await trigger(fields as any, { shouldFocus: true });
-    if (!output) return;
-
-    if (currentStep < steps.length) {
-      setCurrentStep(step => step + 1);
-    } else {
-        handleSubmit(onSubmit)();
-    }
-  };
-
-  const handlePrev = () => {
-    if (currentStep > 1) {
-      setCurrentStep(step => step - 1);
-    }
-  };
+  const { getValues } = methods;
   
   const onSubmit = async (data: FormValues) => {
     setIsGenerating(true);
@@ -161,7 +132,6 @@ export default function ForgePage() {
 
   const resetForm = () => {
     setResults(null);
-    setCurrentStep(1);
     setIsGenerating(false);
     setGenerationSteps([]);
     methods.reset();
@@ -169,12 +139,6 @@ export default function ForgePage() {
 
   const handleTryAgain = () => {
     onSubmit(getValues());
-  };
-
-  const handleExplain = async (concept: string) => {
-    setExplanation({ title: concept, content: "", isLoading: true });
-    const explanationText = await actions.explainConcept(concept);
-    setExplanation({ title: concept, content: explanationText, isLoading: false });
   };
 
 
@@ -237,7 +201,7 @@ export default function ForgePage() {
 
   return (
     <FormProvider {...methods}>
-        <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen bg-background">
         <header className="container mx-auto px-4 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
                 <HappyCoinIcon className="h-8 w-8 text-primary" />
@@ -247,44 +211,10 @@ export default function ForgePage() {
                 <Link href="/dashboard">My Dashboard</Link>
             </Button>
         </header>
-        <main className="flex-grow container mx-auto px-4 py-12 flex flex-col items-center justify-center">
-          <div className="text-center mb-12">
-              <h1 className="text-5xl font-headline font-bold text-primary">Coin Engine</h1>
-              <p className="mt-2 text-lg text-muted-foreground">Your AI co-founder for launching a crypto project.</p>
-          </div>
-          <div className="w-full max-w-4xl">
-            <Stepper currentStep={currentStep} steps={steps.map(s => ({id: s.id, name: s.name}))} />
-          </div>
-          <div className="w-full max-w-3xl mt-10">
-            <form onSubmit={handleSubmit(onSubmit)}
-                // By wrapping the component in a new context provider, we can pass down the `handleExplain` function
-                // to any of the step components without prop drilling.
-                >
-                <ExplanationContext.Provider value={{ handleExplain }}>
-                    {steps[currentStep-1].component}
-                </ExplanationContext.Provider>
-            </form>
-          </div>
-          <div className="w-full max-w-3xl flex justify-between mt-8">
-            <Button variant="outline" onClick={handlePrev} disabled={currentStep === 1}>
-              Previous
-            </Button>
-            <Button onClick={handleNext}>
-              {currentStep === steps.length ? "Forge My Project" : "Next Step"}
-            </Button>
-          </div>
+        <main className="flex-grow container mx-auto px-4 pt-4 pb-12 flex flex-col">
+            <ChatInterface onComplete={onSubmit} />
         </main>
-         <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} Coin Engine. All rights reserved.</p>
-        </footer>
-        <ExplanationDialog
-            isOpen={!!explanation.title}
-            onOpenChange={(isOpen) => !isOpen && setExplanation({ title: "", content: "", isLoading: false })}
-            title={explanation.title}
-            content={explanation.content}
-            isLoading={explanation.isLoading}
-        />
-        </div>
+      </div>
     </FormProvider>
   );
 }

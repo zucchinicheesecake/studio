@@ -2,7 +2,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Coins, FileText } from "lucide-react";
+import { ArrowRight, Bot, Cpu, FileText } from "lucide-react";
 import Link from "next/link";
 import { HappyCoinIcon } from "@/components/icons/happy-coin-icon";
 
@@ -27,48 +27,32 @@ export default function LandingPage() {
       <main className="flex-grow">
         <section className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-5xl md:text-7xl font-bold font-headline bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary/80">
-            Create a Cryptocurrency in Minutes
+            Launch a Crypto Project with an AI Partner
           </h1>
           <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Coin Engine is your AI partner for designing, building, and launching your own digital currency. No coding required. Just your vision.
+            Coin Engine is your AI co-founder for designing, building, and launching your own digital currency. No code, just conversation.
           </p>
           <div className="mt-8 flex justify-center gap-4">
             <Button size="lg" asChild>
               <Link href="/forge">
-                Start Building Now <ArrowRight className="ml-2" />
+                Start the Conversation <ArrowRight className="ml-2" />
               </Link>
             </Button>
           </div>
         </section>
 
         <section className="container mx-auto px-4 py-16">
-            <div className="grid md:grid-cols-3 gap-8 text-center">
-                <div className="flex flex-col items-center">
-                    <div className="p-4 bg-primary/10 rounded-full mb-4">
-                        <HappyCoinIcon className="h-10 w-10 text-primary"/>
+            <div className="max-w-4xl mx-auto bg-card/50 rounded-xl p-8 border border-border">
+                <div className="flex flex-col md:flex-row gap-8 items-center">
+                    <div className="p-4 bg-primary/10 rounded-full">
+                         <Bot className="h-16 w-16 text-primary"/>
                     </div>
-                    <h3 className="text-xl font-bold font-headline">AI-Powered Generation</h3>
-                    <p className="text-muted-foreground mt-2">
-                        Leverage cutting-edge AI to generate everything from your genesis block to your README file.
-                    </p>
-                </div>
-                <div className="flex flex-col items-center">
-                    <div className="p-4 bg-primary/10 rounded-full mb-4">
-                        <FileText className="h-10 w-10 text-primary"/>
+                    <div className="text-center md:text-left">
+                        <h3 className="text-2xl font-bold font-headline">From Idea to Install Script, All Through Chat</h3>
+                        <p className="text-muted-foreground mt-2">
+                            Our unique AI-driven chat interface guides you through every decision, from your project's mission statement to its core technical parameters. At the end, you'll receive a complete, developer-ready toolkit including C++ code, configuration files, a README, and a one-click install script.
+                        </p>
                     </div>
-                    <h3 className="text-xl font-bold font-headline">Complete Asset Toolkit</h3>
-                    <p className="text-muted-foreground mt-2">
-                        Receive a full suite of developer-focused assets including C++ code, configuration files, and documentation.
-                    </p>
-                </div>
-                 <div className="flex flex-col items-center">
-                    <div className="p-4 bg-primary/10 rounded-full mb-4">
-                        <Coins className="h-10 w-10 text-primary"/>
-                    </div>
-                    <h3 className="text-xl font-bold font-headline">Launch with Confidence</h3>
-                    <p className="text-muted-foreground mt-2">
-                        Go from a simple idea to a fully-realized project with a professional brand and a clear path to launch.
-                    </p>
                 </div>
             </div>
         </section>
