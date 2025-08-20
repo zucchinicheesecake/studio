@@ -19,7 +19,6 @@ import { AlertCircle, CheckCircle, CircleDashed, Loader2 } from "lucide-react";
 import { ExplanationDialog } from "@/components/crypto-forge/explanation-dialog";
 import { ExplanationContext } from "@/hooks/use-explanation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 
 const steps = [
@@ -117,30 +116,55 @@ export default function ForgePage() {
 
         const generatedAssets: any = {};
         
+        const updateStepStatus = (name: string, status: GenerationStepStatus, error?: string) => {
+            setGenerationSteps(prev => prev.map(s => s.name === name ? { ...s, status, error } : s));
+        };
+        
         const runStep = async <T,>(name: string, fn: () => Promise<T>): Promise<T> => {
-            setGenerationSteps(prev => prev.map(s => s.name === name ? { ...s, status: 'generating' } : s));
+            updateStepStatus(name, 'generating');
             try {
                 const result = await fn();
-                setGenerationSteps(prev => prev.map(s => s.name === name ? { ...s, status: 'success' } : s));
+                updateStepStatus(name, 'success');
                 return result;
             } catch (e: any) {
                 const errorMessage = e instanceof Error ? e.message : String(e);
-                setGenerationSteps(prev => prev.map(s => s.name === name ? { ...s, status: 'error', error: errorMessage } : s));
+                updateStepStatus(name, 'error', errorMessage);
                 throw new Error(`Failed at step: ${name}`);
             }
         };
 
-        generatedAssets.pitchDeck = await runStep('Investor Pitch Deck', () => actions.generatePitchDeck({ ...data }));
-        generatedAssets.tokenomics = await runStep('Tokenomics Model', () => actions.generateTokenomicsModel({ ...data }));
-        generatedAssets.community = await runStep('Community Strategy', () => actions.generateCommunityStrategy({ ...data }));
-        generatedAssets.logo = await runStep('Logo Generation', () => actions.generateLogo({ coinName: fullFormParams.coinName, logoDescription: data.logoDescription }));
-        generatedAssets.whitepaper = await runStep('Whitepaper', () => actions.generateWhitepaper({ ...fullFormParams }));
-        generatedAssets.audio = await runStep('Audio Summary', () => actions.generateAudioSummary({ summary: technicalSummary.replace(/\*\*/g, '').replace(/\*/g, '') }));
-        generatedAssets.landingPage = await runStep('Landing Page', () => actions.generateLandingPage({ ...fullFormParams }));
-        generatedAssets.social = await runStep('Social Campaign', () => actions.generateSocialCampaign({ ...fullFormParams }));
-        generatedAssets.genesis = await runStep('Genesis Block', () => actions.generateGenesisBlockCode({ ...derivedParams, timestamp: data.timestamp! }));
-        generatedAssets.networkConfig = await runStep('Network Config', () => actions.createNetworkConfigurationFile({ ...derivedParams }));
-        generatedAssets.compilation = await runStep('Compilation Guidance', () => actions.provideCompilationGuidance({ coinName: fullFormParams.coinName, consensusMechanism: data.consensusMechanism!, targetSpacing: fullFormParams.targetSpacingInMinutes }));
+        // Parallelize independent generation tasks
+        const parallelPromises = [
+            runStep('Investor Pitch Deck', () => actions.generatePitchDeck({ ...data })),
+            runStep('Tokenomics Model', () => actions.generateTokenomicsModel({ ...data })),
+            runStep('Community Strategy', () => actions.generateCommunityStrategy({ ...data })),
+            runStep('Logo Generation', () => actions.generateLogo({ coinName: fullFormParams.coinName, logoDescription: data.logoDescription })),
+            runStep('Whitepaper', () => actions.generateWhitepaper({ ...fullFormParams })),
+            runStep('Audio Summary', () => actions.generateAudioSummary({ summary: technicalSummary.replace(/\*\*/g, '').replace(/\*/g, '') })),
+            runStep('Landing Page', () => actions.generateLandingPage({ ...fullFormParams })),
+            runStep('Social Campaign', () => actions.generateSocialCampaign({ ...fullFormParams })),
+            runStep('Genesis Block', () => actions.generateGenesisBlockCode({ ...derivedParams, timestamp: data.timestamp! })),
+            runStep('Network Config', () => actions.createNetworkConfigurationFile({ ...derivedParams })),
+            runStep('Compilation Guidance', () => actions.provideCompilationGuidance({ coinName: fullFormParams.coinName, consensusMechanism: data.consensusMechanism!, targetSpacing: fullFormParams.targetSpacingInMinutes })),
+        ];
+
+        const [
+            pitchDeck, tokenomics, community, logo, whitepaper, audio, landingPage, social, genesis, networkConfig, compilation
+        ] = await Promise.all(parallelPromises);
+
+        generatedAssets.pitchDeck = pitchDeck;
+        generatedAssets.tokenomics = tokenomics;
+        generatedAssets.community = community;
+        generatedAssets.logo = logo;
+        generatedAssets.whitepaper = whitepaper;
+        generatedAssets.audio = audio;
+        generatedAssets.landingPage = landingPage;
+        generatedAssets.social = social;
+        generatedAssets.genesis = genesis;
+        generatedAssets.networkConfig = networkConfig;
+        generatedAssets.compilation = compilation;
+
+        // Dependent step
         generatedAssets.nodeSetup = await runStep('Node Setup Instructions', () => actions.provideNodeSetupMiningInstructions({
             coinName: fullFormParams.coinName,
             coinSymbol: fullFormParams.coinAbbreviation,
@@ -196,9 +220,8 @@ export default function ForgePage() {
   };
 
 
-  if (generationSteps.length > 0) {
+  if (isGenerating || generationSteps.length > 0 && !results) {
     const hasError = generationSteps.some(s => s.status === 'error');
-    const isComplete = generationSteps.every(s => s.status === 'success' || s.status === 'error');
     
     return (
         <div className="flex flex-col items-center justify-center min-h-screen text-center container mx-auto px-4 py-12">
@@ -293,3 +316,4 @@ export default function ForgePage() {
     </FormProvider>
   );
 }
+
