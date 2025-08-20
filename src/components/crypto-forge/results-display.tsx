@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CodeBlock } from "@/components/crypto-forge/code-block";
 import type { GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
-import { Download, Linkedin, MessageSquare, Twitter, TrendingUp, Save, Loader2, CheckCircle, ArrowLeft, FileCode, Presentation, Megaphone } from "lucide-react";
+import { Download, Linkedin, MessageSquare, Twitter, TrendingUp, Save, Loader2, CheckCircle, ArrowLeft, FileCode, Presentation } from "lucide-react";
 import Image from "next/image";
 import { LandingPage } from "@/components/crypto-forge/landing-page";
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
@@ -17,7 +17,7 @@ import { onAuthStateChanged, type User } from "firebase/auth";
 import { saveProject } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
+import { Separator } from "../ui/separator";
 
 
 interface ResultsDisplayProps {
@@ -157,57 +157,52 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
                 <CardDescription>Your public-facing assets. Use these to build your brand and community.</CardDescription>
               </div>
             </CardHeader>
-            <CardContent>
-                <Accordion type="single" collapsible defaultValue="landing-page" className="w-full">
-                    <AccordionItem value="landing-page">
-                        <AccordionTrigger className="text-xl font-headline text-primary">Landing Page Preview</AccordionTrigger>
-                        <AccordionContent>
-                           <div className="flex justify-end mb-4">
-                             <Button variant="outline" size="sm" onClick={() => downloadFile('LandingPage.tsx', results.landingPageCode)}>
-                                  <Download className="mr-2 h-4 w-4" />
-                                  Download Code
-                              </Button>
-                           </div>
-                           <div className="w-full h-[600px] bg-background rounded-lg border overflow-hidden">
-                                <div className="h-full w-full overflow-y-auto">
-                                    <LandingPage
-                                        logoUrl={results.logoDataUri}
-                                        generatedCode={results.landingPageCode}
-                                    />
-                                </div>
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="whitepaper">
-                        <AccordionTrigger className="text-xl font-headline text-primary">Whitepaper</AccordionTrigger>
-                        <AccordionContent>
-                           <div className="flex justify-end mb-4">
-                                <Button variant="outline" size="sm" onClick={() => downloadFile('whitepaper.md', results.whitepaperContent)}>
-                                    <Download className="mr-2 h-4 w-4" />
-                                    Download Whitepaper
-                                </Button>
-                           </div>
-                           <CodeBlock code={results.whitepaperContent} language="markdown" />
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="marketing-kit">
-                        <AccordionTrigger className="text-xl font-headline text-primary">Social Media Kit</AccordionTrigger>
-                        <AccordionContent className="space-y-6">
-                            <div>
-                                <h3 className="font-semibold text-lg mb-2 flex items-center"><Twitter className="mr-2 h-5 w-5" /> X (Twitter) Thread</h3>
-                                <CodeBlock code={results.twitterCampaign} language="markdown" />
-                            </div>
-                            <div>
-                                <h3 className="font-semibold text-lg mb-2 flex items-center"><Linkedin className="mr-2 h-5 w-5" /> LinkedIn Post</h3>
-                                <CodeBlock code={results.linkedInPost} language="markdown" />
-                            </div>
-                            <div>
-                                <h3 className="font-semibold text-lg mb-2 flex items-center"><MessageSquare className="mr-2 h-5 w-5" /> Discord/Telegram Welcome</h3>
-                                <CodeBlock code={results.communityWelcome} language="markdown" />
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
+            <CardContent className="space-y-8">
+                <ResultSection
+                    title="Landing Page Preview"
+                    filename="LandingPage.tsx"
+                    content={results.landingPageCode}
+                >
+                    <div className="w-full h-[600px] bg-background rounded-lg border overflow-hidden">
+                        <div className="h-full w-full overflow-y-auto">
+                            <LandingPage
+                                logoUrl={results.logoDataUri}
+                                generatedCode={results.landingPageCode}
+                            />
+                        </div>
+                    </div>
+                </ResultSection>
+
+                <Separator />
+
+                <ResultSection
+                    title="Whitepaper"
+                    filename="whitepaper.md"
+                    content={results.whitepaperContent}
+                >
+                    <CodeBlock code={results.whitepaperContent} language="markdown" />
+                </ResultSection>
+
+                <Separator />
+                
+                <div>
+                    <h3 className="font-headline text-xl text-primary mb-4">Social Media Kit</h3>
+                    <div className="space-y-6">
+                        <div>
+                            <h4 className="font-semibold text-lg mb-2 flex items-center"><Twitter className="mr-2 h-5 w-5" /> X (Twitter) Thread</h4>
+                            <CodeBlock code={results.twitterCampaign} language="markdown" />
+                        </div>
+                        <div>
+                            <h4 className="font-semibold text-lg mb-2 flex items-center"><Linkedin className="mr-2 h-5 w-5" /> LinkedIn Post</h4>
+                            <CodeBlock code={results.linkedInPost} language="markdown" />
+                        </div>
+                        <div>
+                            <h4 className="font-semibold text-lg mb-2 flex items-center"><MessageSquare className="mr-2 h-5 w-5" /> Discord/Telegram Welcome</h4>
+                            <CodeBlock code={results.communityWelcome} language="markdown" />
+                        </div>
+                    </div>
+                </div>
+
             </CardContent>
         </TabContentCard>
         
@@ -270,41 +265,44 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
                 <CardTitle>Developer Assets</CardTitle>
                 <CardDescription>The core code and instructions needed to compile, run, and maintain your network.</CardDescription>
             </CardHeader>
-            <CardContent>
-                <Accordion type="single" collapsible defaultValue="genesis" className="w-full">
-                    <AccordionItem value="genesis">
-                         <AccordionTriggerWithDownload filename="genesis_block.cpp" content={results.genesisBlockCode}>
-                            Genesis Block
-                         </AccordionTriggerWithDownload>
-                         <AccordionContent>
-                            <CodeBlock code={results.genesisBlockCode} language="cpp" />
-                         </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="config">
-                         <AccordionTriggerWithDownload filename="config.txt" content={results.networkConfigurationFile}>
-                           Network Configuration
-                         </AccordionTriggerWithDownload>
-                         <AccordionContent>
-                             <CodeBlock code={results.networkConfigurationFile} language="ini" />
-                         </AccordionContent>
-                    </AccordionItem>
-                     <AccordionItem value="compile">
-                         <AccordionTriggerWithDownload filename="compilation_guide.md" content={results.compilationInstructions}>
-                           Compilation Guide
-                         </AccordionTriggerWithDownload>
-                         <AccordionContent>
-                            <CodeBlock code={results.compilationInstructions} language="markdown" />
-                         </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="setup">
-                         <AccordionTriggerWithDownload filename="node_setup_guide.md" content={results.nodeSetupInstructions}>
-                           Node Setup & Mining Guide
-                         </AccordionTriggerWithDownload>
-                         <AccordionContent>
-                            <CodeBlock code={results.nodeSetupInstructions} language="markdown" />
-                         </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
+            <CardContent className="space-y-8">
+                <ResultSection
+                    title="Genesis Block"
+                    filename="genesis_block.cpp"
+                    content={results.genesisBlockCode}
+                >
+                    <CodeBlock code={results.genesisBlockCode} language="cpp" />
+                </ResultSection>
+
+                <Separator />
+
+                <ResultSection
+                    title="Network Configuration"
+                    filename="config.txt"
+                    content={results.networkConfigurationFile}
+                >
+                    <CodeBlock code={results.networkConfigurationFile} language="ini" />
+                </ResultSection>
+
+                <Separator />
+                
+                <ResultSection
+                    title="Compilation Guide"
+                    filename="compilation_guide.md"
+                    content={results.compilationInstructions}
+                >
+                    <CodeBlock code={results.compilationInstructions} language="markdown" />
+                </ResultSection>
+
+                <Separator />
+
+                <ResultSection
+                    title="Node Setup & Mining Guide"
+                    filename="node_setup_guide.md"
+                    content={results.nodeSetupInstructions}
+                >
+                    <CodeBlock code={results.nodeSetupInstructions} language="markdown" />
+                </ResultSection>
             </CardContent>
         </TabContentCard>
 
@@ -334,19 +332,22 @@ function TabContentCard({ value, children }: { value: string, children: React.Re
     )
 }
 
-function AccordionTriggerWithDownload({ filename, content, children }: { filename: string, content: string, children: React.ReactNode }) {
+function ResultSection({ title, filename, content, children }: { title: string, filename: string, content: string, children: React.ReactNode }) {
     const handleDownload = (e: React.MouseEvent) => {
-        e.stopPropagation(); // prevent accordion from toggling
+        e.stopPropagation(); 
         downloadFile(filename, content);
     };
 
     return (
-        <div className="flex w-full items-center justify-between hover:bg-accent/10 pr-4">
-             <AccordionTrigger className="text-xl font-headline text-primary flex-grow hover:no-underline">{children}</AccordionTrigger>
-             <Button variant="outline" size="sm" onClick={handleDownload} className="ml-4">
-                <Download className="mr-2 h-4 w-4" />
-                Download
-            </Button>
+        <div>
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="font-headline text-xl text-primary">{title}</h3>
+                <Button variant="outline" size="sm" onClick={handleDownload}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Download
+                </Button>
+            </div>
+            {children}
         </div>
     )
 }
@@ -362,3 +363,5 @@ const downloadFile = (filename: string, content: string) => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 };
+
+    
