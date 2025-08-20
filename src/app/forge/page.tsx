@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, createContext, useContext } from "react";
+import { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -17,6 +17,7 @@ import { Step4TokenStrategy } from "@/components/crypto-forge/step-4-token-strat
 import { ResultsDisplay } from "@/components/crypto-forge/results-display";
 import { Loader2 } from "lucide-react";
 import { ExplanationDialog } from "@/components/crypto-forge/explanation-dialog";
+import { ExplanationContext } from "@/hooks/use-explanation";
 
 
 const steps = [
@@ -153,14 +154,3 @@ export default function ForgePage() {
     </FormProvider>
   );
 }
-
-
-type ExplanationContextType = {
-  handleExplain: (concept: string) => void;
-};
-// Create a context to hold the handleExplain function.
-// This avoids prop-drilling it down through multiple layers.
-const ExplanationContext = createContext<ExplanationContextType>({ handleExplain: () => {} });
-
-// Custom hook to easily access the context
-export const useExplanation = () => useContext(ExplanationContext);
