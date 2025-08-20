@@ -34,35 +34,38 @@ export async function generateGenesisBlockCode(input: GenesisBlockCodeInput): Pr
   return generateGenesisBlockCodeFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'genesisBlockCodePrompt',
-  input: {schema: GenesisBlockCodeInputSchema},
-  output: {schema: GenesisBlockCodeOutputSchema},
-  prompt: `You are an expert in blockchain technology and cryptocurrency development. Your task is to generate the genesis block code for a new cryptocurrency based on the following parameters provided by the user:
-
-Coin Name: {{{coinName}}}
-Coin Abbreviation: {{{coinAbbreviation}}}
-Address Letter: {{{addressLetter}}}
-Coin Unit: {{{coinUnit}}}
-Timestamp: {{{timestamp}}}
-Block Reward: {{{blockReward}}}
-Block Halving: {{{blockHalving}}}
-Coin Supply: {{{coinSupply}}}
-
-Based on these parameters, generate the genesis block code. The code should be well-formatted and ready to be integrated into the cryptocurrency's source code. Pay specific attention to using the timestamp provided in the genesis block.
-
-Ensure that the generated code includes the timestamp and adheres to standard cryptocurrency genesis block conventions.
-`,
-});
-
 const generateGenesisBlockCodeFlow = ai.defineFlow(
   {
     name: 'generateGenesisBlockCodeFlow',
     inputSchema: GenesisBlockCodeInputSchema,
     outputSchema: GenesisBlockCodeOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  async (input) => {
+    const genesisBlockCode = `
+// Genesis Block for ${input.coinName} (${input.coinAbbreviation})
+static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
+{
+    const char* pszTimestamp = "${input.timestamp}";
+    CMutableTransaction txNew;
+    txNew.nVersion = 1;
+    txNew.vin.resize(1);
+    txNew.vout.resize(1);
+    txNew.vin[0].scriptSig = CScript() << 486604799 << CScriptNum(4) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+    txNew.vout[0].nValue = genesisReward;
+    txNew.vout[0].scriptPubKey = CScript() << ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f") << OP_CHECKSIG;
+
+    CBlock genesis;
+    genesis.nTime    = nTime;
+    genesis.nBits    = nBits;
+    genesis.nNonce   = nNonce;
+    genesis.nVersion = nVersion;
+    genesis.vtx.push_back(MakeTransactionRef(std::move(txNew)));
+    genesis.hashPrevBlock.SetNull();
+    genesis.hashMerkleRoot = BlockMerkleRoot(genesis);
+    return genesis;
+}
+`.trim();
+
+    return { genesisBlockCode };
   }
 );
