@@ -96,47 +96,72 @@ export default function ForgePage() {
     setGenerationSteps(initialSteps);
 
     try {
-        const generatedAssets: any = {};
+        const generatedAssets: Partial<GenerationResult> = { formValues: data };
         
-        const updateStepStatus = (name: string, status: GenerationStepStatus, error?: string) => {
-            setGenerationSteps(prev => prev.map(s => s.name === name ? { ...s, status, error } : s));
+        const updateStepStatus = (index: number, status: GenerationStepStatus, error?: string) => {
+            setGenerationSteps(prev => {
+                const newSteps = [...prev];
+                newSteps[index] = { ...newSteps[index], status, error };
+                return newSteps;
+            });
         };
         
-        const runStep = async <T,>(name: string, fn: () => Promise<T>): Promise<T> => {
-            updateStepStatus(name, 'generating');
-            try {
-                const result = await fn();
-                updateStepStatus(name, 'success');
-                return result;
-            } catch (e: any) {
-                const errorMessage = e instanceof Error ? e.message : String(e);
-                updateStepStatus(name, 'error', errorMessage);
-                throw new Error(`Failed at step: ${name}`);
-            }
-        };
+        // Step 1: Logo
+        updateStepStatus(0, 'generating');
+        try {
+            const logo = await actions.generateLogo({ coinName: data.projectName, logoDescription: data.logoDescription });
+            generatedAssets.logoDataUri = logo.logoDataUri;
+            updateStepStatus(0, 'success');
+        } catch(e: any) {
+            updateStepStatus(0, 'error', e.message);
+            throw new Error("Logo generation failed.");
+        }
 
-        const [
-            logo,
-            genesis,
-            networkConfig,
-            installScript,
-            readme,
-        ] = await Promise.all([
-            runStep('Logo Generation', () => actions.generateLogo({ coinName: data.projectName, logoDescription: data.logoDescription })),
-            runStep('Genesis Block', () => actions.generateGenesisBlockCode({ coinName: data.projectName, ticker: data.ticker, timestamp: data.timestamp })),
-            runStep('Network Config', () => actions.createNetworkConfigurationFile(data)),
-            runStep('Install Script', () => actions.generateInstallScript({ projectName: data.projectName, ticker: data.ticker })),
-            runStep('README File', () => actions.generateReadme({ projectName: data.projectName, ticker: data.ticker, missionStatement: data.missionStatement })),
-        ]);
+        // Step 2: Genesis Block
+        updateStepStatus(1, 'generating');
+        try {
+            const genesis = await actions.generateGenesisBlockCode({ coinName: data.projectName, ticker: data.ticker, timestamp: data.timestamp });
+            generatedAssets.genesisBlockCode = genesis.genesisBlockCode;
+            updateStepStatus(1, 'success');
+        } catch(e: any) {
+            updateStepStatus(1, 'error', e.message);
+            throw new Error("Genesis block generation failed.");
+        }
+
+        // Step 3: Network Config
+        updateStepStatus(2, 'generating');
+        try {
+            const networkConfig = await actions.createNetworkConfigurationFile(data);
+            generatedAssets.networkConfigurationFile = networkConfig.networkConfigurationFile;
+            updateStepStatus(2, 'success');
+        } catch(e: any) {
+            updateStepStatus(2, 'error', e.message);
+            throw new Error("Network config generation failed.");
+        }
+
+        // Step 4: README
+        updateStepStatus(3, 'generating');
+        try {
+            const readme = await actions.generateReadme({ projectName: data.projectName, ticker: data.ticker, missionStatement: data.missionStatement });
+            generatedAssets.readmeContent = readme.readmeContent;
+            updateStepStatus(3, 'success');
+        } catch(e: any) {
+            updateStepStatus(3, 'error', e.message);
+            throw new Error("README generation failed.");
+        }
         
-        setResults({
-            formValues: data,
-            genesisBlockCode: genesis.genesisBlockCode,
-            networkConfigurationFile: networkConfig.networkConfigurationFile,
-            readmeContent: readme.readmeContent,
-            logoDataUri: logo.logoDataUri,
-            installScript: installScript.installScript,
-        });
+        // Step 5: Install Script
+        updateStepStatus(4, 'generating');
+        try {
+            const installScript = await actions.generateInstallScript({ projectName: data.projectName, ticker: data.ticker });
+            generatedAssets.installScript = installScript.installScript;
+            updateStepStatus(4, 'success');
+        } catch(e: any) {
+            updateStepStatus(4, 'error', e.message);
+            throw new Error("Install script generation failed.");
+        }
+        
+        setResults(generatedAssets as GenerationResult);
 
     } catch (e: any) {
         toast({
@@ -170,10 +195,12 @@ export default function ForgePage() {
     setIsGenerating(false);
     setGenerationSteps([]);
     setCurrentStep(0);
-    methods.reset();
+    // Note: We don't call methods.reset() here to allow users to easily regenerate with the same data.
+    // If you want to clear the form, you can add `methods.reset();`
   }
 
   const handleTryAgain = () => {
+    // We already have the data, so just call onSubmit again.
     onSubmit(getValues());
   };
 
@@ -216,9 +243,12 @@ export default function ForgePage() {
                 </CardContent>
             </Card>
             {!isGenerating && hasError && (
-                <div className="mt-8">
-                    <Button onClick={handleTryAgain}>
+                <div className="mt-8 flex gap-4">
+                    <Button onClick={handleTryAgain} variant="default">
                         Try Again
+                    </Button>
+                     <Button onClick={resetForm} variant="outline">
+                        Back to Editor
                     </Button>
                 </div>
             )}
@@ -278,4 +308,3 @@ export default function ForgePage() {
     </ExplanationContext.Provider>
   );
 }
-

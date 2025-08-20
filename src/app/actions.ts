@@ -25,7 +25,10 @@ export async function generateGenesisBlockCode(input: GenesisBlockCodeInput) {
         return await generateGenesisBlockCodeFlow(input);
     } catch (error) {
         console.error("Error in generateGenesisBlockCode:", error);
-        throw new Error("Failed to generate Genesis Block code. The AI model may be temporarily unavailable.");
+        if (error instanceof Error) {
+            throw new Error(`Failed to generate Genesis Block code: ${error.message}`);
+        }
+        throw new Error("An unknown error occurred while generating the Genesis Block code.");
     }
 }
 
@@ -34,7 +37,10 @@ export async function createNetworkConfigurationFile(input: CreateNetworkConfigu
         return await createNetworkConfigurationFileFlow(input);
     } catch (error) {
         console.error("Error in createNetworkConfigurationFile:", error);
-        throw new Error("Failed to create network configuration file.");
+         if (error instanceof Error) {
+            throw new Error(`Failed to create network configuration: ${error.message}`);
+        }
+        throw new Error("An unknown error occurred while creating the network configuration.");
     }
 }
 
@@ -43,6 +49,9 @@ export async function generateLogo(input: GenerateLogoInput) {
         return await generateLogoFlow(input);
     } catch (error) {
         console.error("Error in generateLogo:", error);
+         if (error instanceof Error) {
+            throw new Error(`Failed to generate logo: ${error.message}`);
+        }
         throw new Error("Failed to generate logo. The image generation service may be down.");
     }
 }
@@ -52,7 +61,10 @@ export async function generateReadme(input: GenerateReadmeInput) {
         return await generateReadmeFlow(input);
     } catch (error) {
         console.error("Error in generateReadme:", error);
-        throw new Error("Failed to generate README file.");
+        if (error instanceof Error) {
+            throw new Error(`Failed to generate README: ${error.message}`);
+        }
+        throw new Error("An unknown error occurred while generating the README.");
     }
 }
 

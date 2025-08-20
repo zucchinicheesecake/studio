@@ -73,7 +73,7 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
       <div className="text-center mb-8">
         <h1 className="text-5xl font-headline font-bold text-primary">{isSavedProject ? results.formValues.projectName : "Your Crypto Project is Ready!"}</h1>
         <p className="text-muted-foreground mt-2 text-lg">
-          {isSavedProject ? `Viewing saved project details for ${results.formValues.ticker}.` : "Congratulations! Below are the generated assets for your new project."}
+          {isSavedProject ? `Viewing project saved on ${projectDate}.` : "Congratulations! Below are the generated assets for your new project."}
         </p>
       </div>
       
@@ -90,7 +90,7 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
             </div>
             <div className="flex-grow">
                 <CardTitle className="font-headline text-3xl">{results.formValues.projectName} ({results.formValues.ticker})</CardTitle>
-                <CardDescription className="mt-2 text-base">{isSavedProject ? `Created on ${projectDate}` : "Your developer toolkit is ready. Follow the README to get started."}</CardDescription>
+                <CardDescription className="mt-2 text-base">{results.formValues.tagline}</CardDescription>
             </div>
              {user && !isSavedProject && (
                 <div className="flex-shrink-0">
@@ -116,7 +116,7 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
       </Card>
 
         <div className="space-y-8">
-             <Accordion type="single" collapsible className="w-full">
+             <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
                 <AccordionItem value="item-1">
                     <AccordionTrigger className="text-xl font-headline text-accent hover:no-underline">
                         <div className="flex items-center gap-3">
@@ -130,6 +130,20 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
                 </AccordionItem>
             </Accordion>
             
+            <Separator />
+            
+            <ResultSection
+                title="README"
+                filename="README.md"
+                content={results.readmeContent}
+            >
+                 <Card className="bg-card/50">
+                    <CardContent className="p-6">
+                         <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: safeReadmeHtml }} />
+                    </CardContent>
+                </Card>
+            </ResultSection>
+
             <Separator />
 
             <ResultSection
@@ -159,20 +173,6 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
             >
                 <CodeBlock code={results.networkConfigurationFile} language="ini" />
             </ResultSection>
-
-            <Separator />
-            
-            <ResultSection
-                title="README"
-                filename="README.md"
-                content={results.readmeContent}
-            >
-                 <Card className="bg-card/50">
-                    <CardContent className="p-6">
-                         <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: safeReadmeHtml }} />
-                    </CardContent>
-                </Card>
-            </ResultSection>
         </div>
       
        <div className="text-center mt-12">
@@ -200,7 +200,7 @@ function ResultSection({ title, filename, content, children }: { title: string, 
                 <h3 className="font-headline text-xl text-primary">{title}</h3>
                 <Button variant="outline" size="sm" onClick={handleDownload}>
                     <Download className="mr-2 h-4 w-4" />
-                    Download
+                    Download {filename}
                 </Button>
             </div>
             {children}
