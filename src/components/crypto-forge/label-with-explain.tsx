@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 import { FormLabel } from "@/components/ui/form";
-import { useExplanation } from "@/app/page";
+import { useExplanation } from "@/app/forge/page";
 import { HelpCircle } from "lucide-react";
 
 interface LabelWithExplainProps {
