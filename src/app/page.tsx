@@ -13,6 +13,7 @@ import { Step1Consensus } from "@/components/crypto-forge/step-1-consensus";
 import { Step2BasicInfo } from "@/components/crypto-forge/step-2-basic-info";
 import { Step3Economics } from "@/components/crypto-forge/step-3-economics";
 import { Step4Network } from "@/components/crypto-forge/step-4-network";
+import { Step5Logo } from "@/components/crypto-forge/step-5-logo";
 import { ResultsDisplay } from "@/components/crypto-forge/results-display";
 import { Loader2 } from "lucide-react";
 
@@ -22,6 +23,7 @@ const steps = [
   { id: 2, name: "Basics", component: <Step2BasicInfo />, fields: ["coinName", "coinAbbreviation", "addressLetter", "coinUnit", "timestamp", "websiteUrl", "githubUrl"] },
   { id: 3, name: "Economics", component: <Step3Economics />, fields: ["blockReward", "blockHalving", "coinSupply"] },
   { id: 4, name: "Network", component: <Step4Network />, fields: ["coinbaseMaturity", "numberOfConfirmations", "targetSpacingInMinutes", "targetTimespanInMinutes"] },
+  { id: 5, name: "Logo", component: <Step5Logo />, fields: ["logoDescription"] },
 ];
 
 export default function Home() {
@@ -48,6 +50,7 @@ export default function Home() {
       numberOfConfirmations: 6,
       targetSpacingInMinutes: 10,
       targetTimespanInMinutes: 1440,
+      logoDescription: "A golden coin with a futuristic circuit pattern.",
     },
   });
 
@@ -99,6 +102,7 @@ export default function Home() {
             <Loader2 className="h-16 w-16 animate-spin text-primary mb-4" />
             <h1 className="text-3xl font-headline font-bold text-primary">Forging Your Crypto...</h1>
             <p className="text-muted-foreground mt-2">The AI is generating your genesis block, configuration, and instructions.</p>
+            <p className="text-sm text-muted-foreground mt-2">(Logo generation may take up to a minute)</p>
         </div>
     );
   }
@@ -114,7 +118,7 @@ export default function Home() {
               <h1 className="text-5xl font-headline font-bold text-primary">CryptoForge AI</h1>
               <p className="mt-2 text-lg text-muted-foreground">Your personal AI assistant for creating cryptocurrencies.</p>
           </div>
-          <div className="w-full max-w-3xl">
+          <div className="w-full max-w-4xl">
             <Stepper currentStep={currentStep} steps={steps.map(s => s.name)} />
           </div>
           <div className="w-full max-w-3xl mt-8">

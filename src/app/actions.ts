@@ -5,6 +5,7 @@ import { provideCompilationGuidance } from "@/ai/flows/provide-compilation-guida
 import { generateGenesisBlockCode } from "@/ai/flows/generate-genesis-block-code";
 import { createNetworkConfigurationFile } from "@/ai/flows/create-network-configuration-file";
 import { provideNodeSetupMiningInstructions } from "@/ai/flows/provide-node-setup-mining-instructions";
+import { generateLogo } from "@/ai/flows/generate-logo";
 import type { FormValues, GenerationResult } from "@/app/types";
 
 
@@ -32,11 +33,17 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
             targetSpacingInMinutes: values.targetSpacingInMinutes,
             targetTimespanInMinutes: values.targetTimespanInMinutes,
         });
+
+        const logoPromise = generateLogo({
+            coinName: values.coinName,
+            logoDescription: values.logoDescription,
+        });
         
-        const [compilationGuidance, genesisBlock, networkConfig] = await Promise.all([
+        const [compilationGuidance, genesisBlock, networkConfig, logo] = await Promise.all([
             compilationGuidancePromise,
             genesisBlockPromise,
             networkConfigPromise,
+            logoPromise,
         ]);
 
         const nodeSetupInstructions = await provideNodeSetupMiningInstructions({
@@ -55,6 +62,7 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
             networkConfigurationFile: networkConfig.networkConfigurationFile,
             compilationInstructions: compilationGuidance.compilationInstructions,
             nodeSetupInstructions: nodeSetupInstructions.instructions,
+            logoDataUri: logo.logoDataUri,
         };
     } catch (error) {
         console.error("Error generating crypto configuration:", error);

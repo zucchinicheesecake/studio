@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CodeBlock } from "@/components/crypto-forge/code-block";
 import type { GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, Rocket } from "lucide-react";
+import Image from "next/image";
 
 interface ResultsDisplayProps {
   results: GenerationResult;
@@ -21,6 +22,25 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
           Congratulations! Below are the generated assets for your new coin.
         </p>
       </div>
+      
+      <Card className="mb-8 bg-card/50 border-primary/20">
+        <CardHeader className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="flex-shrink-0">
+                <Image
+                    src={results.logoDataUri}
+                    alt="Generated Crypto Logo"
+                    width={128}
+                    height={128}
+                    className="rounded-full border-4 border-primary/50 object-cover"
+                />
+            </div>
+            <div className="flex-grow">
+                <CardTitle className="font-headline text-3xl">Launch Your Coin!</CardTitle>
+                <CardDescription className="mt-2">You have everything you need. Follow the compilation and node setup guides to bring your cryptocurrency to life.</CardDescription>
+            </div>
+        </CardHeader>
+      </Card>
+
 
       <Tabs defaultValue="summary" className="w-full">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 bg-card border-b">
@@ -37,7 +57,7 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
             <CardDescription>A recap of your cryptocurrency's key parameters.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="prose prose-invert leading-relaxed" dangerouslySetInnerHTML={{ __html: results.technicalSummary.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}></p>
+            <div className="prose prose-invert max-w-none leading-relaxed" dangerouslySetInnerHTML={{ __html: results.technicalSummary.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>') }}></div>
           </CardContent>
         </TabContentCard>
 
@@ -93,7 +113,7 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
 function TabContentCard({ value, filename, content, children }: { value: string, filename?: string, content?: string, children: React.ReactNode }) {
     const handleDownload = () => {
         if(!content || !filename) return;
-        const blob = new Blob([content], { type: 'text/plain' });
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;

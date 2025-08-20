@@ -21,6 +21,8 @@ export const formSchema = z.object({
   numberOfConfirmations: z.coerce.number().min(1, "Number of confirmations must be at least 1."),
   targetSpacingInMinutes: z.coerce.number().min(1, "Target spacing must be at least 1 minute."),
   targetTimespanInMinutes: z.coerce.number().min(1, "Target timespan must be at least 1 minute."),
+  // Step 5
+  logoDescription: z.string().min(1, "Please provide a logo description."),
 });
 
 export type FormValues = z.infer<typeof formSchema>;
@@ -31,4 +33,5 @@ export type GenerationResult = {
     networkConfigurationFile: string;
     compilationInstructions: string;
     nodeSetupInstructions: string;
+    logoDataUri: string;
 };
