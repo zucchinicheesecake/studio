@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
+import Link from "next/link";
 import * as actions from "@/app/actions";
 import { formSchema, type FormValues, type GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { Step2NetworkParameters } from "@/components/crypto-forge/step-2-network
 import { Step3TechnicalDetails } from "@/components/crypto-forge/step-3-technical-details";
 import { Step4Consensus } from "@/components/crypto-forge/step-4-consensus";
 import { ResultsDisplay } from "@/components/crypto-forge/results-display";
-import { AlertCircle, CheckCircle, CircleDashed, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle, CircleDashed, Loader2, Bot } from "lucide-react";
 import { ExplanationDialog } from "@/components/crypto-forge/explanation-dialog";
 import { ExplanationContext } from "@/hooks/use-explanation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -185,7 +185,7 @@ export default function ForgePage() {
   };
 
 
-  if (isGenerating || generationSteps.length > 0 && !results) {
+  if (isGenerating || (generationSteps.length > 0 && !results)) {
     const hasError = generationSteps.some(s => s.status === 'error');
     
     return (
@@ -244,7 +244,17 @@ export default function ForgePage() {
 
   return (
     <FormProvider {...methods}>
-        <main className="container mx-auto px-4 py-12 flex flex-col items-center justify-center min-h-screen">
+        <div className="flex flex-col min-h-screen">
+        <header className="container mx-auto px-4 h-16 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+                <Bot className="h-8 w-8 text-primary" />
+                <span className="text-xl font-bold font-headline">CryptoForge</span>
+            </Link>
+            <Button asChild variant="outline">
+                <Link href="/dashboard">My Dashboard</Link>
+            </Button>
+        </header>
+        <main className="flex-grow container mx-auto px-4 py-12 flex flex-col items-center justify-center">
           <div className="text-center mb-4">
               <h1 className="text-5xl font-headline font-bold text-primary">CryptoForge</h1>
               <p className="mt-2 text-lg text-muted-foreground">Your AI co-founder for launching a crypto project.</p>
@@ -271,6 +281,9 @@ export default function ForgePage() {
             </Button>
           </div>
         </main>
+         <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground">
+            <p>&copy; {new Date().getFullYear()} CryptoForge. All rights reserved.</p>
+        </footer>
         <ExplanationDialog
             isOpen={!!explanation.title}
             onOpenChange={(isOpen) => !isOpen && setExplanation({ title: "", content: "", isLoading: false })}
@@ -278,6 +291,7 @@ export default function ForgePage() {
             content={explanation.content}
             isLoading={explanation.isLoading}
         />
+        </div>
     </FormProvider>
   );
 }

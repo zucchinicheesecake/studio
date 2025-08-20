@@ -2,9 +2,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Bot, Coins, FileText, LayoutDashboard } from "lucide-react";
-import Image from "next/image";
+import { ArrowRight, Bot, Coins, FileText } from "lucide-react";
 import Link from "next/link";
 
 export default function LandingPage() {
@@ -50,7 +48,7 @@ export default function LandingPage() {
                     </div>
                     <h3 className="text-xl font-bold font-headline">AI-Powered Generation</h3>
                     <p className="text-muted-foreground mt-2">
-                        Leverage cutting-edge AI to generate everything from your genesis block and whitepaper to your logo and launch campaign.
+                        Leverage cutting-edge AI to generate everything from your genesis block to your README file.
                     </p>
                 </div>
                 <div className="flex flex-col items-center">
@@ -59,7 +57,7 @@ export default function LandingPage() {
                     </div>
                     <h3 className="text-xl font-bold font-headline">Complete Asset Toolkit</h3>
                     <p className="text-muted-foreground mt-2">
-                        Receive a full suite of assets including code, documentation, a landing page, and marketing materials.
+                        Receive a full suite of developer-focused assets including C++ code, configuration files, and documentation.
                     </p>
                 </div>
                  <div className="flex flex-col items-center">

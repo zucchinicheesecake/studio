@@ -65,7 +65,7 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
       </div>
       
       <Card className="mb-8 bg-card/50 border-primary/20">
-        <CardHeader className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+        <CardHeader className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left p-6">
             <div className="flex-shrink-0">
                 <Image
                     src={results.logoDataUri}
@@ -89,6 +89,13 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
                         ) : (
                             <><Save className="mr-2" /> Save Project</>
                         )}
+                    </Button>
+                </div>
+            )}
+             {isSavedProject && (
+                <div className="flex-shrink-0">
+                    <Button asChild>
+                        <Link href="/dashboard"><ArrowLeft className="mr-2" /> Back to Dashboard</Link>
                     </Button>
                 </div>
             )}
@@ -121,14 +128,18 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
                 filename="README.md"
                 content={results.readmeContent}
             >
-                <CodeBlock code={results.readmeContent} language="markdown" />
+                 <Card className="bg-card/50">
+                    <CardContent className="p-6">
+                         <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: results.readmeContent.replace(/\n/g, '<br />') }} />
+                    </CardContent>
+                </Card>
             </ResultSection>
         </div>
       
        <div className="text-center mt-12">
        {isSavedProject ? (
-          <Button asChild size="lg">
-            <Link href="/dashboard"><ArrowLeft className="mr-2" /> Back to Dashboard</Link>
+          <Button asChild size="lg" variant="outline">
+            <Link href="/forge">Create a New Project</Link>
           </Button>
         ) : (
           <Button onClick={onReset} size="lg">Create Another Project</Button>
