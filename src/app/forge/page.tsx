@@ -245,7 +245,7 @@ export default function ForgePage() {
                   <span className="text-xl font-bold font-headline">Coin Engine</span>
               </Link>
               <Button asChild variant="outline">
-                  <Link href="/dashboard">My Dashboard</Link>
+                  <Link href="/dashboard">Login / Signup</Link>
               </Button>
           </header>
           <main className="flex-grow container mx-auto px-4 pt-4 pb-12 flex flex-col items-center">
