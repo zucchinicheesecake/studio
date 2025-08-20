@@ -11,8 +11,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Inter', 'sans-serif'],
-        headline: ['"Space Grotesk"', 'sans-serif'],
+        body: ['"Source Code Pro"', 'monospace'],
+        headline: ['"Press Start 2P"', 'cursive'],
         code: ['"Source Code Pro"', 'monospace'],
       },
       colors: {
