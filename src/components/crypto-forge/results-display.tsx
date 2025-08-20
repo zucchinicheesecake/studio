@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CodeBlock } from "@/components/crypto-forge/code-block";
 import type { GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
-import { Download, Linkedin, MessageSquare, Twitter, TrendingUp, Save, Loader2, CheckCircle, ArrowLeft } from "lucide-react";
+import { Download, Linkedin, MessageSquare, Twitter, TrendingUp, Save, Loader2, CheckCircle, ArrowLeft, FileCode, Presentation, Megaphone } from "lucide-react";
 import Image from "next/image";
 import { LandingPage } from "@/components/crypto-forge/landing-page";
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
@@ -17,6 +17,7 @@ import { onAuthStateChanged, type User } from "firebase/auth";
 import { saveProject } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 
 
 interface ResultsDisplayProps {
@@ -28,7 +29,7 @@ interface ResultsDisplayProps {
 export function ResultsDisplay({ results, onReset, isSavedProject = false }: ResultsDisplayProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(isSavedProject);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -142,167 +143,171 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
       </Card>
 
 
-      <Tabs defaultValue="landing-page" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 lg:grid-cols-9">
-          <TabsTrigger value="landing-page">Landing Page</TabsTrigger>
-          <TabsTrigger value="marketing-kit">Marketing</TabsTrigger>
-          <TabsTrigger value="whitepaper">Whitepaper</TabsTrigger>
-          <TabsTrigger value="tokenomics">Tokenomics</TabsTrigger>
-          <TabsTrigger value="summary">Summary</TabsTrigger>
-          <TabsTrigger value="genesis">Genesis</TabsTrigger>
-          <TabsTrigger value="config">Config</TabsTrigger>
-          <TabsTrigger value="compile">Compilation</TabsTrigger>
-          <TabsTrigger value="setup">Node Setup</TabsTrigger>
+      <Tabs defaultValue="brand-assets" className="w-full">
+        <TabsList className="grid w-full grid-cols-1 md:grid-cols-3">
+          <TabsTrigger value="brand-assets"><Presentation className="mr-2" /> Brand & Marketing</TabsTrigger>
+          <TabsTrigger value="tokenomics"><TrendingUp className="mr-2"/> Tokenomics</TabsTrigger>
+          <TabsTrigger value="developer-assets"><FileCode className="mr-2" /> Developer Assets</TabsTrigger>
         </TabsList>
 
-        <TabContentCard value="landing-page">
+        <TabContentCard value="brand-assets">
             <CardHeader className="flex flex-row justify-between items-start">
               <div>
-                <CardTitle>Landing Page Preview</CardTitle>
-                <CardDescription>A live preview of your generated landing page. Download the code to get started!</CardDescription>
+                <CardTitle>Landing Page & Marketing Kit</CardTitle>
+                <CardDescription>Your public-facing assets. Use these to build your brand and community.</CardDescription>
               </div>
-              <Button variant="outline" size="sm" onClick={() => downloadFile('LandingPage.tsx', results.landingPageCode)}>
-                  <Download className="mr-2 h-4 w-4" />
-                  Download Code
-              </Button>
             </CardHeader>
             <CardContent>
-                <div className="w-full h-[600px] bg-background rounded-lg border overflow-hidden">
-                    <div className="h-full w-full overflow-y-auto">
-                        <LandingPage
-                            logoUrl={results.logoDataUri}
-                            generatedCode={results.landingPageCode}
-                        />
-                    </div>
-                </div>
-            </CardContent>
-        </TabContentCard>
-
-        <TabContentCard value="marketing-kit">
-            <CardHeader>
-                <CardTitle>Marketing Kit</CardTitle>
-                <CardDescription>Use this content to announce your project and build a community.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div>
-                    <h3 className="font-headline text-xl text-primary mb-2 flex items-center"><Twitter className="mr-2 h-5 w-5" /> X (Twitter) Thread</h3>
-                    <CodeBlock code={results.twitterCampaign} language="markdown" />
-                </div>
-                <div>
-                    <h3 className="font-headline text-xl text-primary mb-2 flex items-center"><Linkedin className="mr-2 h-5 w-5" /> LinkedIn Post</h3>
-                    <CodeBlock code={results.linkedInPost} language="markdown" />
-                </div>
-                <div>
-                    <h3 className="font-headline text-xl text-primary mb-2 flex items-center"><MessageSquare className="mr-2 h-5 w-5" /> Discord/Telegram Welcome</h3>
-                    <CodeBlock code={results.communityWelcome} language="markdown" />
-                </div>
+                <Accordion type="single" collapsible defaultValue="landing-page" className="w-full">
+                    <AccordionItem value="landing-page">
+                        <AccordionTrigger className="text-xl font-headline text-primary">Landing Page Preview</AccordionTrigger>
+                        <AccordionContent>
+                           <div className="flex justify-end mb-4">
+                             <Button variant="outline" size="sm" onClick={() => downloadFile('LandingPage.tsx', results.landingPageCode)}>
+                                  <Download className="mr-2 h-4 w-4" />
+                                  Download Code
+                              </Button>
+                           </div>
+                           <div className="w-full h-[600px] bg-background rounded-lg border overflow-hidden">
+                                <div className="h-full w-full overflow-y-auto">
+                                    <LandingPage
+                                        logoUrl={results.logoDataUri}
+                                        generatedCode={results.landingPageCode}
+                                    />
+                                </div>
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="whitepaper">
+                        <AccordionTrigger className="text-xl font-headline text-primary">Whitepaper</AccordionTrigger>
+                        <AccordionContent>
+                           <div className="flex justify-end mb-4">
+                                <Button variant="outline" size="sm" onClick={() => downloadFile('whitepaper.md', results.whitepaperContent)}>
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Download Whitepaper
+                                </Button>
+                           </div>
+                           <CodeBlock code={results.whitepaperContent} language="markdown" />
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="marketing-kit">
+                        <AccordionTrigger className="text-xl font-headline text-primary">Social Media Kit</AccordionTrigger>
+                        <AccordionContent className="space-y-6">
+                            <div>
+                                <h3 className="font-semibold text-lg mb-2 flex items-center"><Twitter className="mr-2 h-5 w-5" /> X (Twitter) Thread</h3>
+                                <CodeBlock code={results.twitterCampaign} language="markdown" />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-lg mb-2 flex items-center"><Linkedin className="mr-2 h-5 w-5" /> LinkedIn Post</h3>
+                                <CodeBlock code={results.linkedInPost} language="markdown" />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-lg mb-2 flex items-center"><MessageSquare className="mr-2 h-5 w-5" /> Discord/Telegram Welcome</h3>
+                                <CodeBlock code={results.communityWelcome} language="markdown" />
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
             </CardContent>
         </TabContentCard>
         
         <TabContentCard value="tokenomics">
             <CardHeader>
-                <CardTitle className="flex items-center"><TrendingUp className="mr-2 h-6 w-6" />Tokenomics Simulator</CardTitle>
-                <CardDescription>A projection of your coin's total supply over its first 10 halving cycles.</CardDescription>
+                <CardTitle className="flex items-center">Tokenomics & Technical Summary</CardTitle>
+                <CardDescription>The economic model and technical parameters of your cryptocurrency.</CardDescription>
             </CardHeader>
-            <CardContent>
-                <ChartContainer config={chartConfig} className="h-[400px] w-full">
-                    <LineChart data={tokenomicsData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                        <CartesianGrid vertical={false} />
-                        <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} />
-                        <YAxis 
-                            tickFormatter={(value) => value.toLocaleString()}
-                            tickLine={false}
-                            axisLine={false}
-                            tickMargin={8}
-                            width={80}
-                         />
-                        <Tooltip
-                            cursor={false}
-                            content={<ChartTooltipContent
-                                indicator="dot"
-                                formatter={(value) => value.toLocaleString()}
-                            />}
-                        />
-                        <Line
-                            dataKey="Total Supply"
-                            type="monotone"
-                            stroke="var(--color-supply)"
-                            strokeWidth={2}
-                            dot={true}
-                        />
-                    </LineChart>
-                </ChartContainer>
+            <CardContent className="space-y-8">
+                <div>
+                     <h3 className="font-headline text-xl text-primary mb-4">Supply Projection</h3>
+                    <ChartContainer config={chartConfig} className="h-[400px] w-full">
+                        <LineChart data={tokenomicsData} margin={{ top: 20, right: 40, bottom: 20, left: 20 }}>
+                            <CartesianGrid vertical={false} />
+                            <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} />
+                            <YAxis 
+                                tickFormatter={(value) => typeof value === 'number' ? value.toLocaleString() : value}
+                                tickLine={false}
+                                axisLine={false}
+                                tickMargin={8}
+                                width={80}
+                             />
+                            <Tooltip
+                                cursor={false}
+                                content={<ChartTooltipContent
+                                    indicator="dot"
+                                    formatter={(value) => typeof value === 'number' ? value.toLocaleString() : value}
+                                />}
+                            />
+                            <Line
+                                dataKey="Total Supply"
+                                type="monotone"
+                                stroke="var(--color-supply)"
+                                strokeWidth={2}
+                                dot={true}
+                            />
+                        </LineChart>
+                    </ChartContainer>
+                </div>
+                 <div>
+                    <div className="flex justify-between items-start mb-4">
+                        <div>
+                             <h3 className="font-headline text-xl text-primary">Technical Summary</h3>
+                             <p className="text-muted-foreground">A recap of your coin's key parameters.</p>
+                        </div>
+                        {results.audioDataUri && (
+                            <audio controls src={results.audioDataUri} className="max-h-10">
+                                Your browser does not support the audio element.
+                            </audio>
+                        )}
+                    </div>
+                    <div className="prose prose-invert max-w-none prose-p:text-base prose-strong:text-primary p-4 bg-black/30 rounded-lg" dangerouslySetInnerHTML={{ __html: results.technicalSummary.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}></div>
+                 </div>
+
             </CardContent>
         </TabContentCard>
 
-        <TabContentCard value="summary">
-          <CardHeader>
-            <div className="flex justify-between items-start">
-              <div>
-                <CardTitle>Technical Summary</CardTitle>
-                <CardDescription>A recap of your cryptocurrency's key parameters.</CardDescription>
-              </div>
-              {results.audioDataUri && (
-                <audio controls src={results.audioDataUri} className="max-h-10">
-                    Your browser does not support the audio element.
-                </audio>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="prose prose-invert max-w-none prose-p:text-lg prose-strong:text-primary" dangerouslySetInnerHTML={{ __html: results.technicalSummary.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}></div>
-          </CardContent>
+        <TabContentCard value="developer-assets">
+           <CardHeader>
+                <CardTitle>Developer Assets</CardTitle>
+                <CardDescription>The core code and instructions needed to compile, run, and maintain your network.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Accordion type="single" collapsible defaultValue="genesis" className="w-full">
+                    <AccordionItem value="genesis">
+                         <AccordionTriggerWithDownload filename="genesis_block.cpp" content={results.genesisBlockCode}>
+                            Genesis Block
+                         </AccordionTriggerWithDownload>
+                         <AccordionContent>
+                            <CodeBlock code={results.genesisBlockCode} language="cpp" />
+                         </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="config">
+                         <AccordionTriggerWithDownload filename="config.txt" content={results.networkConfigurationFile}>
+                           Network Configuration
+                         </AccordionTriggerWithDownload>
+                         <AccordionContent>
+                             <CodeBlock code={results.networkConfigurationFile} language="ini" />
+                         </AccordionContent>
+                    </AccordionItem>
+                     <AccordionItem value="compile">
+                         <AccordionTriggerWithDownload filename="compilation_guide.md" content={results.compilationInstructions}>
+                           Compilation Guide
+                         </AccordionTriggerWithDownload>
+                         <AccordionContent>
+                            <CodeBlock code={results.compilationInstructions} language="markdown" />
+                         </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="setup">
+                         <AccordionTriggerWithDownload filename="node_setup_guide.md" content={results.nodeSetupInstructions}>
+                           Node Setup & Mining Guide
+                         </AccordionTriggerWithDownload>
+                         <AccordionContent>
+                            <CodeBlock code={results.nodeSetupInstructions} language="markdown" />
+                         </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+            </CardContent>
         </TabContentCard>
 
-        <TabContentCardWithDownload value="whitepaper" filename="whitepaper.md" content={results.whitepaperContent}>
-          <CardHeader>
-            <CardTitle>Whitepaper</CardTitle>
-            <CardDescription>The foundational document outlining your cryptocurrency's vision and technology.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CodeBlock code={results.whitepaperContent} language="markdown" />
-          </CardContent>
-        </TabContentCardWithDownload>
-
-        <TabContentCardWithDownload value="genesis" filename="genesis_block.cpp" content={results.genesisBlockCode}>
-          <CardHeader>
-            <CardTitle>Genesis Block Code</CardTitle>
-            <CardDescription>The C++ code for your coin's genesis block.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CodeBlock code={results.genesisBlockCode} language="cpp" />
-          </CardContent>
-        </TabContentCardWithDownload>
-        
-        <TabContentCardWithDownload value="config" filename="config.txt" content={results.networkConfigurationFile}>
-          <CardHeader>
-            <CardTitle>Network Configuration</CardTitle>
-            <CardDescription>The parameters file for configuring your network nodes.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CodeBlock code={results.networkConfigurationFile} language="ini" />
-          </CardContent>
-        </TabContentCardWithDownload>
-
-        <TabContentCardWithDownload value="compile" filename="compilation_guide.md" content={results.compilationInstructions}>
-          <CardHeader>
-            <CardTitle>Compilation Instructions</CardTitle>
-            <CardDescription>Step-by-step guide to compile your cryptocurrency from source.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CodeBlock code={results.compilationInstructions} language="markdown" />
-          </CardContent>
-        </TabContentCardWithDownload>
-
-        <TabContentCardWithDownload value="setup" filename="node_setup_guide.md" content={results.nodeSetupInstructions}>
-          <CardHeader>
-            <CardTitle>Initial Node Setup</CardTitle>
-            <CardDescription>How to start your first node and begin mining.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CodeBlock code={results.nodeSetupInstructions} language="markdown" />
-          </CardContent>
-        </TabContentCardWithDownload>
       </Tabs>
       
        <div className="text-center mt-12">
@@ -329,23 +334,20 @@ function TabContentCard({ value, children }: { value: string, children: React.Re
     )
 }
 
-function TabContentCardWithDownload({ value, filename, content, children }: { value: string, filename: string, content: string, children: React.ReactNode }) {
-    const handleDownload = () => {
+function AccordionTriggerWithDownload({ filename, content, children }: { filename: string, content: string, children: React.ReactNode }) {
+    const handleDownload = (e: React.MouseEvent) => {
+        e.stopPropagation(); // prevent accordion from toggling
         downloadFile(filename, content);
     };
 
     return (
-        <TabsContent value={value} className="mt-4">
-            <Card className="bg-transparent border-border/50 relative">
-                <div className="absolute top-5 right-6 z-10">
-                    <Button variant="outline" size="sm" onClick={handleDownload}>
-                        <Download className="mr-2 h-4 w-4" />
-                        Download File
-                    </Button>
-                </div>
-                {children}
-            </Card>
-        </TabsContent>
+        <div className="flex w-full items-center justify-between hover:bg-accent/10 pr-4">
+             <AccordionTrigger className="text-xl font-headline text-primary flex-grow hover:no-underline">{children}</AccordionTrigger>
+             <Button variant="outline" size="sm" onClick={handleDownload} className="ml-4">
+                <Download className="mr-2 h-4 w-4" />
+                Download
+            </Button>
+        </div>
     )
 }
 
