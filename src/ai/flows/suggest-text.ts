@@ -45,8 +45,10 @@ const improvePrompt = ai.definePrompt({
     - Mission Statement: {{{formContext.missionStatement}}}
     - Target Audience: {{{formContext.targetAudience}}}
     - Brand Voice: {{{formContext.brandVoice}}}
+    - Tagline: {{{formContext.tagline}}}
     - Token Utility: {{{formContext.tokenUtility}}}
     - Initial Distribution: {{{formContext.initialDistribution}}}
+    - Community Strategy: {{{formContext.communityStrategy}}}
 
     **Field to Improve:** {{{fieldName}}}
 
@@ -70,8 +72,10 @@ const generatePrompt = ai.definePrompt({
     - Mission Statement: {{{formContext.missionStatement}}}
     - Target Audience: {{{formContext.targetAudience}}}
     - Brand Voice: {{{formContext.brandVoice}}}
+    - Tagline: {{{formContext.tagline}}}
     - Token Utility: {{{formContext.tokenUtility}}}
     - Initial Distribution: {{{formContext.initialDistribution}}}
+    - Community Strategy: {{{formContext.communityStrategy}}}
 
     **Field to Generate Text For:** {{{fieldName}}}
 

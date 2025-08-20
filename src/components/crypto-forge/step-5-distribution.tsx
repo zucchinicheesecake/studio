@@ -6,34 +6,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { LabelWithExplain } from "./label-with-explain";
 import { AIInput } from "./ai-input";
 
-export function Step4TokenStrategy() {
+export function Step5Distribution() {
   const { control } = useFormContext();
 
   return (
     <Card className="w-full bg-card/50">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl">Token Strategy</CardTitle>
-        <CardDescription>Define the purpose and economic design of your project's token.</CardDescription>
+        <CardTitle className="font-headline text-2xl">Token Distribution</CardTitle>
+        <CardDescription>Plan how your tokens will be allocated to different stakeholders.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <FormField
-          control={control}
-          name="tokenUtility"
-          render={({ field }) => (
-            <FormItem>
-              <LabelWithExplain label="Token Utility" concept="Token Utility" />
-              <FormControl>
-                <AIInput
-                  label="Token Utility"
-                  placeholder="What is the token used for? (e.g., Governance votes, paying transaction fees, staking for rewards, accessing exclusive features)."
-                  className="resize-y"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <CardContent>
         <FormField
           control={control}
           name="initialDistribution"
@@ -44,7 +26,7 @@ export function Step4TokenStrategy() {
                 <AIInput
                   label="Initial Distribution Plan"
                   placeholder="How will the tokens be allocated at launch? (e.g., 50% to the community treasury, 20% to the team (vested), 20% to early investors, 10% for an airdrop)."
-                  className="resize-y"
+                  className="resize-y min-h-[150px]"
                   {...field}
                 />
               </FormControl>

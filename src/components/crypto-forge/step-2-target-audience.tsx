@@ -13,10 +13,10 @@ export function Step2TargetAudience() {
   return (
     <Card className="w-full bg-card/50">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl">Target Audience</CardTitle>
-        <CardDescription>Who are you building this for? Be specific. The AI will use this to tailor your strategy.</CardDescription>
+        <CardTitle className="font-headline text-2xl">Audience & Voice</CardTitle>
+        <CardDescription>Define who you're building for and how you'll communicate with them.</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         <FormField
           control={control}
           name="targetAudience"
@@ -27,7 +27,25 @@ export function Step2TargetAudience() {
                 <AIInput
                   label="Audience Profile"
                   placeholder="e.g., DeFi power users who are frustrated with high gas fees. Or, artists and creators who want to monetize their work through NFTs."
-                  className="resize-y h-36"
+                  className="resize-y h-28"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="brandVoice"
+          render={({ field }) => (
+            <FormItem>
+              <LabelWithExplain label="Brand Voice & Tone" concept="Brand Voice" />
+              <FormControl>
+                <AIInput
+                  label="Brand Voice & Tone"
+                  placeholder="e.g., Professional and trustworthy, aiming to attract institutional investors. Or, fun, quirky, and meme-friendly to build a viral community."
+                  className="resize-y h-28"
                   {...field}
                 />
               </FormControl>

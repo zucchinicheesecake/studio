@@ -26,14 +26,18 @@ export async function explainConcept(input: ExplainConceptInput): Promise<Explai
 }
 
 const predefinedExplanations: Record<string, string> = {
+    'Mission Statement': 'A short, powerful sentence that declares the core purpose and goal of your project. It should answer the question: "Why does this project exist?"',
     'Target Audience': 'The specific group of people you are trying to reach and serve with your project. Defining this helps tailor your messaging, features, and overall strategy. For example, are you building for developers, gamers, artists, or financial institutions?',
+    'Brand Voice': 'The distinct personality your project uses in its communications. Is it professional and serious, or fun and rebellious? This tone should be consistent across your website, social media, and announcements.',
+    'Tagline': "A very short, catchy phrase that's easy to remember and captures the essence of your brand. Think of it as a slogan.",
+    'Logo Design': 'A visual representation of your project. A good logo is simple, memorable, and reflects the core identity of your cryptocurrency.',
     'Token Utility': "The specific purpose or use case of your cryptocurrency within its ecosystem. What can you do with it? Common utilities include governance (voting on proposals), paying transaction fees, staking for network security, or accessing exclusive features.",
     'Token Distribution': 'The plan for how the initial supply of your cryptocurrency will be allocated. This is crucial for transparency and demonstrating the long-term vision of the project. A typical distribution might allocate percentages to the community, development team, early investors, and a public sale.',
+    'Community Strategy': 'The plan for how you will attract, grow, and engage a vibrant community around your project. This can include activities like online events, educational content, social media campaigns, and developer grant programs.',
     'Block Reward': 'The number of new coins that are "minted" and awarded to a miner for successfully validating a new block of transactions.',
     'Block Halving': 'A pre-programmed event that cuts the block reward in half. It happens at a specific block number to create scarcity and control inflation over time.',
     'Total Coin Supply': 'The absolute maximum number of coins that will ever be created for this cryptocurrency. Once this number is reached, no new coins can be minted.',
     'Genesis Block Timestamp': "A unique piece of text or data embedded in the very first block (the 'genesis block') of the blockchain. It often contains a headline from the day it was created, serving as a proof-of-creation timestamp.",
-    'Logo Design': 'A visual representation of your project. A good logo is simple, memorable, and reflects the core identity of your cryptocurrency.',
     'Address Prefix': "The character that all public addresses for your cryptocurrency will begin with. For example, Bitcoin addresses often start with '1' or '3', and Ethereum addresses start with '0x'.",
     'Coin Unit': "The name for the smallest divisible unit of your cryptocurrency, similar to how a 'satoshi' is the smallest unit of Bitcoin.",
     'Coinbase Maturity': 'The number of blocks that must pass before the coins from a block reward can actually be spent by the miner who earned them. This prevents blockchain reorganizations from invalidating newly minted coins.',

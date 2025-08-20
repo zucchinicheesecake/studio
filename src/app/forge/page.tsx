@@ -10,22 +10,26 @@ import { formSchema, type FormValues, type GenerationResult } from "@/app/types"
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Stepper } from "@/components/crypto-forge/stepper";
-import { Step1CoreConcept } from "@/components/crypto-forge/step-1-core-concept";
 import { ResultsDisplay } from "@/components/crypto-forge/results-display";
 import { AlertCircle, CheckCircle, CircleDashed, Loader2 } from "lucide-react";
 import { ExplanationDialog } from "@/components/crypto-forge/explanation-dialog";
 import { ExplanationContext } from "@/hooks/use-explanation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { HappyCoinIcon } from "@/components/icons/happy-coin-icon";
+import { Step1CoreConcept } from "@/components/crypto-forge/step-1-core-concept";
 import { Step2TargetAudience } from "@/components/crypto-forge/step-2-target-audience";
 import { Step3Branding } from "@/components/crypto-forge/step-3-branding";
-import { Step4TokenStrategy } from "@/components/crypto-forge/step-4-token-strategy";
-import { HappyCoinIcon } from "@/components/icons/happy-coin-icon";
+import { Step4Tokenomics } from "@/components/crypto-forge/step-4-tokenomics";
+import { Step5Distribution } from "@/components/crypto-forge/step-5-distribution";
+import { Step6Community } from "@/components/crypto-forge/step-6-community";
 
 const steps = [
   { id: 1, name: "Core Concept", component: <Step1CoreConcept />, fields: ["projectName", "ticker", "missionStatement"] },
-  { id: 2, name: "Audience", component: <Step2TargetAudience />, fields: ["targetAudience"] },
-  { id: 3, name: "Branding", component: <Step3Branding />, fields: ["brandVoice", "logoDescription"] },
-  { id: 4, name: "Tokenomics", component: <Step4TokenStrategy />, fields: ["tokenUtility", "initialDistribution"] },
+  { id: 2, name: "Audience", component: <Step2TargetAudience />, fields: ["targetAudience", "brandVoice"] },
+  { id: 3, name: "Branding", component: <Step3Branding />, fields: ["tagline", "logoDescription"] },
+  { id: 4, name: "Tokenomics", component: <Step4Tokenomics />, fields: ["tokenUtility"] },
+  { id: 5, name: "Distribution", component: <Step5Distribution />, fields: ["initialDistribution"] },
+  { id: 6, name: "Community", component: <Step6Community />, fields: ["communityStrategy"] },
 ];
 
 type GenerationStepStatus = 'pending' | 'generating' | 'success' | 'error';
@@ -50,14 +54,20 @@ export default function ForgePage() {
       
       // Step 2
       targetAudience: "Developers and privacy advocates looking for a scalable and secure alternative to the traditional web infrastructure.",
+      brandVoice: "Authoritative, forward-thinking, and slightly rebellious. The tone should inspire confidence and a sense of being part of a movement.",
       
       // Step 3
-      brandVoice: "Authoritative, forward-thinking, and slightly rebellious. The tone should inspire confidence and a sense of being part of a movement.",
+      tagline: "The web, rebuilt.",
       logoDescription: "A stylized 'N' that looks like a shield or a network node, with circuit-like patterns. Colors should be electric blue and dark purple.",
       
       // Step 4
       tokenUtility: "The token is used for network governance, staking to secure the network, and as the primary medium of exchange for services within the NovaNet ecosystem.",
+      
+      // Step 5
       initialDistribution: "40% to the community treasury (DAO-controlled), 25% to the core development team (4-year vesting), 20% to early backers and partners, and 15% reserved for a public sale.",
+
+      // Step 6
+      communityStrategy: "Foster a strong developer community through hackathons, grants for building on NovaNet, and extensive, high-quality documentation. Engage privacy advocates through partnerships with privacy-focused organizations and content marketing that highlights the project's censorship-resistance."
     },
   });
 

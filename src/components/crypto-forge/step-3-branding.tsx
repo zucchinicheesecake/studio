@@ -1,9 +1,10 @@
 
 "use client";
 import { useFormContext } from "react-hook-form";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AIInput } from "./ai-input";
+import { LabelWithExplain } from "./label-with-explain";
 
 export function Step3Branding() {
   const { control } = useFormContext();
@@ -11,21 +12,20 @@ export function Step3Branding() {
   return (
     <Card className="w-full bg-card/50">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl">Brand & Identity</CardTitle>
-        <CardDescription>Define the personality of your project. How should it look, feel, and sound?</CardDescription>
+        <CardTitle className="font-headline text-2xl">Brand Identity</CardTitle>
+        <CardDescription>Define the core visual and textual identity of your project.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
          <FormField
           control={control}
-          name="brandVoice"
+          name="tagline"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Brand Voice & Tone</FormLabel>
+              <LabelWithExplain label="Project Tagline" concept="Tagline" />
               <FormControl>
                 <AIInput
-                  label="Brand Voice & Tone"
-                  placeholder="e.g., Professional and trustworthy, aiming to attract institutional investors. Or, fun, quirky, and meme-friendly to build a viral community."
-                  className="resize-y"
+                  label="Project Tagline"
+                  placeholder="A short, memorable phrase that captures the essence of your project."
                   {...field}
                 />
               </FormControl>
@@ -38,12 +38,12 @@ export function Step3Branding() {
           name="logoDescription"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Logo Description</FormLabel>
+              <LabelWithExplain label="Logo Description" concept="Logo Design" />
               <FormControl>
                 <AIInput
                   label="Logo Description"
                   placeholder="e.g., A minimalist geometric shape, like a stylized eagle, in shades of blue and silver."
-                  className="resize-y"
+                  className="resize-y min-h-[120px]"
                   {...field}
                 />
               </FormControl>
