@@ -26,9 +26,17 @@ export async function explainConcept(input: ExplainConceptInput): Promise<Explai
 }
 
 const predefinedExplanations: Record<string, string> = {
-    'Target Audience': 'Your target audience is the specific group of people you want to reach with your project. Defining this helps tailor your marketing, features, and community efforts effectively. Think about their needs, motivations, and where they spend their time online.',
-    'Token Utility': "Token utility refers to the specific purpose or use case of your cryptocurrency within its ecosystem. It's what gives the token value beyond just speculation. Examples include governance rights (voting), paying for network fees, or accessing exclusive features.",
-    'Token Distribution': 'Token distribution outlines how your total supply of tokens will be allocated among different groups, such as the community, development team, investors, and ecosystem fund. A well-planned distribution model is crucial for long-term project health and decentralization.',
+    'Block Reward': 'The number of new coins that are "minted" and awarded to a miner for successfully validating a new block of transactions.',
+    'Block Halving': 'A pre-programmed event that cuts the block reward in half. It happens at a specific block number to create scarcity and control inflation over time.',
+    'Total Coin Supply': 'The absolute maximum number of coins that will ever be created for this cryptocurrency. Once this number is reached, no new coins can be minted.',
+    'Genesis Block Timestamp': "A unique piece of text or data embedded in the very first block (the 'genesis block') of the blockchain. It often contains a headline from the day it was created, serving as a proof-of-creation timestamp.",
+    'Logo Design': 'A visual representation of your project. A good logo is simple, memorable, and reflects the core identity of your cryptocurrency.',
+    'Address Prefix': "The character that all public addresses for your cryptocurrency will begin with. For example, Bitcoin addresses often start with '1' or '3', and Ethereum addresses start with '0x'.",
+    'Coin Unit': "The name for the smallest divisible unit of your cryptocurrency, similar to how a 'satoshi' is the smallest unit of Bitcoin.",
+    'Coinbase Maturity': 'The number of blocks that must pass before the coins from a block reward can actually be spent by the miner who earned them. This prevents blockchain reorganizations from invalidating newly minted coins.',
+    'Number of Confirmations': 'The number of blocks that must be mined on top of the block containing a transaction before that transaction is considered final and irreversible.',
+    'Target Spacing': 'The ideal amount of time, in minutes, between the creation of new blocks on the network. This setting directly impacts transaction confirmation times.',
+    'Target Timespan': 'The timeframe, in minutes, over which the network difficulty is recalculated. The difficulty adjusts to try and maintain the "Target Spacing" between blocks, even as more or less mining power joins the network.',
   };
   
 

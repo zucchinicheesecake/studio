@@ -7,22 +7,22 @@ export const formSchema = z.object({
   ticker: z.string().min(1, "Ticker is required.").max(5, "Ticker is too long."),
   missionStatement: z.string().min(1, "Mission statement is required."),
   
-  // Step 2: Target Audience
-  targetAudience: z.string().min(1, "Please describe your target audience."),
+  // Step 2: Network Parameters
+  blockReward: z.coerce.number().min(1, "Block reward must be at least 1."),
+  blockHalving: z.coerce.number().min(1, "Block halving must be at least 1."),
+  coinSupply: z.coerce.number().min(1, "Coin supply must be at least 1."),
   
-  // Step 3: Branding
-  brandVoice: z.string().min(1, "Please describe your brand voice."),
+  // Step 3: Technical Details
+  timestamp: z.string().min(1, "Genesis timestamp message is required."),
   logoDescription: z.string().min(1, "Please provide a logo description."),
-  
-  // Step 4: Token Strategy
-  tokenUtility: z.string().min(1, "Please describe the token's utility."),
-  initialDistribution: z.string().min(1, "Please describe the initial token distribution plan."),
-  
-  // Implicitly derived or default values, no longer in the form
-  websiteUrl: z.string().url().optional().or(z.literal('')),
-  githubUrl: z.string().url().optional().or(z.literal('')),
-  consensusMechanism: z.string().optional().default("Scrypt - Proof of Work and Proof of Stake"),
-  timestamp: z.string().optional().default("The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"),
+
+  // Step 4: Consensus & Addressing
+  addressLetter: z.string().min(1, "Address letter is required.").max(1, "Address letter must be a single character."),
+  coinUnit: z.string().min(1, "Coin unit is required."),
+  coinbaseMaturity: z.coerce.number().min(1, "Coinbase maturity must be at least 1."),
+  numberOfConfirmations: z.coerce.number().min(1, "Number of confirmations must be at least 1."),
+  targetSpacingInMinutes: z.coerce.number().min(1, "Target spacing must be at least 1 minute."),
+  targetTimespanInMinutes: z.coerce.number().min(1, "Target timespan must be at least 1 minute."),
 });
 
 export type FormValues = z.infer<typeof formSchema>;

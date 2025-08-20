@@ -11,9 +11,9 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Stepper } from "@/components/crypto-forge/stepper";
 import { Step1CoreConcept } from "@/components/crypto-forge/step-1-core-concept";
-import { Step2TargetAudience } from "@/components/crypto-forge/step-2-target-audience";
-import { Step3Branding } from "@/components/crypto-forge/step-3-branding";
-import { Step4TokenStrategy } from "@/components/crypto-forge/step-4-token-strategy";
+import { Step2NetworkParameters } from "@/components/crypto-forge/step-2-network-parameters";
+import { Step3TechnicalDetails } from "@/components/crypto-forge/step-3-technical-details";
+import { Step4Consensus } from "@/components/crypto-forge/step-4-consensus";
 import { ResultsDisplay } from "@/components/crypto-forge/results-display";
 import { AlertCircle, CheckCircle, CircleDashed, Loader2 } from "lucide-react";
 import { ExplanationDialog } from "@/components/crypto-forge/explanation-dialog";
@@ -23,9 +23,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 
 const steps = [
   { id: 1, name: "Core Concept", component: <Step1CoreConcept />, fields: ["projectName", "ticker", "missionStatement"] },
-  { id: 2, name: "Audience", component: <Step2TargetAudience />, fields: ["targetAudience"] },
-  { id: 3, name: "Branding", component: <Step3Branding />, fields: ["brandVoice", "logoDescription"] },
-  { id: 4, name: "Token Strategy", component: <Step4TokenStrategy />, fields: ["tokenUtility", "initialDistribution"] },
+  { id: 2, name: "Network", component: <Step2NetworkParameters />, fields: ["blockReward", "blockHalving", "coinSupply"] },
+  { id: 3, name: "Technical", component: <Step3TechnicalDetails />, fields: ["timestamp", "logoDescription"] },
+  { id: 4, name: "Consensus", component: <Step4Consensus />, fields: ["addressLetter", "coinUnit", "coinbaseMaturity", "numberOfConfirmations", "targetSpacingInMinutes", "targetTimespanInMinutes"] },
 ];
 
 type GenerationStepStatus = 'pending' | 'generating' | 'success' | 'error';
@@ -43,14 +43,27 @@ export default function ForgePage() {
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      // Step 1
       projectName: "NovaNet",
       ticker: "NOV",
       missionStatement: "To build a decentralized, censorship-resistant internet for the next generation of web applications.",
-      targetAudience: "Developers and users interested in Web3, privacy advocates, and people in regions with restricted internet access.",
-      brandVoice: "Empowering, innovative, and slightly rebellious. We are for the builders and the pioneers.",
+      
+      // Step 2
+      blockReward: 50,
+      blockHalving: 210000,
+      coinSupply: 100000000,
+      
+      // Step 3
+      timestamp: "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks",
       logoDescription: "A stylized 'N' that looks like a shield or a network node, with circuit-like patterns. Colors should be electric blue and dark purple.",
-      tokenUtility: "The NOV token is used for network governance, paying for decentralized storage, and accessing premium features on the network.",
-      initialDistribution: "40% for community mining rewards, 20% for the development team (vested over 4 years), 20% for the ecosystem fund, 10% for a public sale.",
+      
+      // Step 4
+      addressLetter: "N",
+      coinUnit: "sats",
+      coinbaseMaturity: 100,
+      numberOfConfirmations: 6,
+      targetSpacingInMinutes: 10,
+      targetTimespanInMinutes: 1440,
     },
   });
 
@@ -87,20 +100,11 @@ export default function ForgePage() {
     setGenerationSteps(initialSteps);
 
     try {
-        const derivedParams = {
+        const fullFormParams = { 
+            ...data, 
             coinName: data.projectName,
-            coinAbbreviation: data.ticker,
-            addressLetter: data.ticker.charAt(0).toUpperCase(),
-            coinUnit: "sats",
-            blockReward: 50,
-            blockHalving: 210000,
-            coinSupply: 100000000,
-            coinbaseMaturity: 100,
-            numberOfConfirmations: 6,
-            targetSpacingInMinutes: 10,
-            targetTimespanInMinutes: 1440,
+            coinAbbreviation: data.ticker
         };
-        const fullFormParams = { ...data, ...derivedParams };
 
         const generatedAssets: any = {};
         
@@ -128,8 +132,8 @@ export default function ForgePage() {
             networkConfig,
         ] = await Promise.all([
             runStep('Logo Generation', () => actions.generateLogo({ coinName: fullFormParams.coinName, logoDescription: data.logoDescription })),
-            runStep('Genesis Block', () => actions.generateGenesisBlockCode({ ...derivedParams, timestamp: data.timestamp! })),
-            runStep('Network Config', () => actions.createNetworkConfigurationFile({ ...derivedParams })),
+            runStep('Genesis Block', () => actions.generateGenesisBlockCode(fullFormParams)),
+            runStep('Network Config', () => actions.createNetworkConfigurationFile(fullFormParams)),
         ]);
 
         generatedAssets.logo = logo;
