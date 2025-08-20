@@ -6,7 +6,7 @@ import { type GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { askAiAboutCode } from "@/app/actions";
-import { Send, Loader2, User, Bot } from "lucide-react";
+import { Send, Loader2, User, Bot, Sparkles } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
@@ -20,6 +20,14 @@ type Message = {
     content: string;
 };
 
+const suggestedQuestions = [
+    "How do I compile the code?",
+    "What is the block reward for this coin?",
+    "Explain the genesis block timestamp.",
+    "Where is the network configuration file stored?",
+    "How do I use the install script?",
+]
+
 export function ResultsChat({ results }: ResultsChatProps) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
@@ -28,15 +36,21 @@ export function ResultsChat({ results }: ResultsChatProps) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!input.trim() || isPending) return;
+        const question = input.trim();
+        if (!question || isPending) return;
+        askQuestion(question);
+    };
 
-        const userMessage: Message = { role: 'user', content: input };
+    const askQuestion = (question: string) => {
+        if (!question || isPending) return;
+
+        const userMessage: Message = { role: 'user', content: question };
         setMessages(prev => [...prev, userMessage]);
         setInput('');
 
         startTransition(async () => {
             const answer = await askAiAboutCode({
-                question: input,
+                question,
                 codeContext: {
                     genesisBlockCode: results.genesisBlockCode,
                     networkConfigurationFile: results.networkConfigurationFile,
@@ -47,27 +61,38 @@ export function ResultsChat({ results }: ResultsChatProps) {
             const assistantMessage: Message = { role: 'assistant', content: answer };
             setMessages(prev => [...prev, assistantMessage]);
         });
-    };
+    }
 
     useEffect(() => {
-        if (scrollAreaRef.current) {
-            scrollAreaRef.current.scrollTo({
-                top: scrollAreaRef.current.scrollHeight,
-                behavior: 'smooth'
-            });
+        if (scrollAreaRef.current?.lastElementChild) {
+            scrollAreaRef.current.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
     }, [messages]);
 
 
     return (
         <div className="bg-card/50 rounded-lg border border-border p-4 h-[500px] flex flex-col">
-            <ScrollArea className="flex-grow mb-4 pr-4" ref={scrollAreaRef}>
+            <ScrollArea className="flex-grow mb-4 pr-4" viewportRef={scrollAreaRef}>
                 <div className="space-y-4">
                     {messages.length === 0 && (
                         <div className="text-center text-muted-foreground pt-10">
                             <Bot className="mx-auto h-10 w-10 mb-2" />
                             <p className="font-semibold">Ask me anything about your project!</p>
                             <p className="text-sm">For example: "How do I compile the code?" or "What is the block reward?"</p>
+                            <div className="flex flex-wrap gap-2 justify-center mt-4">
+                                {suggestedQuestions.map(q => (
+                                    <Button 
+                                        key={q} 
+                                        variant="outline" 
+                                        size="sm"
+                                        onClick={() => askQuestion(q)}
+                                        className="text-xs"
+                                    >
+                                        <Sparkles className="mr-2 h-3 w-3" />
+                                        {q}
+                                    </Button>
+                                ))}
+                            </div>
                         </div>
                     )}
                     {messages.map((message, index) => (
