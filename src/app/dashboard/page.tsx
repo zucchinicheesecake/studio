@@ -37,25 +37,20 @@ export default function DashboardPage() {
         return () => unsubscribe();
     }, []);
 
-    const handleSignUp = async (e: React.FormEvent) => {
+    const handleAuthAction = async (action: 'signIn' | 'signUp', e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
         try {
-            await createUserWithEmailAndPassword(auth, email, password);
+            if (action === 'signIn') {
+                await signInWithEmailAndPassword(auth, email, password);
+            } else {
+                await createUserWithEmailAndPassword(auth, email, password);
+            }
         } catch (err: any) {
             setError(err.message);
         }
     };
 
-    const handleSignIn = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError(null);
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-        } catch (err: any) {
-            setError(err.message);
-        }
-    };
 
     const handleSignOut = async () => {
         await signOut(auth);
@@ -73,10 +68,12 @@ export default function DashboardPage() {
         return (
           <div className="flex flex-col min-h-screen bg-background items-center justify-center p-4">
             <div className="w-full max-w-md">
-                <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold font-headline text-primary">Welcome to CoinGenius</h1>
-                    <p className="text-muted-foreground mt-2">Sign in or create an account to get started.</p>
-                </div>
+                <Card className="mb-8">
+                    <CardHeader className="text-center">
+                        <CardTitle className="text-4xl font-bold font-headline text-primary">CoinGenius</CardTitle>
+                        <CardDescription className="text-muted-foreground mt-2">Sign in or create an account to get started.</CardDescription>
+                    </CardHeader>
+                </Card>
 
                 <Tabs defaultValue="signin" className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
@@ -90,7 +87,7 @@ export default function DashboardPage() {
                                 <CardDescription>Access your dashboard and saved projects.</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <form onSubmit={handleSignIn} className="space-y-4">
+                                <form onSubmit={(e) => handleAuthAction('signIn', e)} className="space-y-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="email-in">Email</Label>
                                         <Input id="email-in" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@example.com" required />
@@ -112,7 +109,7 @@ export default function DashboardPage() {
                                 <CardDescription>Create a new account to start building.</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <form onSubmit={handleSignUp} className="space-y-4">
+                                <form onSubmit={(e) => handleAuthAction('signUp', e)} className="space-y-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="email-up">Email</Label>
                                         <Input id="email-up" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@example.com" required />

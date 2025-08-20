@@ -1,17 +1,21 @@
 
 "use client";
 
-import { useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CodeBlock } from "@/components/crypto-forge/code-block";
 import type { GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
-import { Download, Linkedin, MessageSquare, Twitter, TrendingUp } from "lucide-react";
+import { Download, Linkedin, MessageSquare, Twitter, TrendingUp, Save, Loader2, CheckCircle } from "lucide-react";
 import Image from "next/image";
 import { LandingPage } from "@/components/crypto-forge/landing-page";
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged, type User } from "firebase/auth";
+import { saveProject } from "@/app/actions";
+import { useToast } from "@/hooks/use-toast";
 
 
 interface ResultsDisplayProps {
@@ -20,6 +24,35 @@ interface ResultsDisplayProps {
 }
 
 export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleSaveProject = async () => {
+    if (!user) {
+        toast({ variant: "destructive", title: "Not Logged In", description: "You must be logged in to save a project." });
+        return;
+    }
+    setIsSaving(true);
+    try {
+        await saveProject(results, user.uid);
+        setIsSaved(true);
+        toast({ title: "Project Saved!", description: "Your project has been successfully saved to your dashboard." });
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+        toast({ variant: "destructive", title: "Save Failed", description: errorMessage });
+    } finally {
+        setIsSaving(false);
+    }
+  };
 
   const tokenomicsData = useMemo(() => {
     const { blockReward, blockHalving, coinSupply } = results.formValues;
@@ -90,6 +123,19 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
                 <CardTitle className="font-headline text-3xl">Launch Your Coin!</CardTitle>
                 <CardDescription className="mt-2 text-base">You have everything you need. Follow the compilation and node setup guides to bring your cryptocurrency to life.</CardDescription>
             </div>
+             {user && (
+                <div className="flex-shrink-0">
+                    <Button onClick={handleSaveProject} disabled={isSaving || isSaved}>
+                        {isSaving ? (
+                            <><Loader2 className="mr-2 animate-spin" /> Saving...</>
+                        ) : isSaved ? (
+                            <><CheckCircle className="mr-2" /> Project Saved</>
+                        ) : (
+                            <><Save className="mr-2" /> Save Project</>
+                        )}
+                    </Button>
+                </div>
+            )}
         </CardHeader>
       </Card>
 

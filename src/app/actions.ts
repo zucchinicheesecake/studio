@@ -12,6 +12,8 @@ import { explainConcept as explainConceptFlow } from "@/ai/flows/explain-concept
 import { generateLandingPage } from "@/ai/flows/generate-landing-page";
 import { generateSocialCampaign } from "@/ai/flows/generate-social-campaign";
 import type { FormValues, GenerationResult } from "@/app/types";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 
 export async function generateCrypto(values: FormValues): Promise<GenerationResult> {
@@ -129,6 +131,27 @@ export async function explainConcept(concept: string): Promise<string> {
     } catch (error) {
         console.error("Error explaining concept:", error);
         return "Sorry, I couldn't fetch an explanation at this time. Please try again later.";
+    }
+}
+
+export async function saveProject(projectData: GenerationResult, userId: string): Promise<{ projectId: string }> {
+    if (!userId) {
+        throw new Error("User must be logged in to save a project.");
+    }
+    try {
+        const projectCollection = collection(db, "users", userId, "projects");
+        const docRef = await addDoc(projectCollection, {
+            ...projectData,
+            createdAt: serverTimestamp(),
+            userId: userId,
+        });
+        return { projectId: docRef.id };
+    } catch (error) {
+        console.error("Error saving project to Firestore:", error);
+        if (error instanceof Error) {
+            throw new Error(`Failed to save project: ${error.message}`);
+        }
+        throw new Error("An unknown error occurred while saving the project.");
     }
 }
 
