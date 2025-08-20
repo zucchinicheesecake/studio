@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Bot, Coins, FileText } from "lucide-react";
+import { ArrowRight, Bot, Coins, FileText, LayoutDashboard } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -15,9 +15,14 @@ export default function LandingPage() {
             <Bot className="h-8 w-8 text-primary" />
             <span className="text-xl font-bold font-headline">CoinGenius</span>
         </div>
-        <Button asChild>
-          <Link href="/forge">Get Started</Link>
-        </Button>
+        <div className="flex items-center gap-2">
+            <Button asChild variant="ghost">
+              <Link href="/dashboard">Dashboard</Link>
+            </Button>
+            <Button asChild>
+              <Link href="/forge">Get Started</Link>
+            </Button>
+        </div>
       </header>
 
       <main className="flex-grow">
