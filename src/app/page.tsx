@@ -14,6 +14,7 @@ import { Step2BasicInfo } from "@/components/crypto-forge/step-2-basic-info";
 import { Step3Economics } from "@/components/crypto-forge/step-3-economics";
 import { Step4Network } from "@/components/crypto-forge/step-4-network";
 import { Step5Logo } from "@/components/crypto-forge/step-5-logo";
+import { Step6Whitepaper } from "@/components/crypto-forge/step-6-whitepaper";
 import { ResultsDisplay } from "@/components/crypto-forge/results-display";
 import { Loader2 } from "lucide-react";
 
@@ -24,6 +25,7 @@ const steps = [
   { id: 3, name: "Economics", component: <Step3Economics />, fields: ["blockReward", "blockHalving", "coinSupply"] },
   { id: 4, name: "Network", component: <Step4Network />, fields: ["coinbaseMaturity", "numberOfConfirmations", "targetSpacingInMinutes", "targetTimespanInMinutes"] },
   { id: 5, name: "Logo", component: <Step5Logo />, fields: ["logoDescription"] },
+  { id: 6, name: "Whitepaper", component: <Step6Whitepaper />, fields: ["problemStatement", "solutionStatement", "keyFeatures"] },
 ];
 
 export default function Home() {
@@ -51,6 +53,9 @@ export default function Home() {
       targetSpacingInMinutes: 10,
       targetTimespanInMinutes: 1440,
       logoDescription: "A golden coin with a futuristic circuit pattern.",
+      problemStatement: "Traditional financial systems are slow, expensive, and opaque.",
+      solutionStatement: "A decentralized, peer-to-peer digital currency that enables instant, low-cost payments to anyone, anywhere in the world, without the need for a central authority.",
+      keyFeatures: "- Fast and efficient transactions\n- Low network fees\n- Secure and immutable ledger\n- Decentralized governance",
     },
   });
 
@@ -104,7 +109,7 @@ export default function Home() {
             <Loader2 className="h-16 w-16 animate-spin text-primary mb-4" />
             <h1 className="text-3xl font-headline font-bold text-primary">Forging Your Crypto...</h1>
             <p className="text-muted-foreground mt-2">The AI is generating your genesis block, configuration, and instructions.</p>
-            <p className="text-sm text-muted-foreground mt-2">(Logo generation may take up to a minute)</p>
+            <p className="text-sm text-muted-foreground mt-2">(This may take up to a minute)</p>
         </div>
     );
   }
@@ -120,7 +125,7 @@ export default function Home() {
               <h1 className="text-5xl font-headline font-bold text-primary">CryptoForge AI</h1>
               <p className="mt-2 text-lg text-muted-foreground">Your personal AI assistant for creating cryptocurrencies.</p>
           </div>
-          <div className="w-full max-w-4xl">
+          <div className="w-full max-w-5xl">
             <Stepper currentStep={currentStep} steps={steps.map(s => s.name)} />
           </div>
           <div className="w-full max-w-3xl mt-8">

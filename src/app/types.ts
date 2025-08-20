@@ -23,6 +23,10 @@ export const formSchema = z.object({
   targetTimespanInMinutes: z.coerce.number().min(1, "Target timespan must be at least 1 minute."),
   // Step 5
   logoDescription: z.string().min(1, "Please provide a logo description."),
+  // Step 6
+  problemStatement: z.string().min(1, "Problem statement is required."),
+  solutionStatement: z.string().min(1, "Solution statement is required."),
+  keyFeatures: z.string().min(1, "Key features are required."),
 });
 
 export type FormValues = z.infer<typeof formSchema>;
@@ -34,4 +38,5 @@ export type GenerationResult = {
     compilationInstructions: string;
     nodeSetupInstructions: string;
     logoDataUri: string;
+    whitepaperContent: string;
 };

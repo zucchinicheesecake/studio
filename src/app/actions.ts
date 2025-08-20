@@ -6,10 +6,13 @@ import { generateGenesisBlockCode } from "@/ai/flows/generate-genesis-block-code
 import { createNetworkConfigurationFile } from "@/ai/flows/create-network-configuration-file";
 import { provideNodeSetupMiningInstructions } from "@/ai/flows/provide-node-setup-mining-instructions";
 import { generateLogo } from "@/ai/flows/generate-logo";
+import { generateWhitepaper } from "@/ai/flows/generate-whitepaper";
 import type { FormValues, GenerationResult } from "@/app/types";
 
 
 export async function generateCrypto(values: FormValues): Promise<GenerationResult> {
+    const tokenomicsSummary = `Initial block reward of ${values.blockReward} ${values.coinAbbreviation}, halving every ${values.blockHalving} blocks, with a total supply of ${values.coinSupply} coins.`;
+
     const results = await Promise.allSettled([
         provideCompilationGuidance({
             coinName: values.coinName,
@@ -34,17 +37,27 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
         generateLogo({
             coinName: values.coinName,
             logoDescription: values.logoDescription,
+        }),
+        generateWhitepaper({
+            coinName: values.coinName,
+            coinAbbreviation: values.coinAbbreviation,
+            problemStatement: values.problemStatement,
+            solutionStatement: values.solutionStatement,
+            keyFeatures: values.keyFeatures,
+            consensusMechanism: values.consensusMechanism,
+            tokenomics: tokenomicsSummary,
         })
     ]);
 
-    const [compilationGuidanceResult, genesisBlockResult, networkConfigResult, logoResult] = results;
+    const [compilationGuidanceResult, genesisBlockResult, networkConfigResult, logoResult, whitepaperResult] = results;
 
     const failedSteps = results
         .map((result, index) => (result.status === 'rejected' ? [
             'Compilation Guidance', 
             'Genesis Block', 
             'Network Config', 
-            'Logo Generation'
+            'Logo Generation',
+            'Whitepaper'
         ][index] : null))
         .filter(Boolean);
 
@@ -56,6 +69,7 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
     const genesisBlock = (genesisBlockResult as PromiseFulfillment<any>).value;
     const networkConfig = (networkConfigResult as PromiseFulfillment<any>).value;
     const logo = (logoResult as PromiseFulfillment<any>).value;
+    const whitepaper = (whitepaperResult as PromiseFulfillment<any>).value;
 
 
     const nodeSetupInstructions = await provideNodeSetupMiningInstructions({
@@ -75,6 +89,7 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
         compilationInstructions: compilationGuidance.compilationInstructions,
         nodeSetupInstructions: nodeSetupInstructions.instructions,
         logoDataUri: logo.logoDataUri,
+        whitepaperContent: whitepaper.whitepaperContent,
     };
 }
 

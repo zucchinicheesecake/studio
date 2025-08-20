@@ -43,8 +43,9 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
 
 
       <Tabs defaultValue="summary" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 bg-card border-b">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-6 bg-card border-b">
           <TabsTrigger value="summary">Summary</TabsTrigger>
+          <TabsTrigger value="whitepaper">Whitepaper</TabsTrigger>
           <TabsTrigger value="genesis">Genesis Block</TabsTrigger>
           <TabsTrigger value="config">Config File</TabsTrigger>
           <TabsTrigger value="compile">Compilation</TabsTrigger>
@@ -58,6 +59,16 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
           </CardHeader>
           <CardContent>
             <div className="prose prose-invert max-w-none leading-relaxed" dangerouslySetInnerHTML={{ __html: results.technicalSummary.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>') }}></div>
+          </CardContent>
+        </TabContentCard>
+
+        <TabContentCard value="whitepaper" filename="whitepaper.md" content={results.whitepaperContent}>
+          <CardHeader>
+            <CardTitle>Whitepaper</CardTitle>
+            <CardDescription>The foundational document outlining your cryptocurrency's vision and technology.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CodeBlock code={results.whitepaperContent} language="markdown" />
           </CardContent>
         </TabContentCard>
 
