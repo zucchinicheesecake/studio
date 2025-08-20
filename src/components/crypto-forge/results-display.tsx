@@ -35,6 +35,8 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
   const [safeReadmeHtml, setSafeReadmeHtml] = useState('');
 
   useEffect(() => {
+    // DOMPurify can only run on the client, so we need to ensure this code
+    // only executes in a browser environment.
     if (typeof window !== 'undefined') {
         const unsafeHtml = marked.parse(results.readmeContent) as string;
         setSafeReadmeHtml(DOMPurify.sanitize(unsafeHtml));
