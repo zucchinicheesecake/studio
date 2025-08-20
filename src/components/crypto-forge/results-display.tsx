@@ -16,6 +16,9 @@ import Link from "next/link";
 import { Separator } from "../ui/separator";
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
+import { MessageSquarePlus } from "lucide-react";
+import { ResultsChat } from "./results-chat";
 
 
 interface ResultsDisplayProps {
@@ -32,8 +35,10 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
   const [safeReadmeHtml, setSafeReadmeHtml] = useState('');
 
   useEffect(() => {
-    const unsafeHtml = marked.parse(results.readmeContent) as string;
-    setSafeReadmeHtml(DOMPurify.sanitize(unsafeHtml));
+    if (typeof window !== 'undefined') {
+        const unsafeHtml = marked.parse(results.readmeContent) as string;
+        setSafeReadmeHtml(DOMPurify.sanitize(unsafeHtml));
+    }
   }, [results.readmeContent]);
 
   useEffect(() => {
@@ -110,7 +115,23 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
         </CardHeader>
       </Card>
 
-      <div className="space-y-8">
+        <div className="space-y-8">
+             <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="item-1">
+                    <AccordionTrigger className="text-xl font-headline text-accent hover:no-underline">
+                        <div className="flex items-center gap-3">
+                            <MessageSquarePlus className="h-6 w-6" />
+                            Ask AI About Your Code
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-4">
+                        <ResultsChat results={results} />
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+            
+            <Separator />
+
             <ResultSection
                 title="Installation Script"
                 filename="install.sh"

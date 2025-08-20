@@ -9,3 +9,5 @@ import '@/ai/flows/explain-concept.ts';
 import '@/ai/flows/suggest-text.ts';
 import '@/ai/flows/generate-readme.ts';
 import '@/ai/flows/generate-install-script.ts';
+import '@/ai/flows/ask-ai-about-code.ts';
+

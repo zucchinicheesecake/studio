@@ -8,6 +8,7 @@ import { explainConcept as explainConceptFlow } from "@/ai/flows/explain-concept
 import { suggestTextForField as suggestTextForFieldFlow, type SuggestTextForFieldInput } from "@/ai/flows/suggest-text";
 import { generateReadme as generateReadmeFlow } from "@/ai/flows/generate-readme";
 import { generateInstallScript as generateInstallScriptFlow } from "@/ai/flows/generate-install-script";
+import { askAiAboutCode as askAiAboutCodeFlow, type AskAiAboutCodeInput } from "@/ai/flows/ask-ai-about-code";
 import type { GenerationResult, Project } from "@/app/types";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp, getDocs, query, orderBy, doc, getDoc } from "firebase/firestore";
@@ -64,6 +65,19 @@ export async function generateInstallScript(input: GenerateInstallScriptInput) {
             throw new Error(`Failed to generate installation script: ${error.message}`);
         }
         throw new Error("An unknown error occurred while generating the installation script.");
+    }
+}
+
+export async function askAiAboutCode(input: AskAiAboutCodeInput): Promise<string> {
+    try {
+        const result = await askAiAboutCodeFlow(input);
+        return result.answer;
+    } catch (error) {
+        console.error("Error in askAiAboutCode:", error);
+        if (error instanceof Error) {
+            return `AI Assistant failed: ${error.message}`;
+        }
+        return "The AI assistant encountered an error. Please try again.";
     }
 }
 
