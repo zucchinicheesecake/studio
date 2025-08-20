@@ -3,33 +3,66 @@
 
 import { generateGenesisBlockCode as generateGenesisBlockCodeFlow, type GenesisBlockCodeInput } from "@/ai/flows/generate-genesis-block-code";
 import { createNetworkConfigurationFile as createNetworkConfigurationFileFlow, type CreateNetworkConfigurationFileInput } from "@/ai/flows/create-network-configuration-file";
-import { generateLogo } from "@/ai/flows/generate-logo";
+import { generateLogo as generateLogoFlow } from "@/ai/flows/generate-logo";
 import { explainConcept as explainConceptFlow } from "@/ai/flows/explain-concept";
 import { suggestTextForField as suggestTextForFieldFlow, type SuggestTextForFieldInput } from "@/ai/flows/suggest-text";
-import { generateReadme } from "@/ai/flows/generate-readme";
-import { generateInstallScript } from "@/ai/flows/generate-install-script";
+import { generateReadme as generateReadmeFlow } from "@/ai/flows/generate-readme";
+import { generateInstallScript as generateInstallScriptFlow } from "@/ai/flows/generate-install-script";
 import type { GenerationResult, Project } from "@/app/types";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp, getDocs, query, orderBy, doc, getDoc } from "firebase/firestore";
+import type { GenerateLogoInput } from "@/ai/flows/generate-logo";
+import type { GenerateReadmeInput } from "@/ai/flows/generate-readme";
+import type { GenerateInstallScriptInput } from "@/ai/flows/generate-install-script";
 
 
 // This file now only contains individual server actions that can be called from the client.
 // The main orchestration logic has been moved to the client in `forge/page.tsx`.
 
 export async function generateGenesisBlockCode(input: GenesisBlockCodeInput) {
-    return await generateGenesisBlockCodeFlow(input);
+    try {
+        return await generateGenesisBlockCodeFlow(input);
+    } catch (error) {
+        console.error("Error in generateGenesisBlockCode:", error);
+        throw new Error("Failed to generate Genesis Block code. The AI model may be temporarily unavailable.");
+    }
 }
 
 export async function createNetworkConfigurationFile(input: CreateNetworkConfigurationFileInput) {
-    return await createNetworkConfigurationFileFlow(input);
+    try {
+        return await createNetworkConfigurationFileFlow(input);
+    } catch (error) {
+        console.error("Error in createNetworkConfigurationFile:", error);
+        throw new Error("Failed to create network configuration file.");
+    }
 }
 
+export async function generateLogo(input: GenerateLogoInput) {
+    try {
+        return await generateLogoFlow(input);
+    } catch (error) {
+        console.error("Error in generateLogo:", error);
+        throw new Error("Failed to generate logo. The image generation service may be down.");
+    }
+}
 
-export { 
-    generateLogo,
-    generateReadme,
-    generateInstallScript
-};
+export async function generateReadme(input: GenerateReadmeInput) {
+     try {
+        return await generateReadmeFlow(input);
+    } catch (error) {
+        console.error("Error in generateReadme:", error);
+        throw new Error("Failed to generate README file.");
+    }
+}
+
+export async function generateInstallScript(input: GenerateInstallScriptInput) {
+     try {
+        return await generateInstallScriptFlow(input);
+    } catch (error) {
+        console.error("Error in generateInstallScript:", error);
+        throw new Error("Failed to generate installation script.");
+    }
+}
 
 
 export async function explainConcept(concept: string): Promise<string> {

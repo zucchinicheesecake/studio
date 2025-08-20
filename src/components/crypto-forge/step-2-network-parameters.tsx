@@ -2,7 +2,7 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LabelWithExplain } from "./label-with-explain";
@@ -13,11 +13,11 @@ export function Step2NetworkParameters() {
   return (
     <Card className="w-full bg-card/50">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl">Network Parameters</CardTitle>
+        <CardTitle className="font-headline text-2xl text-primary">Network Parameters</CardTitle>
         <CardDescription>Define the core economic and operational parameters of your blockchain network.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <FormField control={control} name="blockReward" render={({ field }) => (
                 <FormItem>
                     <LabelWithExplain label="Block Reward" concept="Block Reward" />

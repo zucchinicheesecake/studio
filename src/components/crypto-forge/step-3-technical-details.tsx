@@ -12,10 +12,27 @@ export function Step3TechnicalDetails() {
   return (
     <Card className="w-full bg-card/50">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl">Technical Details</CardTitle>
+        <CardTitle className="font-headline text-2xl text-primary">Technical Details</CardTitle>
         <CardDescription>Provide the specific technical inputs for the genesis block and visual assets.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
+         <FormField
+          control={control}
+          name="tagline"
+          render={({ field }) => (
+            <FormItem>
+              <LabelWithExplain label="Project Tagline" concept="Tagline" />
+              <FormControl>
+                <AIInput
+                  label="Project Tagline"
+                  placeholder="A short, memorable phrase that captures the essence of your project."
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={control}
           name="timestamp"

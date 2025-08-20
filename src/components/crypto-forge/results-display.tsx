@@ -14,6 +14,8 @@ import { saveProject } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { Separator } from "../ui/separator";
+import { marked } from 'marked';
+import DOMPurify from 'isomorphic-dompurify';
 
 
 interface ResultsDisplayProps {
@@ -27,6 +29,12 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(isSavedProject);
   const { toast } = useToast();
+  const [safeReadmeHtml, setSafeReadmeHtml] = useState('');
+
+  useEffect(() => {
+    const unsafeHtml = marked.parse(results.readmeContent) as string;
+    setSafeReadmeHtml(DOMPurify.sanitize(unsafeHtml));
+  }, [results.readmeContent]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -140,7 +148,7 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
             >
                  <Card className="bg-card/50">
                     <CardContent className="p-6">
-                         <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: results.readmeContent.replace(/\n/g, '<br />') }} />
+                         <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: safeReadmeHtml }} />
                     </CardContent>
                 </Card>
             </ResultSection>

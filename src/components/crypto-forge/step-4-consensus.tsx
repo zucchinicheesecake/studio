@@ -1,7 +1,7 @@
 
 "use client";
 import { useFormContext } from "react-hook-form";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { LabelWithExplain } from "./label-with-explain";
@@ -12,11 +12,11 @@ export function Step4Consensus() {
   return (
     <Card className="w-full bg-card/50">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl">Consensus & Addressing</CardTitle>
+        <CardTitle className="font-headline text-2xl text-primary">Consensus & Addressing</CardTitle>
         <CardDescription>Finalize the consensus rules and network constants for your cryptocurrency.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <FormField control={control} name="addressLetter" render={({ field }) => (
                 <FormItem>
                     <LabelWithExplain label="Address Letter" concept="Address Prefix" />
@@ -39,7 +39,7 @@ export function Step4Consensus() {
                 </FormItem>
             )} />
         </div>
-         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
              <FormField control={control} name="numberOfConfirmations" render={({ field }) => (
                 <FormItem>
                     <LabelWithExplain label="Confirmations" concept="Number of Confirmations" />

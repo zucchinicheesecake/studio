@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -13,31 +13,46 @@ import { ResultsDisplay } from "@/components/crypto-forge/results-display";
 import { AlertCircle, CheckCircle, CircleDashed, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { HappyCoinIcon } from "@/components/icons/happy-coin-icon";
-import { ChatInterface } from "@/components/crypto-forge/chat-interface";
+import { Step1CoreConcept } from "@/components/crypto-forge/step-1-core-concept";
+import { Stepper } from "@/components/crypto-forge/stepper";
+import { Step2NetworkParameters } from "@/components/crypto-forge/step-2-network-parameters";
+import { Step3TechnicalDetails } from "@/components/crypto-forge/step-3-technical-details";
+import { Step4Consensus } from "@/components/crypto-forge/step-4-consensus";
+import { ExplanationContext } from "@/hooks/use-explanation";
+import { ExplanationDialog } from "@/components/crypto-forge/explanation-dialog";
 
 
 type GenerationStepStatus = 'pending' | 'generating' | 'success' | 'error';
 type GenerationStep = { name: string; status: GenerationStepStatus; error?: string };
 
+const steps: { title: string, component: ReactNode }[] = [
+    { title: "Core Concept", component: <Step1CoreConcept /> },
+    { title: "Network Parameters", component: <Step2NetworkParameters /> },
+    { title: "Technical Details", component: <Step3TechnicalDetails /> },
+    { title: "Consensus", component: <Step4Consensus /> },
+];
+
 export default function ForgePage() {
+  const [currentStep, setCurrentStep] = useState(0);
   const [generationSteps, setGenerationSteps] = useState<GenerationStep[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [results, setResults] = useState<GenerationResult | null>(null);
+
+  // Explanation Dialog State
+  const [explanation, setExplanation] = useState({ isOpen: false, concept: '', content: '', isLoading: false });
   
   const { toast } = useToast();
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
-        // Step 1
         projectName: "NovaNet",
         ticker: "NOV",
         missionStatement: "To build a decentralized, censorship-resistant internet for the next generation of web applications.",
         tagline: "The web, rebuilt.",
         logoDescription: "A stylized 'N' that looks like a shield or a network node, with circuit-like patterns. Colors should be electric blue and dark purple.",
         timestamp: `The Times 03/Jan/2009 Chancellor on brink of second bailout for banks`,
-  
-        // Step 2
         blockReward: 50,
         blockHalving: 210000,
         coinSupply: 21000000,
@@ -50,7 +65,13 @@ export default function ForgePage() {
     },
   });
 
-  const { getValues } = methods;
+  const { getValues, trigger, formState } = methods;
+
+  const handleExplain = async (concept: string) => {
+    setExplanation({ isOpen: true, concept, content: '', isLoading: true });
+    const content = await actions.explainConcept(concept);
+    setExplanation({ isOpen: true, concept, content, isLoading: false });
+  };
   
   const onSubmit = async (data: FormValues) => {
     setIsGenerating(true);
@@ -85,38 +106,27 @@ export default function ForgePage() {
             }
         };
 
-        // Parallelize independent generation tasks
         const [
             logo,
             genesis,
             networkConfig,
-            installScript
+            installScript,
+            readme,
         ] = await Promise.all([
             runStep('Logo Generation', () => actions.generateLogo({ coinName: data.projectName, logoDescription: data.logoDescription })),
             runStep('Genesis Block', () => actions.generateGenesisBlockCode({ coinName: data.projectName, ticker: data.ticker, timestamp: data.timestamp })),
             runStep('Network Config', () => actions.createNetworkConfigurationFile(data)),
             runStep('Install Script', () => actions.generateInstallScript({ projectName: data.projectName, ticker: data.ticker })),
+            runStep('README File', () => actions.generateReadme({ projectName: data.projectName, ticker: data.ticker, missionStatement: data.missionStatement })),
         ]);
-
-        generatedAssets.logo = logo;
-        generatedAssets.genesis = genesis;
-        generatedAssets.networkConfig = networkConfig;
-        generatedAssets.installScript = installScript;
-        
-        // Dependent step
-        generatedAssets.readme = await runStep('README File', () => actions.generateReadme({
-            projectName: data.projectName,
-            ticker: data.ticker,
-            missionStatement: data.missionStatement,
-        }));
         
         setResults({
             formValues: data,
-            genesisBlockCode: generatedAssets.genesis.genesisBlockCode,
-            networkConfigurationFile: generatedAssets.networkConfig.networkConfigurationFile,
-            readmeContent: generatedAssets.readme.readmeContent,
-            logoDataUri: generatedAssets.logo.logoDataUri,
-            installScript: generatedAssets.installScript.installScript,
+            genesisBlockCode: genesis.genesisBlockCode,
+            networkConfigurationFile: networkConfig.networkConfigurationFile,
+            readmeContent: readme.readmeContent,
+            logoDataUri: logo.logoDataUri,
+            installScript: installScript.installScript,
         });
 
     } catch (e: any) {
@@ -130,10 +140,27 @@ export default function ForgePage() {
     }
   };
 
+  const handleNext = async () => {
+    const fieldsToValidate = Object.keys(methods.getValues());
+    const isValid = await trigger(fieldsToValidate as any, { shouldFocus: true });
+    if (isValid && currentStep < steps.length - 1) {
+        setCurrentStep(prev => prev + 1);
+    } else if (isValid && currentStep === steps.length - 1) {
+        onSubmit(getValues());
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+        setCurrentStep(prev => prev - 1);
+    }
+  };
+
   const resetForm = () => {
     setResults(null);
     setIsGenerating(false);
     setGenerationSteps([]);
+    setCurrentStep(0);
     methods.reset();
   }
 
@@ -200,21 +227,46 @@ export default function ForgePage() {
   }
 
   return (
-    <FormProvider {...methods}>
-      <div className="flex flex-col min-h-screen bg-background">
-        <header className="container mx-auto px-4 h-16 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-                <HappyCoinIcon className="h-8 w-8 text-primary" />
-                <span className="text-xl font-bold font-headline">Coin Engine</span>
-            </Link>
-            <Button asChild variant="outline">
-                <Link href="/dashboard">My Dashboard</Link>
-            </Button>
-        </header>
-        <main className="flex-grow container mx-auto px-4 pt-4 pb-12 flex flex-col">
-            <ChatInterface onComplete={onSubmit} />
-        </main>
-      </div>
-    </FormProvider>
+    <ExplanationContext.Provider value={{ handleExplain }}>
+      <FormProvider {...methods}>
+        <div className="flex flex-col min-h-screen bg-background">
+          <header className="container mx-auto px-4 h-16 flex items-center justify-between">
+              <Link href="/" className="flex items-center gap-2">
+                  <HappyCoinIcon className="h-8 w-8 text-primary" />
+                  <span className="text-xl font-bold font-headline">Coin Engine</span>
+              </Link>
+              <Button asChild variant="outline">
+                  <Link href="/dashboard">My Dashboard</Link>
+              </Button>
+          </header>
+          <main className="flex-grow container mx-auto px-4 pt-4 pb-12 flex flex-col items-center">
+            <div className="w-full max-w-4xl">
+              <Stepper currentStep={currentStep} steps={steps.map(s => s.title)} />
+              
+              <form onSubmit={methods.handleSubmit(onSubmit)} className="mt-8 space-y-8">
+                {steps[currentStep].component}
+
+                <div className="flex justify-between mt-8">
+                    <Button type="button" variant="outline" onClick={handleBack} disabled={currentStep === 0}>
+                        Back
+                    </Button>
+                    <Button type="button" onClick={handleNext} disabled={!formState.isValid}>
+                        {currentStep === steps.length - 1 ? "Forge Project" : "Next Step"}
+                    </Button>
+                </div>
+              </form>
+            </div>
+          </main>
+        </div>
+         <ExplanationDialog
+            isOpen={explanation.isOpen}
+            onOpenChange={(isOpen) => setExplanation(prev => ({ ...prev, isOpen }))}
+            title={explanation.concept}
+            content={explanation.content}
+            isLoading={explanation.isLoading}
+        />
+      </FormProvider>
+    </ExplanationContext.Provider>
   );
 }
+
