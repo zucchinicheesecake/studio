@@ -10,12 +10,12 @@ export function Step3Tokenomics() {
   const { control } = useFormContext();
 
   return (
-    <Card className="w-full bg-card/50">
+    <Card className="w-full border-none shadow-none bg-transparent">
       <CardHeader>
         <CardTitle className="font-headline text-2xl text-primary">Tokenomics</CardTitle>
         <CardDescription>Define the purpose and economic design of your project's token.</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <FormField
           control={control}
           name="tokenUtility"

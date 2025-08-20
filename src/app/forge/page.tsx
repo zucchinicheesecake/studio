@@ -256,8 +256,8 @@ export default function ForgePage() {
   return (
     <ExplanationContext.Provider value={{ handleExplain }}>
       <FormProvider {...methods}>
-        <div className="flex flex-col min-h-screen bg-background">
-          <header className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="flex flex-col min-h-screen bg-gradient-to-br from-background to-blue-950/20">
+          <header className="container mx-auto px-4 h-20 flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2">
                   <HappyCoinIcon className="h-8 w-8 text-primary" />
                   <span className="text-xl font-bold font-headline">Coin Engine</span>
@@ -266,22 +266,26 @@ export default function ForgePage() {
                   <Link href="/dashboard">Login / Signup</Link>
               </Button>
           </header>
-          <main className="flex-grow container mx-auto px-4 pt-4 pb-12 flex flex-col items-center">
-            <div className="w-full max-w-4xl">
-              <Stepper currentStep={currentStep} steps={steps.map(s => s.title)} />
+          <main className="flex-grow container mx-auto px-4 pt-4 pb-24 flex flex-col items-center">
+            <div className="w-full max-w-6xl">
+              <Stepper currentStep={currentStep} steps={steps.map(s => s.title)} className="mb-12" />
               
-              <form onSubmit={methods.handleSubmit(onSubmit)} className="mt-8 space-y-8">
-                {steps[currentStep].component}
+              <Card className="w-full">
+                <CardContent className="p-8">
+                    <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-8">
+                        {steps[currentStep].component}
 
-                <div className="flex justify-between mt-8">
-                    <Button type="button" variant="outline" onClick={handleBack} disabled={currentStep === 0}>
-                        Back
-                    </Button>
-                    <Button type="button" onClick={handleNext} disabled={!formState.isValid}>
-                        {currentStep === steps.length - 1 ? "Forge Project" : "Next Step"}
-                    </Button>
-                </div>
-              </form>
+                        <div className="flex justify-between mt-12 pt-8 border-t">
+                            <Button type="button" variant="outline" size="lg" onClick={handleBack} disabled={currentStep === 0}>
+                                Back
+                            </Button>
+                            <Button type="button" size="lg" onClick={handleNext} disabled={!formState.isValid}>
+                                {currentStep === steps.length - 1 ? "Forge Project" : "Next Step"}
+                            </Button>
+                        </div>
+                    </form>
+                </CardContent>
+              </Card>
             </div>
           </main>
         </div>

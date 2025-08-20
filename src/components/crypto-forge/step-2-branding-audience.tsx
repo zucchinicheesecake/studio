@@ -10,12 +10,12 @@ export function Step2BrandingAudience() {
   const { control } = useFormContext();
 
   return (
-    <Card className="w-full bg-card/50">
+    <Card className="w-full border-none shadow-none bg-transparent">
       <CardHeader>
         <CardTitle className="font-headline text-2xl text-primary">Branding & Audience</CardTitle>
         <CardDescription>Define who you're building for and the personality of your project.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 pt-6">
         <FormField
           control={control}
           name="targetAudience"

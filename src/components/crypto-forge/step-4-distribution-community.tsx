@@ -10,12 +10,12 @@ export function Step4DistributionCommunity() {
   const { control } = useFormContext();
 
   return (
-    <Card className="w-full bg-card/50">
+    <Card className="w-full border-none shadow-none bg-transparent">
       <CardHeader>
         <CardTitle className="font-headline text-2xl text-primary">Distribution & Community</CardTitle>
         <CardDescription>Plan how you'll allocate your tokens and grow your community.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 pt-6">
         <FormField
           control={control}
           name="initialDistribution"
