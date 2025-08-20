@@ -6,46 +6,39 @@ interface StepperProps {
 
 export function Stepper({ currentStep, steps }: StepperProps) {
   return (
-    <div className="flex flex-col">
-      <div className="flex items-center justify-center">
-        {steps.map((step, index) => (
-          <div key={step.id} className="flex items-center">
-            <div className="flex flex-col items-center">
-              <div
-                className={`flex h-8 w-8 items-center justify-center rounded-full border-2 transition-colors duration-300 ${
-                  step.id < currentStep
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : step.id === currentStep
-                    ? 'border-primary bg-primary/20 text-primary'
-                    : 'border-muted-foreground/50 bg-background text-muted-foreground'
-                }`}
-              >
-                <span className="font-bold">{step.id}</span>
-              </div>
-            </div>
-            {index < steps.length - 1 && (
-              <div
-                className={`h-0.5 w-24 transition-colors duration-300 ${
-                  step.id < currentStep ? 'bg-primary' : 'bg-muted-foreground/50'
-                }`}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-      <div className="mt-4 flex justify-between px-8">
-        {steps.map((step) => (
-          <div key={step.id} className="text-center w-full">
-            <p
-              className={`font-medium transition-colors duration-300 ${
-                step.id === currentStep ? 'text-primary' : 'text-muted-foreground'
+    <div className="flex items-center justify-center w-full">
+      {steps.map((step, index) => (
+        <div key={step.id} className="flex items-center w-full">
+          <div className="flex flex-col items-center relative">
+            <div
+              className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-300 ${
+                step.id < currentStep
+                  ? 'bg-primary border-primary'
+                  : step.id === currentStep
+                  ? 'border-primary scale-110'
+                  : 'border-border'
               }`}
             >
+              {step.id < currentStep ? (
+                <span className="text-primary-foreground font-bold">✓</span>
+              ) : (
+                <span className={`font-bold ${step.id === currentStep ? 'text-primary' : 'text-muted-foreground'}`}>{step.id}</span>
+              )}
+            </div>
+             <p className={`absolute top-12 text-center text-sm font-medium transition-colors duration-300 w-32 ${
+                step.id === currentStep ? 'text-primary' : 'text-muted-foreground'
+              }`}>
               {step.name}
             </p>
           </div>
-        ))}
-      </div>
+          {index < steps.length - 1 && (
+            <div className={`flex-1 h-1 transition-colors duration-300 ${
+                step.id < currentStep ? 'bg-primary' : 'bg-border'
+              }`}
+            />
+          )}
+        </div>
+      ))}
     </div>
   );
 }

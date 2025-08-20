@@ -19,7 +19,7 @@ import { AlertCircle, CheckCircle, CircleDashed, Loader2 } from "lucide-react";
 import { ExplanationDialog } from "@/components/crypto-forge/explanation-dialog";
 import { ExplanationContext } from "@/hooks/use-explanation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { EngineBotIcon } from "@/components/icons/engine-bot-icon";
+import { HappyCoinIcon } from "@/components/icons/happy-coin-icon";
 
 
 const steps = [
@@ -248,7 +248,7 @@ export default function ForgePage() {
         <div className="flex flex-col min-h-screen">
         <header className="container mx-auto px-4 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-                <EngineBotIcon className="h-8 w-8 text-primary" />
+                <HappyCoinIcon className="h-8 w-8 text-primary" />
                 <span className="text-xl font-bold font-headline">Coin Engine</span>
             </Link>
             <Button asChild variant="outline">
