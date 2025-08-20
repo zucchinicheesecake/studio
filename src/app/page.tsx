@@ -76,14 +76,16 @@ export default function Home() {
   
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
+    setResults(null);
     try {
         const resultData = await generateCrypto(data);
         setResults(resultData);
     } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
         toast({
             variant: "destructive",
             title: "Generation Failed",
-            description: "There was an error generating your cryptocurrency. Please try again.",
+            description: errorMessage,
         })
     } finally {
         setIsLoading(false);

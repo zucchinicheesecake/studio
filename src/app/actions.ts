@@ -10,14 +10,13 @@ import type { FormValues, GenerationResult } from "@/app/types";
 
 
 export async function generateCrypto(values: FormValues): Promise<GenerationResult> {
-    try {
-        const compilationGuidancePromise = provideCompilationGuidance({
+    const results = await Promise.allSettled([
+        provideCompilationGuidance({
             coinName: values.coinName,
             consensusMechanism: values.consensusMechanism,
             targetSpacing: values.targetSpacingInMinutes,
-        });
-
-        const genesisBlockPromise = generateGenesisBlockCode({
+        }),
+        generateGenesisBlockCode({
             coinName: values.coinName,
             coinAbbreviation: values.coinAbbreviation,
             addressLetter: values.addressLetter,
@@ -26,46 +25,61 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
             blockReward: values.blockReward,
             blockHalving: values.blockHalving,
             coinSupply: values.coinSupply,
-        });
-
-        const networkConfigPromise = createNetworkConfigurationFile({
+        }),
+        createNetworkConfigurationFile({
             ...values,
             targetSpacingInMinutes: values.targetSpacingInMinutes,
             targetTimespanInMinutes: values.targetTimespanInMinutes,
-        });
-
-        const logoPromise = generateLogo({
+        }),
+        generateLogo({
             coinName: values.coinName,
             logoDescription: values.logoDescription,
-        });
-        
-        const [compilationGuidance, genesisBlock, networkConfig, logo] = await Promise.all([
-            compilationGuidancePromise,
-            genesisBlockPromise,
-            networkConfigPromise,
-            logoPromise,
-        ]);
+        })
+    ]);
 
-        const nodeSetupInstructions = await provideNodeSetupMiningInstructions({
-            coinName: values.coinName,
-            coinSymbol: values.coinAbbreviation,
-            genesisBlockCode: genesisBlock.genesisBlockCode,
-            networkParameters: networkConfig.networkConfigurationFile,
-            compilationInstructions: compilationGuidance.compilationInstructions,
-        });
-        
-        const technicalSummary = `You've chosen to build **${values.coinName} (${values.coinAbbreviation})**. It will use the **${values.consensusMechanism}** consensus mechanism. The network is designed for a **${values.targetSpacingInMinutes}-minute** block time, with a difficulty readjustment every **${values.targetTimespanInMinutes} minutes**. Miners will initially receive a reward of **${values.blockReward} ${values.coinAbbreviation}** per block, which will halve every **${values.blockHalving}** blocks, leading to a total supply of **${values.coinSupply} ${values.coinAbbreviation}**. Transactions will be considered confirmed after **${values.numberOfConfirmations}** blocks, and mined coins will mature after **${values.coinbaseMaturity}** blocks.`;
-        
-        return {
-            technicalSummary,
-            genesisBlockCode: genesisBlock.genesisBlockCode,
-            networkConfigurationFile: networkConfig.networkConfigurationFile,
-            compilationInstructions: compilationGuidance.compilationInstructions,
-            nodeSetupInstructions: nodeSetupInstructions.instructions,
-            logoDataUri: logo.logoDataUri,
-        };
-    } catch (error) {
-        console.error("Error generating crypto configuration:", error);
-        throw new Error("Failed to generate cryptocurrency configuration. Please try again.");
+    const [compilationGuidanceResult, genesisBlockResult, networkConfigResult, logoResult] = results;
+
+    const failedSteps = results
+        .map((result, index) => (result.status === 'rejected' ? [
+            'Compilation Guidance', 
+            'Genesis Block', 
+            'Network Config', 
+            'Logo Generation'
+        ][index] : null))
+        .filter(Boolean);
+
+    if (failedSteps.length > 0) {
+        throw new Error(`The following steps failed: ${failedSteps.join(', ')}. Please try again.`);
     }
+
+    const compilationGuidance = (compilationGuidanceResult as PromiseFulfillment<any>).value;
+    const genesisBlock = (genesisBlockResult as PromiseFulfillment<any>).value;
+    const networkConfig = (networkConfigResult as PromiseFulfillment<any>).value;
+    const logo = (logoResult as PromiseFulfillment<any>).value;
+
+
+    const nodeSetupInstructions = await provideNodeSetupMiningInstructions({
+        coinName: values.coinName,
+        coinSymbol: values.coinAbbreviation,
+        genesisBlockCode: genesisBlock.genesisBlockCode,
+        networkParameters: networkConfig.networkConfigurationFile,
+        compilationInstructions: compilationGuidance.compilationInstructions,
+    });
+    
+    const technicalSummary = `You've chosen to build **${values.coinName} (${values.coinAbbreviation})**. It will use the **${values.consensusMechanism}** consensus mechanism. The network is designed for a **${values.targetSpacingInMinutes}-minute** block time, with a difficulty readjustment every **${values.targetTimespanInMinutes} minutes**. Miners will initially receive a reward of **${values.blockReward} ${values.coinAbbreviation}** per block, which will halve every **${values.blockHalving}** blocks, leading to a total supply of **${values.coinSupply} ${values.coinAbbreviation}**. Transactions will be considered confirmed after **${values.numberOfConfirmations}** blocks, and mined coins will mature after **${values.coinbaseMaturity}** blocks.`;
+    
+    return {
+        technicalSummary,
+        genesisBlockCode: genesisBlock.genesisBlockCode,
+        networkConfigurationFile: networkConfig.networkConfigurationFile,
+        compilationInstructions: compilationGuidance.compilationInstructions,
+        nodeSetupInstructions: nodeSetupInstructions.instructions,
+        logoDataUri: logo.logoDataUri,
+    };
 }
+
+// Helper type for Promise.allSettled
+type PromiseFulfillment<T> = {
+    status: 'fulfilled';
+    value: T;
+};
