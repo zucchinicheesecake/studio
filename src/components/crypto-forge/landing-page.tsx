@@ -3,7 +3,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Cpu, Layers, GitBranch, Download, BookOpen } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import Image from 'next/image';
 
 interface LandingPageProps {
@@ -34,19 +34,22 @@ export function LandingPage({ logoUrl, generatedCode }: LandingPageProps) {
       // This is safe in this sandboxed environment, but should not be done
       // with untrusted code on a production server.
       const transformedCode = `
-        return (function(React, ShieldCheck, Cpu, Layers, GitBranch, Download, BookOpen) {
+        return (function(React, Image, LucideIcons) {
+          const { ${Object.keys(LucideIcons).join(', ')} } = LucideIcons;
           ${codeWithoutImports}
-          // The AI is prompted to return a single component, so we assume the last declared
-          // function is the one we want to render.
           const componentMatch = /const\\s+([A-Z][A-Za-z0-9_]*)\\s*=\\s*\\(/.exec(codeWithoutImports);
           if (componentMatch && componentMatch[1]) {
             return eval(componentMatch[1]);
           }
-          throw new Error("Could not find a component to render in the generated code.");
-        })(React, ShieldCheck, Cpu, Layers, GitBranch, Download, BookOpen);
+          const functionMatch = /function\\s+([A-Z][A-Za-z0-9_]*)\\s*\\(/.exec(codeWithoutImports);
+          if (functionMatch && functionMatch[1]) {
+            return eval(functionMatch[1]);
+          }
+          throw new Error("Could not find a React component in the generated code.");
+        })(React, Image, LucideIcons);
       `;
       
-      const EvaluatedComponent = new Function('React', 'ShieldCheck', 'Cpu', 'Layers', 'GitBranch', 'Download', 'BookOpen', transformedCode)(React, ShieldCheck, Cpu, Layers, GitBranch, Download, BookOpen);
+      const EvaluatedComponent = new Function('React', 'Image', 'LucideIcons', transformedCode)(React, Image, LucideIcons);
 
       setComponent(() => EvaluatedComponent);
       setError(null);
@@ -60,17 +63,19 @@ export function LandingPage({ logoUrl, generatedCode }: LandingPageProps) {
 
   if (error) {
     return (
-        <div className="flex flex-col items-center justify-center h-full bg-red-900/20 p-8 text-center">
+        <div className="flex flex-col items-center justify-center h-full bg-red-900/20 p-8 text-center rounded-lg">
+            <LucideIcons.AlertTriangle className="h-12 w-12 text-red-400 mb-4" />
             <h2 className="text-2xl font-bold text-red-400 mb-4">Preview Error</h2>
-            <p className="text-red-300 mb-4">{error}</p>
+            <p className="text-red-300 mb-4 text-sm">{error}</p>
         </div>
     )
   }
 
   if (!Component) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p>Loading Preview...</p>
+      <div className="flex flex-col items-center justify-center h-full">
+        <LucideIcons.Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="mt-4 text-muted-foreground">Loading Preview...</p>
       </div>
     );
   }

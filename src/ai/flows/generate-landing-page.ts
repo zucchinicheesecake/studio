@@ -62,7 +62,7 @@ const prompt = ai.definePrompt({
   3.  **Content:** Use the provided parameters to populate the content of the page.
   4.  **Styling:**
       *   Use a dark theme. The background should be dark (e.g., \`bg-gray-900\`), and text should be light (e.g., \`text-white\`, \`text-gray-300\`).
-      *   Use the project's magenta/pink color (like \`text-pink-500\`, \`bg-pink-600\`) as the primary accent color for buttons, headings, and highlights.
+      *   Use the project's primary color as the main accent color for buttons, headings, and highlights.
       *   Make it look professional, sleek, and modern. Use cards, proper spacing, and good typography.
   5.  **Code Format:**
       *   Return the code for a **single React component** as a raw string.
