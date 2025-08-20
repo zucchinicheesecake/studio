@@ -15,10 +15,11 @@ import { Step2NetworkParameters } from "@/components/crypto-forge/step-2-network
 import { Step3TechnicalDetails } from "@/components/crypto-forge/step-3-technical-details";
 import { Step4Consensus } from "@/components/crypto-forge/step-4-consensus";
 import { ResultsDisplay } from "@/components/crypto-forge/results-display";
-import { AlertCircle, CheckCircle, CircleDashed, Loader2, Bot } from "lucide-react";
+import { AlertCircle, CheckCircle, CircleDashed, Loader2 } from "lucide-react";
 import { ExplanationDialog } from "@/components/crypto-forge/explanation-dialog";
 import { ExplanationContext } from "@/hooks/use-explanation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { EngineBotIcon } from "@/components/icons/engine-bot-icon";
 
 
 const steps = [
@@ -83,7 +84,7 @@ export default function ForgePage() {
 
   const handlePrev = () => {
     if (currentStep > 1) {
-      setCurrentStep(step => step + 1);
+      setCurrentStep(step => step - 1);
     }
   };
   
@@ -247,7 +248,7 @@ export default function ForgePage() {
         <div className="flex flex-col min-h-screen">
         <header className="container mx-auto px-4 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-                <Bot className="h-8 w-8 text-primary" />
+                <EngineBotIcon className="h-8 w-8 text-primary" />
                 <span className="text-xl font-bold font-headline">Coin Engine</span>
             </Link>
             <Button asChild variant="outline">

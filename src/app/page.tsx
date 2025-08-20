@@ -2,15 +2,16 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Bot, Coins, FileText } from "lucide-react";
+import { ArrowRight, Coins, FileText } from "lucide-react";
 import Link from "next/link";
+import { EngineBotIcon } from "@/components/icons/engine-bot-icon";
 
 export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
-            <Bot className="h-8 w-8 text-primary" />
+            <EngineBotIcon className="h-8 w-8 text-primary" />
             <span className="text-xl font-bold font-headline">Coin Engine</span>
         </div>
         <div className="flex items-center gap-2">
@@ -44,7 +45,7 @@ export default function LandingPage() {
             <div className="grid md:grid-cols-3 gap-8 text-center">
                 <div className="flex flex-col items-center">
                     <div className="p-4 bg-primary/10 rounded-full mb-4">
-                        <Bot className="h-10 w-10 text-primary"/>
+                        <EngineBotIcon className="h-10 w-10 text-primary"/>
                     </div>
                     <h3 className="text-xl font-bold font-headline">AI-Powered Generation</h3>
                     <p className="text-muted-foreground mt-2">
