@@ -15,7 +15,7 @@ import { Step2TargetAudience } from "@/components/crypto-forge/step-2-target-aud
 import { Step3Branding } from "@/components/crypto-forge/step-3-branding";
 import { Step4TokenStrategy } from "@/components/crypto-forge/step-4-token-strategy";
 import { ResultsDisplay } from "@/components/crypto-forge/results-display";
-import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { ExplanationDialog } from "@/components/crypto-forge/explanation-dialog";
 import { ExplanationContext } from "@/hooks/use-explanation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,32 +29,11 @@ const steps = [
   { id: 4, name: "Token Strategy", component: <Step4TokenStrategy />, fields: ["tokenUtility", "initialDistribution"] },
 ];
 
-const generationSteps = [
-    'Investor Pitch Deck',
-    'Tokenomics Model',
-    'Community Strategy',
-    'Logo Generation',
-    'Whitepaper',
-    'Audio Summary',
-    'Landing Page',
-    'Social Campaign',
-    'Genesis Block',
-    'Network Config',
-    'Compilation Guidance',
-    'Node Setup Instructions',
-];
-
-
 type Status = 'idle' | 'generating' | 'success' | 'error';
-type StepStatus = {
-    [key: string]: { status: 'pending' | 'success' | 'error'; error?: string };
-};
-
 
 export default function ForgePage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [generationStatus, setGenerationStatus] = useState<Status>('idle');
-  const [stepStatuses, setStepStatuses] = useState<StepStatus>({});
   const [results, setResults] = useState<GenerationResult | null>(null);
   const [explanation, setExplanation] = useState({ title: "", content: "", isLoading: false });
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +50,7 @@ export default function ForgePage() {
       brandVoice: "Empowering, innovative, and slightly rebellious. We are for the builders and the pioneers.",
       logoDescription: "A stylized 'N' that looks like a shield or a network node, with circuit-like patterns. Colors should be electric blue and dark purple.",
       tokenUtility: "The NOV token is used for network governance, paying for decentralized storage, and accessing premium features on the network.",
-      initialDistribution: "40% for community mining rewards, 20% for the development team (vested over 4 years), 20% for the ecosystem fund, 10% for strategic partners, and 10% for a public sale.",
+      initialDistribution: "40% for community mining rewards, 20% for the development team (vested over 4 years), 20% for the ecosystem fund, 10% for a public sale.",
     },
   });
 
@@ -91,7 +70,7 @@ export default function ForgePage() {
 
   const handlePrev = () => {
     if (currentStep > 1) {
-      setCurrentStep(step => step - 1);
+      setCurrentStep(step => step + 1);
     }
   };
   
@@ -99,23 +78,9 @@ export default function ForgePage() {
     setGenerationStatus('generating');
     setResults(null);
     setError(null);
-    setStepStatuses(
-        generationSteps.reduce((acc, stepName) => {
-            acc[stepName] = { status: 'pending' };
-            return acc;
-        }, {} as StepStatus)
-    );
-
+    
     try {
-        // This function will be called by the server action to update status
-        const onStepComplete = async (step: string, success: boolean, error?: string) => {
-            setStepStatuses(prev => ({
-                ...prev,
-                [step]: { status: success ? 'success' : 'error', error },
-            }));
-        };
-
-        const resultData = await generateCrypto(data, onStepComplete);
+        const resultData = await generateCrypto(data);
         setResults(resultData);
         setGenerationStatus('success');
     } catch (e) {
@@ -162,17 +127,11 @@ export default function ForgePage() {
                     <CardTitle>Generation Status</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <ul className="space-y-3">
-                        {Object.entries(stepStatuses).map(([stepName, { status, error }]) => (
-                            <li key={stepName} className="flex items-center text-sm">
-                                {status === 'pending' && <Loader2 className="h-4 w-4 animate-spin text-primary mr-3" />}
-                                {status === 'success' && <CheckCircle className="h-4 w-4 text-green-500 mr-3" />}
-                                {status === 'error' && <AlertCircle className="h-4 w-4 text-destructive mr-3" />}
-                                <span className="flex-grow">{stepName}</span>
-                                {status === 'error' && <span className="text-destructive text-xs ml-4">Failed</span>}
-                            </li>
-                        ))}
-                    </ul>
+                    {generationStatus === 'generating' && (
+                        <div className="flex items-center justify-center p-8">
+                            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                        </div>
+                    )}
                     {generationStatus === 'error' && error && (
                          <Alert variant="destructive" className="mt-6">
                             <AlertCircle className="h-4 w-4" />
@@ -236,5 +195,3 @@ export default function ForgePage() {
     </FormProvider>
   );
 }
-
-    

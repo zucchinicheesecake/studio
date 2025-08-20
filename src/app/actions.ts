@@ -43,7 +43,7 @@ const deriveTechnicalParams = (values: FormValues) => {
 };
 
 
-export async function generateCrypto(values: FormValues, onStepComplete: (step: string, success: boolean, error?: string) => Promise<void>): Promise<GenerationResult> {
+export async function generateCrypto(values: FormValues): Promise<GenerationResult> {
     
     const derivedParams = deriveTechnicalParams(values);
     const fullFormParams = { ...values, ...derivedParams };
@@ -65,17 +65,13 @@ export async function generateCrypto(values: FormValues, onStepComplete: (step: 
     ];
 
     const results: any = {};
-    const errors: { step: string; message: string }[] = [];
 
     for (const step of generationSteps) {
         try {
             const result = await step.fn();
             results[step.name] = result;
-            await onStepComplete(step.name, true);
         } catch (e) {
             const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-            errors.push({ step: step.name, message: errorMessage });
-            await onStepComplete(step.name, false, errorMessage);
             // Stop further processing if a step fails
             throw new Error(`Failed at step: ${step.name}. Reason: ${errorMessage}`);
         }
@@ -95,10 +91,8 @@ export async function generateCrypto(values: FormValues, onStepComplete: (step: 
             networkParameters: networkConfig.networkConfigurationFile,
             compilationInstructions: compilationGuidance.compilationInstructions,
         });
-        await onStepComplete('Node Setup Instructions', true);
     } catch (e) {
         const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-        await onStepComplete('Node Setup Instructions', false, errorMessage);
         throw new Error(`Failed at step: Node Setup Instructions. Reason: ${errorMessage}`);
     }
 
@@ -233,5 +227,3 @@ type PromiseFulfillment<T> = {
     status: 'fulfilled';
     value: T;
 };
-
-    
