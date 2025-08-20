@@ -45,11 +45,11 @@ export type FormValues = z.infer<typeof formSchema>;
 
 export type GenerationResult = {
     formValues: FormValues;
-    genesisBlockCode: string;
-    networkConfigurationFile: string;
-    readmeContent: string;
-    logoDataUri: string;
-    installScript: string;
+    genesisBlockCode?: string;
+    networkConfigurationFile?: string;
+    readmeContent?: string;
+    logoDataUri?: string;
+    installScript?: string;
 };
 
 // This represents a project as it is stored in and retrieved from Firestore

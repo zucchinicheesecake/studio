@@ -41,6 +41,7 @@ export default function ForgePage() {
   const [generationSteps, setGenerationSteps] = useState<GenerationStep[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [results, setResults] = useState<GenerationResult | null>(null);
+  const [showResultsPage, setShowResultsPage] = useState(false);
 
   // Explanation Dialog State
   const [explanation, setExplanation] = useState({ isOpen: false, concept: '', content: '', isLoading: false });
@@ -85,6 +86,7 @@ export default function ForgePage() {
   const onSubmit = async (data: FormValues) => {
     setIsGenerating(true);
     setResults(null);
+    setShowResultsPage(false);
 
     const initialSteps: GenerationStep[] = [
         { name: 'Logo Generation', status: 'pending' },
@@ -93,52 +95,65 @@ export default function ForgePage() {
         { name: 'README File', status: 'pending' },
         { name: 'Install Script', status: 'pending' },
     ];
-    setGenerationSteps(initialSteps);
+    setGenerationSteps(initialSteps.map(step => ({ ...step, status: 'generating' })));
 
     try {
-      const generationPromises = {
-        logo: actions.generateLogo({ coinName: data.projectName, logoDescription: data.logoDescription }),
-        genesis: actions.generateGenesisBlockCode({ coinName: data.projectName, ticker: data.ticker, timestamp: data.timestamp }),
-        networkConfig: actions.createNetworkConfigurationFile(data),
-        readme: actions.generateReadme({ projectName: data.projectName, ticker: data.ticker, missionStatement: data.missionStatement }),
-        installScript: actions.generateInstallScript({ projectName: data.projectName, ticker: data.ticker }),
-      };
-      
-      const updateStepStatus = (index: number, status: GenerationStepStatus, error?: string) => {
-          setGenerationSteps(prev => {
-              const newSteps = [...prev];
-              newSteps[index] = { ...newSteps[index], status, error };
-              return newSteps;
-          });
-      };
+        const generationPromises = [
+            actions.generateLogo({ coinName: data.projectName, logoDescription: data.logoDescription }),
+            actions.generateGenesisBlockCode({ coinName: data.projectName, ticker: data.ticker, timestamp: data.timestamp }),
+            actions.createNetworkConfigurationFile(data),
+            actions.generateReadme({ projectName: data.projectName, ticker: data.ticker, missionStatement: data.missionStatement }),
+            actions.generateInstallScript({ projectName: data.projectName, ticker: data.ticker }),
+        ];
 
-      // We'll update statuses manually as promises resolve or reject
-      generationPromises.logo.then(() => updateStepStatus(0, 'success')).catch(e => updateStepStatus(0, 'error', e.message));
-      generationPromises.genesis.then(() => updateStepStatus(1, 'success')).catch(e => updateStepStatus(1, 'error', e.message));
-      generationPromises.networkConfig.then(() => updateStepStatus(2, 'success')).catch(e => updateStepStatus(2, 'error', e.message));
-      generationPromises.readme.then(() => updateStepStatus(3, 'success')).catch(e => updateStepStatus(3, 'error', e.message));
-      generationPromises.installScript.then(() => updateStepStatus(4, 'success')).catch(e => updateStepStatus(4, 'error', e.message));
+        const results = await Promise.allSettled(generationPromises);
 
-      // Visually indicate that all are generating
-      setGenerationSteps(initialSteps.map(step => ({...step, status: 'generating'})));
-      
-      const [logo, genesis, networkConfig, readme, installScript] = await Promise.all(Object.values(generationPromises));
+        const partialResults: Partial<GenerationResult> = {};
+        let hasErrors = false;
 
-      setResults({
-        formValues: data,
-        logoDataUri: logo.logoDataUri,
-        genesisBlockCode: genesis.genesisBlockCode,
-        networkConfigurationFile: networkConfig.networkConfigurationFile,
-        readmeContent: readme.readmeContent,
-        installScript: installScript.installScript,
-      });
+        results.forEach((result, index) => {
+            const stepName = initialSteps[index].name;
+            if (result.status === 'fulfilled') {
+                setGenerationSteps(prev => prev.map(s => s.name === stepName ? { ...s, status: 'success' } : s));
+                switch(stepName) {
+                    case 'Logo Generation': partialResults.logoDataUri = (result.value as { logoDataUri: string }).logoDataUri; break;
+                    case 'Genesis Block': partialResults.genesisBlockCode = (result.value as { genesisBlockCode: string }).genesisBlockCode; break;
+                    case 'Network Config': partialResults.networkConfigurationFile = (result.value as { networkConfigurationFile: string }).networkConfigurationFile; break;
+                    case 'README File': partialResults.readmeContent = (result.value as { readmeContent: string }).readmeContent; break;
+                    case 'Install Script': partialResults.installScript = (result.value as { installScript: string }).installScript; break;
+                }
+            } else {
+                hasErrors = true;
+                const errorMessage = (result.reason as Error).message || 'An unknown error occurred.';
+                setGenerationSteps(prev => prev.map(s => s.name === stepName ? { ...s, status: 'error', error: errorMessage } : s));
+            }
+        });
+
+        if (Object.keys(partialResults).length > 0) {
+            setResults({
+                formValues: data,
+                ...partialResults
+            });
+        }
+
+        if (hasErrors) {
+            toast({
+                variant: "destructive",
+                title: "One or more steps failed",
+                description: "Review the generation status below for details.",
+            });
+        } else {
+            // If everything was successful, go straight to the results page.
+            setShowResultsPage(true);
+        }
 
     } catch (e: any) {
         toast({
             variant: "destructive",
-            title: "Generation Failed",
-            description: e.message || "One or more steps failed. See details below.",
+            title: "A critical error occurred",
+            description: e.message || "Could not start the generation process.",
         });
+        setGenerationSteps(initialSteps.map(step => ({ ...step, status: 'error', error: 'Process failed to start.' })));
     } finally {
         setIsGenerating(false);
     }
@@ -165,18 +180,20 @@ export default function ForgePage() {
     setIsGenerating(false);
     setGenerationSteps([]);
     setCurrentStep(0);
-    // Note: We don't call methods.reset() here to allow users to easily regenerate with the same data.
-    // If you want to clear the form, you can add `methods.reset();`
+    setShowResultsPage(false);
   }
 
   const handleTryAgain = () => {
-    // We already have the data, so just call onSubmit again.
     onSubmit(getValues());
   };
 
+  if (showResultsPage && results) {
+    return <ResultsDisplay results={results} onReset={resetForm} />;
+  }
 
-  if (isGenerating || (generationSteps.length > 0 && !results)) {
+  if (generationSteps.length > 0) {
     const hasError = generationSteps.some(s => s.status === 'error');
+    const allDone = generationSteps.every(s => s.status === 'success' || s.status === 'error');
     
     return (
         <div className="flex flex-col items-center justify-center min-h-screen text-center container mx-auto px-4 py-12">
@@ -212,27 +229,28 @@ export default function ForgePage() {
                     </ul>
                 </CardContent>
             </Card>
-            {!isGenerating && hasError && (
-                <div className="mt-8 flex gap-4">
-                    <Button onClick={handleTryAgain} variant="default">
-                        Try Again
-                    </Button>
-                     <Button onClick={resetForm} variant="outline">
-                        Back to Editor
-                    </Button>
+
+            {allDone && (
+                <div className="mt-8 flex justify-center items-center gap-4">
+                    {hasError && (
+                        <>
+                            <Button onClick={handleTryAgain} variant="default">
+                                Try Again
+                            </Button>
+                            <Button onClick={resetForm} variant="outline">
+                                Back to Editor
+                            </Button>
+                        </>
+                    )}
+                    {results && (
+                         <Button onClick={() => setShowResultsPage(true)} variant={hasError ? "secondary" : "default"}>
+                            View Results
+                        </Button>
+                    )}
                 </div>
             )}
-             {!isGenerating && !hasError && results && (
-                 <div className="mt-8">
-                    <Button onClick={() => setGenerationSteps([])}>View Results</Button>
-                </div>
-             )}
         </div>
     );
-  }
-
-  if (results) {
-    return <ResultsDisplay results={results} onReset={resetForm} />;
   }
 
   return (
