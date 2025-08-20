@@ -32,6 +32,7 @@ export const formSchema = z.object({
 export type FormValues = z.infer<typeof formSchema>;
 
 export type GenerationResult = {
+    formValues: FormValues;
     technicalSummary: string;
     genesisBlockCode: string;
     networkConfigurationFile: string;

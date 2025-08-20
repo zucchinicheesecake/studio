@@ -1,13 +1,18 @@
+
 "use client";
 
+import { useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CodeBlock } from "@/components/crypto-forge/code-block";
 import type { GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
-import { Download, Linkedin, MessageSquare, Twitter } from "lucide-react";
+import { Download, Linkedin, MessageSquare, Twitter, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import { LandingPage } from "@/components/crypto-forge/landing-page";
+import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
+import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+
 
 interface ResultsDisplayProps {
   results: GenerationResult;
@@ -15,16 +20,50 @@ interface ResultsDisplayProps {
 }
 
 export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
-  const downloadFile = (filename: string, content: string) => {
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+
+  const tokenomicsData = useMemo(() => {
+    const { blockReward, blockHalving, coinSupply } = results.formValues;
+    const data = [];
+    let currentSupply = 0;
+    let currentReward = blockReward;
+    let blocks = 0;
+    let halvings = 0;
+
+    const HALVING_LIMIT = 10; // Show first 10 halving events
+
+    // Initial state
+    data.push({ name: `Year 0`, 'Total Supply': 0 });
+
+    while (currentSupply < coinSupply && halvings < HALVING_LIMIT) {
+        currentSupply += currentReward * blockHalving;
+        blocks += blockHalving;
+        halvings++;
+        
+        data.push({
+            name: `Halving ${halvings}`,
+            'Total Supply': Math.min(currentSupply, coinSupply),
+        });
+
+        currentReward /= 2;
+    }
+    
+    // Ensure final supply is shown
+    if (data[data.length -1]['Total Supply'] < coinSupply) {
+        data.push({
+            name: 'Max Supply',
+            'Total Supply': coinSupply
+        });
+    }
+
+    return data;
+
+  }, [results.formValues]);
+
+  const chartConfig = {
+    supply: {
+      label: "Total Supply",
+      color: "hsl(var(--primary))",
+    },
   };
 
   return (
@@ -56,10 +95,11 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
 
 
       <Tabs defaultValue="landing-page" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 lg:grid-cols-9">
           <TabsTrigger value="landing-page">Landing Page</TabsTrigger>
           <TabsTrigger value="marketing-kit">Marketing</TabsTrigger>
           <TabsTrigger value="whitepaper">Whitepaper</TabsTrigger>
+          <TabsTrigger value="tokenomics">Tokenomics</TabsTrigger>
           <TabsTrigger value="summary">Summary</TabsTrigger>
           <TabsTrigger value="genesis">Genesis</TabsTrigger>
           <TabsTrigger value="config">Config</TabsTrigger>
@@ -108,6 +148,42 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
                     <h3 className="font-headline text-xl text-primary mb-2 flex items-center"><MessageSquare className="mr-2 h-5 w-5" /> Discord/Telegram Welcome</h3>
                     <CodeBlock code={results.communityWelcome} language="markdown" />
                 </div>
+            </CardContent>
+        </TabContentCard>
+        
+        <TabContentCard value="tokenomics">
+            <CardHeader>
+                <CardTitle className="flex items-center"><TrendingUp className="mr-2 h-6 w-6" />Tokenomics Simulator</CardTitle>
+                <CardDescription>A projection of your coin's total supply over its first 10 halving cycles.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ChartContainer config={chartConfig} className="h-[400px] w-full">
+                    <LineChart data={tokenomicsData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} />
+                        <YAxis 
+                            tickFormatter={(value) => value.toLocaleString()}
+                            tickLine={false}
+                            axisLine={false}
+                            tickMargin={8}
+                            width={80}
+                         />
+                        <Tooltip
+                            cursor={false}
+                            content={<ChartTooltipContent
+                                indicator="dot"
+                                formatter={(value) => value.toLocaleString()}
+                            />}
+                        />
+                        <Line
+                            dataKey="Total Supply"
+                            type="monotone"
+                            stroke="var(--color-supply)"
+                            strokeWidth={2}
+                            dot={true}
+                        />
+                    </LineChart>
+                </ChartContainer>
             </CardContent>
         </TabContentCard>
 
@@ -201,15 +277,7 @@ function TabContentCard({ value, children }: { value: string, children: React.Re
 
 function TabContentCardWithDownload({ value, filename, content, children }: { value: string, filename: string, content: string, children: React.ReactNode }) {
     const handleDownload = () => {
-        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        downloadFile(filename, content);
     };
 
     return (
@@ -226,3 +294,15 @@ function TabContentCardWithDownload({ value, filename, content, children }: { va
         </TabsContent>
     )
 }
+
+const downloadFile = (filename: string, content: string) => {
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+};

@@ -108,6 +108,7 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
     });
     
     return {
+        formValues: values,
         technicalSummary,
         genesisBlockCode: genesisBlock.genesisBlockCode,
         networkConfigurationFile: networkConfig.networkConfigurationFile,
