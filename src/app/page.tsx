@@ -3,10 +3,9 @@
 import { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Loader2 } from "lucide-react";
 
-import { formSchema, generateCrypto, GenerationResult } from "@/app/actions";
+import { generateCrypto } from "@/app/actions";
+import { formSchema, type FormValues, type GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Stepper } from "@/components/crypto-forge/stepper";
@@ -15,8 +14,8 @@ import { Step2BasicInfo } from "@/components/crypto-forge/step-2-basic-info";
 import { Step3Economics } from "@/components/crypto-forge/step-3-economics";
 import { Step4Network } from "@/components/crypto-forge/step-4-network";
 import { ResultsDisplay } from "@/components/crypto-forge/results-display";
+import { Loader2 } from "lucide-react";
 
-type FormValues = z.infer<typeof formSchema>;
 
 const steps = [
   { id: 1, name: "Consensus", component: <Step1Consensus />, fields: ["consensusMechanism"] },

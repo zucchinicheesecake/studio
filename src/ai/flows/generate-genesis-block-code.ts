@@ -51,16 +51,6 @@ Coin Supply: {{{coinSupply}}}
 
 Based on these parameters, generate the genesis block code. The code should be well-formatted and ready to be integrated into the cryptocurrency's source code. Pay specific attention to using the timestamp provided in the genesis block.
 
-Here's an example of what a genesis block might look like (this is just a template, use the user provided information):
-
-```c++
-static CBlock CreateGenesisBlock(uint32_t nTime, uint256 nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward) {
-    const char* pszTimestamp = \"The Times 03/Jan/2009 Chancellor on brink of second bailout for banks\";
-    const CScript genesisOutputScript = CScript() << ParseHex(\"04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38\") << OP_CHECKSIG;
-    return CreateGenesisBlock(genesisOutputScript, nTime, nNonce, nBits, nVersion, genesisReward);
-}
-```
-
 Ensure that the generated code includes the timestamp and adheres to standard cryptocurrency genesis block conventions.
 `,
 });

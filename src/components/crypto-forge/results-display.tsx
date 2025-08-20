@@ -3,7 +3,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CodeBlock } from "@/components/crypto-forge/code-block";
-import type { GenerationResult } from "@/app/actions";
+import type { GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 
