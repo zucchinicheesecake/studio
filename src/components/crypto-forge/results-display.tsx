@@ -35,9 +35,7 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
   const [safeReadmeHtml, setSafeReadmeHtml] = useState('');
 
   useEffect(() => {
-    // DOMPurify can only run on the client, so we need to ensure this code
-    // only executes in a browser environment.
-    if (typeof window !== 'undefined') {
+    if (results.readmeContent && typeof window !== 'undefined') {
         const unsafeHtml = marked.parse(results.readmeContent) as string;
         setSafeReadmeHtml(DOMPurify.sanitize(unsafeHtml));
     }
@@ -81,15 +79,17 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
       
       <Card className="mb-8 bg-card/50 border-primary/20">
         <CardHeader className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left p-6">
-            <div className="flex-shrink-0">
-                <Image
-                    src={results.logoDataUri}
-                    alt="Generated Crypto Logo"
-                    width={100}
-                    height={100}
-                    className="rounded-full border-4 border-primary/50 object-cover"
-                />
-            </div>
+            {results.logoDataUri && (
+                <div className="flex-shrink-0">
+                    <Image
+                        src={results.logoDataUri}
+                        alt="Generated Crypto Logo"
+                        width={100}
+                        height={100}
+                        className="rounded-full border-4 border-primary/50 object-cover"
+                    />
+                </div>
+            )}
             <div className="flex-grow">
                 <CardTitle className="font-headline text-3xl">{results.formValues.projectName} ({results.formValues.ticker})</CardTitle>
                 <CardDescription className="mt-2 text-base">{results.formValues.tagline}</CardDescription>
@@ -132,49 +132,61 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
                 </AccordionItem>
             </Accordion>
             
-            <Separator />
-            
-            <ResultSection
-                title="README"
-                filename="README.md"
-                content={results.readmeContent}
-            >
-                 <Card className="bg-card/50">
-                    <CardContent className="p-6">
-                         <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: safeReadmeHtml }} />
-                    </CardContent>
-                </Card>
-            </ResultSection>
+            {results.readmeContent && (
+                <>
+                    <Separator />
+                    <ResultSection
+                        title="README"
+                        filename="README.md"
+                        content={results.readmeContent}
+                    >
+                        <Card className="bg-card/50">
+                            <CardContent className="p-6">
+                                <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: safeReadmeHtml }} />
+                            </CardContent>
+                        </Card>
+                    </ResultSection>
+                </>
+            )}
 
-            <Separator />
+            {results.installScript && (
+                <>
+                    <Separator />
+                    <ResultSection
+                        title="Installation Script"
+                        filename="install.sh"
+                        content={results.installScript}
+                    >
+                        <CodeBlock code={results.installScript} language="bash" />
+                    </ResultSection>
+                </>
+            )}
 
-            <ResultSection
-                title="Installation Script"
-                filename="install.sh"
-                content={results.installScript}
-            >
-                <CodeBlock code={results.installScript} language="bash" />
-            </ResultSection>
+            {results.genesisBlockCode && (
+                <>
+                    <Separator />
+                    <ResultSection
+                        title="Genesis Block"
+                        filename="genesis_block.cpp"
+                        content={results.genesisBlockCode}
+                    >
+                        <CodeBlock code={results.genesisBlockCode} language="cpp" />
+                    </ResultSection>
+                </>
+            )}
 
-            <Separator />
-
-            <ResultSection
-                title="Genesis Block"
-                filename="genesis_block.cpp"
-                content={results.genesisBlockCode}
-            >
-                <CodeBlock code={results.genesisBlockCode} language="cpp" />
-            </ResultSection>
-
-            <Separator />
-
-            <ResultSection
-                title="Network Configuration"
-                filename={`${results.formValues.projectName.toLowerCase()}.conf`}
-                content={results.networkConfigurationFile}
-            >
-                <CodeBlock code={results.networkConfigurationFile} language="ini" />
-            </ResultSection>
+            {results.networkConfigurationFile && (
+                 <>
+                    <Separator />
+                    <ResultSection
+                        title="Network Configuration"
+                        filename={`${results.formValues.projectName.toLowerCase()}.conf`}
+                        content={results.networkConfigurationFile}
+                    >
+                        <CodeBlock code={results.networkConfigurationFile} language="ini" />
+                    </ResultSection>
+                </>
+            )}
         </div>
       
        <div className="text-center mt-12">
