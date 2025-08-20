@@ -10,12 +10,12 @@ export function Step5TechnicalDetails() {
   const { control } = useFormContext();
 
   return (
-    <Card className="w-full bg-card/50">
+    <Card className="w-full border-none shadow-none bg-transparent">
       <CardHeader>
         <CardTitle className="font-headline text-2xl text-primary">Technical Details</CardTitle>
         <CardDescription>Provide the specific inputs for the genesis block and visual assets.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 pt-6">
         <FormField
           control={control}
           name="timestamp"
