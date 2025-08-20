@@ -98,7 +98,7 @@ export default function DashboardPage() {
             <div className="w-full max-w-md">
                 <Card className="mb-8">
                     <CardHeader className="text-center">
-                        <CardTitle className="text-4xl font-bold font-headline text-primary">CryptoForge</CardTitle>
+                        <CardTitle className="text-4xl font-bold font-headline text-primary">Coin Engine</CardTitle>
                         <CardDescription className="text-muted-foreground mt-2">Sign in or create an account to get started.</CardDescription>
                     </CardHeader>
                 </Card>
@@ -162,7 +162,7 @@ export default function DashboardPage() {
         <div className="flex flex-col min-h-screen bg-background">
              <header className="container mx-auto px-4 h-16 flex items-center justify-between border-b border-border">
                 <h1 className="text-2xl font-bold font-headline text-primary">
-                    <Link href="/">CryptoForge</Link>
+                    <Link href="/">Coin Engine</Link>
                 </h1>
                 <div className="flex items-center gap-4">
                     <p className="text-sm text-muted-foreground">{user.email}</p>

@@ -11,7 +11,7 @@ export default function LandingPage() {
       <header className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
             <Bot className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold font-headline">CryptoForge</span>
+            <span className="text-xl font-bold font-headline">Coin Engine</span>
         </div>
         <div className="flex items-center gap-2">
             <Button asChild variant="ghost">
@@ -29,7 +29,7 @@ export default function LandingPage() {
             Create a Cryptocurrency in Minutes
           </h1>
           <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            CryptoForge is your AI partner for designing, building, and launching your own digital currency. No coding required. Just your vision.
+            Coin Engine is your AI partner for designing, building, and launching your own digital currency. No coding required. Just your vision.
           </p>
           <div className="mt-8 flex justify-center gap-4">
             <Button size="lg" asChild>
@@ -74,7 +74,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} CryptoForge. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Coin Engine. All rights reserved.</p>
       </footer>
     </div>
   );

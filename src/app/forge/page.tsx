@@ -83,7 +83,7 @@ export default function ForgePage() {
 
   const handlePrev = () => {
     if (currentStep > 1) {
-      setCurrentStep(step => step - 1);
+      setCurrentStep(step => step + 1);
     }
   };
   
@@ -248,7 +248,7 @@ export default function ForgePage() {
         <header className="container mx-auto px-4 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
                 <Bot className="h-8 w-8 text-primary" />
-                <span className="text-xl font-bold font-headline">CryptoForge</span>
+                <span className="text-xl font-bold font-headline">Coin Engine</span>
             </Link>
             <Button asChild variant="outline">
                 <Link href="/dashboard">My Dashboard</Link>
@@ -256,7 +256,7 @@ export default function ForgePage() {
         </header>
         <main className="flex-grow container mx-auto px-4 py-12 flex flex-col items-center justify-center">
           <div className="text-center mb-4">
-              <h1 className="text-5xl font-headline font-bold text-primary">CryptoForge</h1>
+              <h1 className="text-5xl font-headline font-bold text-primary">Coin Engine</h1>
               <p className="mt-2 text-lg text-muted-foreground">Your AI co-founder for launching a crypto project.</p>
           </div>
           <div className="w-full max-w-4xl">
@@ -282,7 +282,7 @@ export default function ForgePage() {
           </div>
         </main>
          <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} CryptoForge. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Coin Engine. All rights reserved.</p>
         </footer>
         <ExplanationDialog
             isOpen={!!explanation.title}
