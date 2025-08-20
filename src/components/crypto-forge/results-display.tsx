@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { Separator } from "../ui/separator";
 import { marked } from 'marked';
-import DOMPurify from 'isomorphic-dompurify';
+import DOMPurify from 'dompurify';
 
 
 interface ResultsDisplayProps {
