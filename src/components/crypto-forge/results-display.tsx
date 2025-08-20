@@ -1,13 +1,13 @@
 
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CodeBlock } from "@/components/crypto-forge/code-block";
 import type { GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
-import { Download, Linkedin, MessageSquare, Twitter, TrendingUp, Save, Loader2, CheckCircle, ArrowLeft, FileCode, Presentation, Briefcase, Users } from "lucide-react";
+import { Download, Linkedin, MessageSquare, Twitter, Save, Loader2, CheckCircle, ArrowLeft, FileCode, Presentation, Briefcase } from "lucide-react";
 import Image from "next/image";
 import { LandingPage } from "@/components/crypto-forge/landing-page";
 import { auth } from "@/lib/firebase";
@@ -55,6 +55,9 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
     }
   };
 
+  const projectDate = isSavedProject && 'createdAt' in results ? new Date((results as any).createdAt).toLocaleDateString() : new Date().toLocaleDateString();
+
+
   return (
     <div className="w-full max-w-7xl mx-auto py-12 px-4">
       <div className="text-center mb-8">
@@ -77,7 +80,7 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
             </div>
             <div className="flex-grow">
                 <CardTitle className="font-headline text-3xl">{isSavedProject ? "Project Overview" : "Launch Your Project!"}</CardTitle>
-                <CardDescription className="mt-2 text-base">{isSavedProject ? `Created on ${new Date(results.createdAt!).toLocaleDateString()}` : "You have everything you need. Follow the guides to bring your project to life."}</CardDescription>
+                <CardDescription className="mt-2 text-base">{isSavedProject ? `Created on ${projectDate}` : "You have everything you need. Follow the guides to bring your project to life."}</CardDescription>
             </div>
              {user && !isSavedProject && (
                 <div className="flex-shrink-0">
@@ -275,7 +278,7 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
 function TabContentCard({ value, children }: { value: string, children: React.ReactNode }) {
     return (
         <TabsContent value={value} className="mt-4">
-            <Card className="bg-transparent border-border/50">
+            <Card className="bg-card/70 border-border/50">
                 {children}
             </Card>
         </TabsContent>
