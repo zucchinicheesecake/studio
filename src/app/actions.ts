@@ -7,11 +7,14 @@ import { createNetworkConfigurationFile } from "@/ai/flows/create-network-config
 import { provideNodeSetupMiningInstructions } from "@/ai/flows/provide-node-setup-mining-instructions";
 import { generateLogo } from "@/ai/flows/generate-logo";
 import { generateWhitepaper } from "@/ai/flows/generate-whitepaper";
+import { generateAudioSummary } from "@/ai/flows/generate-audio-summary";
 import type { FormValues, GenerationResult } from "@/app/types";
 
 
 export async function generateCrypto(values: FormValues): Promise<GenerationResult> {
     const tokenomicsSummary = `Initial block reward of ${values.blockReward} ${values.coinAbbreviation}, halving every ${values.blockHalving} blocks, with a total supply of ${values.coinSupply} coins.`;
+    
+    const technicalSummary = `You've chosen to build **${values.coinName} (${values.coinAbbreviation})**. It will use the **${values.consensusMechanism}** consensus mechanism. The network is designed for a **${values.targetSpacingInMinutes}-minute** block time, with a difficulty readjustment every **${values.targetTimespanInMinutes} minutes**. Miners will initially receive a reward of **${values.blockReward} ${values.coinAbbreviation}** per block, which will halve every **${values.blockHalving}** blocks, leading to a total supply of **${values.coinSupply} ${values.coinAbbreviation}**. Transactions will be considered confirmed after **${values.numberOfConfirmations}** blocks, and mined coins will mature after **${values.coinbaseMaturity}** blocks.`;
 
     const results = await Promise.allSettled([
         provideCompilationGuidance({
@@ -46,10 +49,13 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
             keyFeatures: values.keyFeatures,
             consensusMechanism: values.consensusMechanism,
             tokenomics: tokenomicsSummary,
+        }),
+        generateAudioSummary({
+            summary: technicalSummary.replace(/\\*\\*/g, ''), // remove markdown for TTS
         })
     ]);
 
-    const [compilationGuidanceResult, genesisBlockResult, networkConfigResult, logoResult, whitepaperResult] = results;
+    const [compilationGuidanceResult, genesisBlockResult, networkConfigResult, logoResult, whitepaperResult, audioSummaryResult] = results;
 
     const failedSteps = results
         .map((result, index) => (result.status === 'rejected' ? [
@@ -57,7 +63,8 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
             'Genesis Block', 
             'Network Config', 
             'Logo Generation',
-            'Whitepaper'
+            'Whitepaper',
+            'Audio Summary'
         ][index] : null))
         .filter(Boolean);
 
@@ -70,6 +77,7 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
     const networkConfig = (networkConfigResult as PromiseFulfillment<any>).value;
     const logo = (logoResult as PromiseFulfillment<any>).value;
     const whitepaper = (whitepaperResult as PromiseFulfillment<any>).value;
+    const audioSummary = (audioSummaryResult as PromiseFulfillment<any>).value;
 
 
     const nodeSetupInstructions = await provideNodeSetupMiningInstructions({
@@ -80,8 +88,6 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
         compilationInstructions: compilationGuidance.compilationInstructions,
     });
     
-    const technicalSummary = `You've chosen to build **${values.coinName} (${values.coinAbbreviation})**. It will use the **${values.consensusMechanism}** consensus mechanism. The network is designed for a **${values.targetSpacingInMinutes}-minute** block time, with a difficulty readjustment every **${values.targetTimespanInMinutes} minutes**. Miners will initially receive a reward of **${values.blockReward} ${values.coinAbbreviation}** per block, which will halve every **${values.blockHalving}** blocks, leading to a total supply of **${values.coinSupply} ${values.coinAbbreviation}**. Transactions will be considered confirmed after **${values.numberOfConfirmations}** blocks, and mined coins will mature after **${values.coinbaseMaturity}** blocks.`;
-    
     return {
         technicalSummary,
         genesisBlockCode: genesisBlock.genesisBlockCode,
@@ -90,6 +96,7 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
         nodeSetupInstructions: nodeSetupInstructions.instructions,
         logoDataUri: logo.logoDataUri,
         whitepaperContent: whitepaper.whitepaperContent,
+        audioDataUri: audioSummary.audioDataUri,
     };
 }
 

@@ -39,4 +39,5 @@ export type GenerationResult = {
     nodeSetupInstructions: string;
     logoDataUri: string;
     whitepaperContent: string;
+    audioDataUri: string;
 };

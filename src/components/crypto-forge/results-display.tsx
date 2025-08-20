@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CodeBlock } from "@/components/crypto-forge/code-block";
 import type { GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
-import { Download, Rocket } from "lucide-react";
+import { Download, Rocket, Volume2 } from "lucide-react";
 import Image from "next/image";
 
 interface ResultsDisplayProps {
@@ -54,8 +54,17 @@ export function ResultsDisplay({ results, onReset }: ResultsDisplayProps) {
 
         <TabContentCard value="summary">
           <CardHeader>
-            <CardTitle>Technical Summary</CardTitle>
-            <CardDescription>A recap of your cryptocurrency's key parameters.</CardDescription>
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle>Technical Summary</CardTitle>
+                <CardDescription>A recap of your cryptocurrency's key parameters.</CardDescription>
+              </div>
+              {results.audioDataUri && (
+                <audio controls src={results.audioDataUri} className="max-h-10">
+                    Your browser does not support the audio element.
+                </audio>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             <div className="prose prose-invert max-w-none leading-relaxed" dangerouslySetInnerHTML={{ __html: results.technicalSummary.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>') }}></div>
