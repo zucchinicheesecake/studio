@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CodeBlock } from "@/components/crypto-forge/code-block";
-import type { GenerationResult } from "@/app/types";
+import type { GenerationResult, Project } from "@/app/types";
 import { Button } from "@/components/ui/button";
 import { Download, Linkedin, MessageSquare, Twitter, Save, Loader2, CheckCircle, ArrowLeft, FileCode, Presentation, Briefcase } from "lucide-react";
 import Image from "next/image";
@@ -55,7 +55,7 @@ export function ResultsDisplay({ results, onReset, isSavedProject = false }: Res
     }
   };
 
-  const projectDate = isSavedProject && 'createdAt' in results ? new Date((results as any).createdAt).toLocaleDateString() : new Date().toLocaleDateString();
+  const projectDate = isSavedProject && 'createdAt' in results ? new Date((results as Project).createdAt).toLocaleDateString() : new Date().toLocaleDateString();
 
 
   return (

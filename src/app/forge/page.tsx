@@ -1,11 +1,11 @@
 
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { generateCrypto, explainConcept } from "@/app/actions";
+import * as actions from "@/app/actions";
 import { formSchema, type FormValues, type GenerationResult } from "@/app/types";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -15,10 +15,10 @@ import { Step2TargetAudience } from "@/components/crypto-forge/step-2-target-aud
 import { Step3Branding } from "@/components/crypto-forge/step-3-branding";
 import { Step4TokenStrategy } from "@/components/crypto-forge/step-4-token-strategy";
 import { ResultsDisplay } from "@/components/crypto-forge/results-display";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle, CircleDashed, Loader2 } from "lucide-react";
 import { ExplanationDialog } from "@/components/crypto-forge/explanation-dialog";
 import { ExplanationContext } from "@/hooks/use-explanation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 
@@ -29,15 +29,16 @@ const steps = [
   { id: 4, name: "Token Strategy", component: <Step4TokenStrategy />, fields: ["tokenUtility", "initialDistribution"] },
 ];
 
-type Status = 'idle' | 'generating' | 'success' | 'error';
+type GenerationStepStatus = 'pending' | 'generating' | 'success' | 'error';
+type GenerationStep = { name: string; status: GenerationStepStatus; error?: string };
 
 export default function ForgePage() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [generationStatus, setGenerationStatus] = useState<Status>('idle');
+  const [generationSteps, setGenerationSteps] = useState<GenerationStep[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [results, setResults] = useState<GenerationResult | null>(null);
   const [explanation, setExplanation] = useState({ title: "", content: "", isLoading: false });
-  const [error, setError] = useState<string | null>(null);
-
+  
   const { toast } = useToast();
 
   const methods = useForm<FormValues>({
@@ -70,35 +71,117 @@ export default function ForgePage() {
 
   const handlePrev = () => {
     if (currentStep > 1) {
-      setCurrentStep(step => step + 1);
+      setCurrentStep(step => step - 1);
     }
   };
   
   const onSubmit = async (data: FormValues) => {
-    setGenerationStatus('generating');
+    setIsGenerating(true);
     setResults(null);
-    setError(null);
-    
+
+    const initialSteps: GenerationStep[] = [
+        { name: 'Investor Pitch Deck', status: 'pending' },
+        { name: 'Tokenomics Model', status: 'pending' },
+        { name: 'Community Strategy', status: 'pending' },
+        { name: 'Logo Generation', status: 'pending' },
+        { name: 'Whitepaper', status: 'pending' },
+        { name: 'Audio Summary', status: 'pending' },
+        { name: 'Landing Page', status: 'pending' },
+        { name: 'Social Campaign', status: 'pending' },
+        { name: 'Genesis Block', status: 'pending' },
+        { name: 'Network Config', status: 'pending' },
+        { name: 'Compilation Guidance', status: 'pending' },
+        { name: 'Node Setup Instructions', status: 'pending' },
+    ];
+    setGenerationSteps(initialSteps);
+
     try {
-        const resultData = await generateCrypto(data);
-        setResults(resultData);
-        setGenerationStatus('success');
-    } catch (e) {
-        const errorMessage = e instanceof Error ? e.message : "An unknown error occurred during generation.";
-        setError(errorMessage);
-        setGenerationStatus('error');
+        const derivedParams = {
+            coinName: data.projectName,
+            coinAbbreviation: data.ticker,
+            addressLetter: data.ticker.charAt(0).toUpperCase(),
+            coinUnit: "sats",
+            blockReward: 50,
+            blockHalving: 210000,
+            coinSupply: 100000000,
+            coinbaseMaturity: 100,
+            numberOfConfirmations: 6,
+            targetSpacingInMinutes: 10,
+            targetTimespanInMinutes: 1440,
+            problemStatement: `The current market lacks a solution for: ${data.missionStatement}`,
+            solutionStatement: `${data.projectName} addresses this by providing a platform that is ${data.brandVoice.toLowerCase()}.`,
+            keyFeatures: `- Core Utility: ${data.tokenUtility}\n- Target Audience Focus: ${data.targetAudience}\n- Decentralized Governance`,
+        };
+        const fullFormParams = { ...data, ...derivedParams };
+        const technicalSummary = `**${fullFormParams.coinName} (${fullFormParams.coinAbbreviation})** is a new cryptocurrency protocol driven by the mission: *"${data.missionStatement}"*. It uses the **${data.consensusMechanism}** consensus mechanism. The network is designed for a **${fullFormParams.targetSpacingInMinutes}-minute** block time. This project is tailored for **${data.targetAudience.toLowerCase()}** with a brand voice that is **${data.brandVoice.toLowerCase()}**.`;
+
+        const generatedAssets: any = {};
+        
+        const runStep = async <T,>(name: string, fn: () => Promise<T>): Promise<T> => {
+            setGenerationSteps(prev => prev.map(s => s.name === name ? { ...s, status: 'generating' } : s));
+            try {
+                const result = await fn();
+                setGenerationSteps(prev => prev.map(s => s.name === name ? { ...s, status: 'success' } : s));
+                return result;
+            } catch (e: any) {
+                const errorMessage = e instanceof Error ? e.message : String(e);
+                setGenerationSteps(prev => prev.map(s => s.name === name ? { ...s, status: 'error', error: errorMessage } : s));
+                throw new Error(`Failed at step: ${name}`);
+            }
+        };
+
+        generatedAssets.pitchDeck = await runStep('Investor Pitch Deck', () => actions.generatePitchDeck({ ...data }));
+        generatedAssets.tokenomics = await runStep('Tokenomics Model', () => actions.generateTokenomicsModel({ ...data }));
+        generatedAssets.community = await runStep('Community Strategy', () => actions.generateCommunityStrategy({ ...data }));
+        generatedAssets.logo = await runStep('Logo Generation', () => actions.generateLogo({ coinName: fullFormParams.coinName, logoDescription: data.logoDescription }));
+        generatedAssets.whitepaper = await runStep('Whitepaper', () => actions.generateWhitepaper({ ...fullFormParams }));
+        generatedAssets.audio = await runStep('Audio Summary', () => actions.generateAudioSummary({ summary: technicalSummary.replace(/\*\*/g, '').replace(/\*/g, '') }));
+        generatedAssets.landingPage = await runStep('Landing Page', () => actions.generateLandingPage({ ...fullFormParams }));
+        generatedAssets.social = await runStep('Social Campaign', () => actions.generateSocialCampaign({ ...fullFormParams }));
+        generatedAssets.genesis = await runStep('Genesis Block', () => actions.generateGenesisBlockCode({ ...derivedParams, timestamp: data.timestamp! }));
+        generatedAssets.networkConfig = await runStep('Network Config', () => actions.createNetworkConfigurationFile({ ...derivedParams }));
+        generatedAssets.compilation = await runStep('Compilation Guidance', () => actions.provideCompilationGuidance({ coinName: fullFormParams.coinName, consensusMechanism: data.consensusMechanism!, targetSpacing: fullFormParams.targetSpacingInMinutes }));
+        generatedAssets.nodeSetup = await runStep('Node Setup Instructions', () => actions.provideNodeSetupMiningInstructions({
+            coinName: fullFormParams.coinName,
+            coinSymbol: fullFormParams.coinAbbreviation,
+            genesisBlockCode: generatedAssets.genesis.genesisBlockCode,
+            networkParameters: generatedAssets.networkConfig.networkConfigurationFile,
+            compilationInstructions: generatedAssets.compilation.compilationInstructions,
+        }));
+        
+        setResults({
+            formValues: data,
+            technicalSummary,
+            genesisBlockCode: generatedAssets.genesis.genesisBlockCode,
+            networkConfigurationFile: generatedAssets.networkConfig.networkConfigurationFile,
+            compilationInstructions: generatedAssets.compilation.compilationInstructions,
+            nodeSetupInstructions: generatedAssets.nodeSetup.instructions,
+            logoDataUri: generatedAssets.logo.logoDataUri,
+            whitepaperContent: generatedAssets.whitepaper.whitepaperContent,
+            audioDataUri: generatedAssets.audio.audioDataUri,
+            landingPageCode: generatedAssets.landingPage.landingPageCode,
+            pitchDeckContent: generatedAssets.pitchDeck.pitchDeckContent,
+            tokenomicsModelContent: generatedAssets.tokenomics.tokenomicsModelContent,
+            communityStrategyContent: generatedAssets.community.communityStrategyContent,
+            ...generatedAssets.social,
+        });
+
+    } catch (e: any) {
         toast({
             variant: "destructive",
             title: "Generation Failed",
-            description: "One or more steps failed. See details below.",
+            description: e.message || "One or more steps failed. See details below.",
         });
+    } finally {
+        setIsGenerating(false);
     }
   };
 
   const resetForm = () => {
     setResults(null);
     setCurrentStep(1);
-    setGenerationStatus('idle');
+    setIsGenerating(false);
+    setGenerationSteps([]);
     methods.reset();
   }
 
@@ -108,46 +191,61 @@ export default function ForgePage() {
 
   const handleExplain = async (concept: string) => {
     setExplanation({ title: concept, content: "", isLoading: true });
-    const explanationText = await explainConcept(concept);
+    const explanationText = await actions.explainConcept(concept);
     setExplanation({ title: concept, content: explanationText, isLoading: false });
   };
 
 
-  if (generationStatus === 'generating' || generationStatus === 'error') {
+  if (generationSteps.length > 0) {
+    const hasError = generationSteps.some(s => s.status === 'error');
+    const isComplete = generationSteps.every(s => s.status === 'success' || s.status === 'error');
+    
     return (
         <div className="flex flex-col items-center justify-center min-h-screen text-center container mx-auto px-4 py-12">
             <h1 className="text-3xl font-headline font-bold text-primary">
-                {generationStatus === 'error' ? 'Generation Failed' : 'Forging Your Project...'}
+                {isGenerating ? 'Forging Your Project...' : hasError ? 'Generation Failed' : 'Generation Complete!'}
             </h1>
             <p className="text-muted-foreground mt-2 mb-8">
-                {generationStatus === 'error' ? 'An error occurred. See the log below for details.' : 'The AI is building your assets. Please wait.'}
+                {isGenerating ? 'The AI is building your assets. Please wait.' : 'Review the status of each step below.'}
             </p>
             <Card className="w-full max-w-2xl text-left">
                 <CardHeader>
                     <CardTitle>Generation Status</CardTitle>
+                    <CardDescription>Tracking the progress of your project asset creation.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {generationStatus === 'generating' && (
-                        <div className="flex items-center justify-center p-8">
-                            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                        </div>
-                    )}
-                    {generationStatus === 'error' && error && (
-                         <Alert variant="destructive" className="mt-6">
-                            <AlertCircle className="h-4 w-4" />
-                            <AlertTitle>Error Details</AlertTitle>
-                            <AlertDescription className="font-code text-xs">{error}</AlertDescription>
-                        </Alert>
-                    )}
+                    <ul className="space-y-4">
+                        {generationSteps.map(step => (
+                            <li key={step.name} className="flex items-start">
+                                <div className="flex items-center h-6">
+                                    {step.status === 'pending' && <CircleDashed className="h-5 w-5 text-muted-foreground" />}
+                                    {step.status === 'generating' && <Loader2 className="h-5 w-5 animate-spin text-primary" />}
+                                    {step.status === 'success' && <CheckCircle className="h-5 w-5 text-green-500" />}
+                                    {step.status === 'error' && <AlertCircle className="h-5 w-5 text-destructive" />}
+                                </div>
+                                <div className="ml-4">
+                                    <p className={`font-medium ${step.status === 'error' ? 'text-destructive' : ''}`}>{step.name}</p>
+                                    {step.status === 'error' && (
+                                        <p className="text-xs text-destructive/80 mt-1 font-code">{step.error}</p>
+                                    )}
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
                 </CardContent>
             </Card>
-            {generationStatus === 'error' && (
+            {!isGenerating && hasError && (
                 <div className="mt-8">
                     <Button onClick={handleTryAgain}>
                         Try Again
                     </Button>
                 </div>
             )}
+             {!isGenerating && !hasError && results && (
+                 <div className="mt-8">
+                    <Button onClick={() => setGenerationSteps([])}>View Results</Button>
+                </div>
+             )}
         </div>
     );
   }
