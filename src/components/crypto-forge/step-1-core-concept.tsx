@@ -11,13 +11,13 @@ export function Step1CoreConcept() {
   const { control } = useFormContext();
 
   return (
-    <Card className="w-full bg-card/50">
+    <Card className="w-full bg-card border-border">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl">Core Concept</CardTitle>
+        <CardTitle className="font-headline text-2xl text-primary">Core Concept</CardTitle>
         <CardDescription>Define the fundamental identity and mission of your project. This is the foundation of everything.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField control={control} name="projectName" render={({ field }) => (
                 <FormItem>
                     <FormLabel>Project Name</FormLabel>
@@ -43,7 +43,7 @@ export function Step1CoreConcept() {
                 <AIInput
                   label="Mission Statement"
                   placeholder="What is the ultimate goal of your project? What problem are you solving?"
-                  className="resize-y"
+                  className="resize-y min-h-[100px]"
                   {...field}
                 />
               </FormControl>

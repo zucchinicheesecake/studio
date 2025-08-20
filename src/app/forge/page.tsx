@@ -256,14 +256,14 @@ export default function ForgePage() {
             </Button>
         </header>
         <main className="flex-grow container mx-auto px-4 py-12 flex flex-col items-center justify-center">
-          <div className="text-center mb-4">
+          <div className="text-center mb-12">
               <h1 className="text-5xl font-headline font-bold text-primary">Coin Engine</h1>
               <p className="mt-2 text-lg text-muted-foreground">Your AI co-founder for launching a crypto project.</p>
           </div>
           <div className="w-full max-w-4xl">
-            <Stepper currentStep={currentStep} steps={steps.map(s => s.name)} />
+            <Stepper currentStep={currentStep} steps={steps.map(s => ({id: s.id, name: s.name}))} />
           </div>
-          <div className="w-full max-w-3xl mt-8">
+          <div className="w-full max-w-3xl mt-10">
             <form onSubmit={handleSubmit(onSubmit)}
                 // By wrapping the component in a new context provider, we can pass down the `handleExplain` function
                 // to any of the step components without prop drilling.

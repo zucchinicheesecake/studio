@@ -1,58 +1,51 @@
 
 interface StepperProps {
   currentStep: number;
-  steps: string[];
+  steps: { id: number; name: string }[];
 }
 
 export function Stepper({ currentStep, steps }: StepperProps) {
   return (
-    <nav aria-label="Progress">
-      <ol role="list" className="flex items-center">
+    <div className="flex flex-col">
+      <div className="flex items-center justify-center">
         {steps.map((step, index) => (
-          <li key={step} className={`relative flex-1 ${index !== steps.length - 1 ? 'pr-8 sm:pr-20' : ''}`}>
-            {/* Completed Step */}
-            {index + 1 < currentStep ? (
-              <>
-                <div className="absolute inset-0 top-4 left-0 flex items-center" aria-hidden="true">
-                  <div className="h-0.5 w-full bg-primary" />
-                </div>
-                <div
-                  className="relative flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground"
-                >
-                  <span className="text-sm font-bold">{index + 1}</span>
-                </div>
-              </>
-            ) : index + 1 === currentStep ? (
-              // Current Step 
-              <>
-                <div className="absolute inset-0 top-4 left-0 flex items-center" aria-hidden="true">
-                  <div className="h-0.5 w-full bg-border" />
-                </div>
-                <div
-                  className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-background text-primary"
-                >
-                   <span className="text-sm font-bold">{index + 1}</span>
-                </div>
-              </>
-            ) : (
-              // Upcoming Step
-              <>
-                <div className="absolute inset-0 top-4 left-0 flex items-center" aria-hidden="true">
-                  <div className="h-0.5 w-full bg-border" />
-                </div>
-                <div
-                  className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-border bg-background text-muted-foreground"
-                >
-                   <span className="text-sm font-bold">{index + 1}</span>
-                </div>
-              </>
+          <div key={step.id} className="flex items-center">
+            <div className="flex flex-col items-center">
+              <div
+                className={`flex h-8 w-8 items-center justify-center rounded-full border-2 transition-colors duration-300 ${
+                  step.id < currentStep
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : step.id === currentStep
+                    ? 'border-primary bg-primary/20 text-primary'
+                    : 'border-muted-foreground/50 bg-background text-muted-foreground'
+                }`}
+              >
+                <span className="font-bold">{step.id}</span>
+              </div>
+            </div>
+            {index < steps.length - 1 && (
+              <div
+                className={`h-0.5 w-24 transition-colors duration-300 ${
+                  step.id < currentStep ? 'bg-primary' : 'bg-muted-foreground/50'
+                }`}
+              />
             )}
-            <p className={`absolute top-10 left-1/2 -translate-x-1/2 mt-2 w-max text-center text-xs font-medium transition-colors duration-300 sm:text-sm ${index + 1 <= currentStep ? 'text-primary' : 'text-muted-foreground'}`}>
-              {step}
-            </p>
-          </li>
+          </div>
         ))}
-      </ol>
-    </nav>
+      </div>
+      <div className="mt-4 flex justify-between px-8">
+        {steps.map((step) => (
+          <div key={step.id} className="text-center w-full">
+            <p
+              className={`font-medium transition-colors duration-300 ${
+                step.id === currentStep ? 'text-primary' : 'text-muted-foreground'
+              }`}
+            >
+              {step.name}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
