@@ -117,7 +117,7 @@ export default function Home() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen text-center">
             <Loader2 className="h-16 w-16 animate-spin text-primary mb-4" />
-            <h1 className="text-3xl font-headline font-bold text-primary">Forging Your Crypto...</h1>
+            <h1 className="text-3xl font-headline font-bold text-primary">Generating Your Coin...</h1>
             <p className="text-muted-foreground mt-2">The AI is generating your genesis block, configuration, and instructions.</p>
             <p className="text-sm text-muted-foreground mt-2">(This may take up to a minute)</p>
         </div>
@@ -132,8 +132,8 @@ export default function Home() {
     <FormProvider {...methods}>
         <main className="container mx-auto px-4 py-12 flex flex-col items-center justify-center min-h-screen">
           <div className="text-center mb-4">
-              <h1 className="text-5xl font-headline font-bold text-primary">CryptoForge AI</h1>
-              <p className="mt-2 text-lg text-muted-foreground">Your personal AI assistant for creating cryptocurrencies.</p>
+              <h1 className="text-5xl font-headline font-bold text-primary">CoinGenius AI</h1>
+              <p className="mt-2 text-lg text-muted-foreground">Your AI partner for creating custom cryptocurrencies.</p>
           </div>
           <div className="w-full max-w-5xl">
             <Stepper currentStep={currentStep} steps={steps.map(s => s.name)} />
@@ -153,7 +153,7 @@ export default function Home() {
               Previous
             </Button>
             <Button onClick={handleNext}>
-              {currentStep === steps.length ? "Forge My Coin" : "Next Step"}
+              {currentStep === steps.length ? "Generate My Coin" : "Next Step"}
             </Button>
           </div>
         </main>
