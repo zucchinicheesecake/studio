@@ -14,7 +14,8 @@ import { formSchema, type FormValues } from '@/app/types';
 
 
 const SuggestTextForFieldInputSchema = z.object({
-  fieldName: z.keyof(formSchema.shape),
+  // @ts-ignore - The `z.enum` type with a dynamic value is valid but can confuse TypeScript.
+  fieldName: z.enum(Object.keys(formSchema.shape) as [keyof FormValues, ...(keyof FormValues)[]]),
   currentValue: z.string().optional(),
   formContext: formSchema.partial(),
 });
