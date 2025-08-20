@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -15,9 +15,11 @@ import { Step2TargetAudience } from "@/components/crypto-forge/step-2-target-aud
 import { Step3Branding } from "@/components/crypto-forge/step-3-branding";
 import { Step4TokenStrategy } from "@/components/crypto-forge/step-4-token-strategy";
 import { ResultsDisplay } from "@/components/crypto-forge/results-display";
-import { Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 import { ExplanationDialog } from "@/components/crypto-forge/explanation-dialog";
 import { ExplanationContext } from "@/hooks/use-explanation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 
 const steps = [
@@ -27,11 +29,35 @@ const steps = [
   { id: 4, name: "Token Strategy", component: <Step4TokenStrategy />, fields: ["tokenUtility", "initialDistribution"] },
 ];
 
+const generationSteps = [
+    'Investor Pitch Deck',
+    'Tokenomics Model',
+    'Community Strategy',
+    'Logo Generation',
+    'Whitepaper',
+    'Audio Summary',
+    'Landing Page',
+    'Social Campaign',
+    'Genesis Block',
+    'Network Config',
+    'Compilation Guidance',
+    'Node Setup Instructions',
+];
+
+
+type Status = 'idle' | 'generating' | 'success' | 'error';
+type StepStatus = {
+    [key: string]: { status: 'pending' | 'success' | 'error'; error?: string };
+};
+
+
 export default function ForgePage() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
+  const [generationStatus, setGenerationStatus] = useState<Status>('idle');
+  const [stepStatuses, setStepStatuses] = useState<StepStatus>({});
   const [results, setResults] = useState<GenerationResult | null>(null);
   const [explanation, setExplanation] = useState({ title: "", content: "", isLoading: false });
+  const [error, setError] = useState<string | null>(null);
 
   const { toast } = useToast();
 
@@ -49,7 +75,7 @@ export default function ForgePage() {
     },
   });
 
-  const { trigger, handleSubmit } = methods;
+  const { trigger, handleSubmit, getValues } = methods;
 
   const handleNext = async () => {
     const fields = steps[currentStep - 1].fields;
@@ -70,28 +96,50 @@ export default function ForgePage() {
   };
   
   const onSubmit = async (data: FormValues) => {
-    setIsLoading(true);
+    setGenerationStatus('generating');
     setResults(null);
+    setError(null);
+    setStepStatuses(
+        generationSteps.reduce((acc, stepName) => {
+            acc[stepName] = { status: 'pending' };
+            return acc;
+        }, {} as StepStatus)
+    );
+
     try {
-        const resultData = await generateCrypto(data);
+        // This function will be called by the server action to update status
+        const onStepComplete = async (step: string, success: boolean, error?: string) => {
+            setStepStatuses(prev => ({
+                ...prev,
+                [step]: { status: success ? 'success' : 'error', error },
+            }));
+        };
+
+        const resultData = await generateCrypto(data, onStepComplete);
         setResults(resultData);
-    } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+        setGenerationStatus('success');
+    } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : "An unknown error occurred during generation.";
+        setError(errorMessage);
+        setGenerationStatus('error');
         toast({
             variant: "destructive",
             title: "Generation Failed",
-            description: errorMessage,
-        })
-    } finally {
-        setIsLoading(false);
+            description: "One or more steps failed. See details below.",
+        });
     }
   };
 
   const resetForm = () => {
     setResults(null);
     setCurrentStep(1);
+    setGenerationStatus('idle');
     methods.reset();
   }
+
+  const handleTryAgain = () => {
+    onSubmit(getValues());
+  };
 
   const handleExplain = async (concept: string) => {
     setExplanation({ title: concept, content: "", isLoading: true });
@@ -100,13 +148,47 @@ export default function ForgePage() {
   };
 
 
-  if (isLoading) {
+  if (generationStatus === 'generating' || generationStatus === 'error') {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen text-center">
-            <Loader2 className="h-16 w-16 animate-spin text-primary mb-4" />
-            <h1 className="text-3xl font-headline font-bold text-primary">Forging Your Project...</h1>
-            <p className="text-muted-foreground mt-2">The AI is building your whitepaper, pitch deck, code, and go-to-market strategy.</p>
-            <p className="text-sm text-muted-foreground mt-2">(This may take up to a minute)</p>
+        <div className="flex flex-col items-center justify-center min-h-screen text-center container mx-auto px-4 py-12">
+            <h1 className="text-3xl font-headline font-bold text-primary">
+                {generationStatus === 'error' ? 'Generation Failed' : 'Forging Your Project...'}
+            </h1>
+            <p className="text-muted-foreground mt-2 mb-8">
+                {generationStatus === 'error' ? 'An error occurred. See the log below for details.' : 'The AI is building your assets. Please wait.'}
+            </p>
+            <Card className="w-full max-w-2xl text-left">
+                <CardHeader>
+                    <CardTitle>Generation Status</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <ul className="space-y-3">
+                        {Object.entries(stepStatuses).map(([stepName, { status, error }]) => (
+                            <li key={stepName} className="flex items-center text-sm">
+                                {status === 'pending' && <Loader2 className="h-4 w-4 animate-spin text-primary mr-3" />}
+                                {status === 'success' && <CheckCircle className="h-4 w-4 text-green-500 mr-3" />}
+                                {status === 'error' && <AlertCircle className="h-4 w-4 text-destructive mr-3" />}
+                                <span className="flex-grow">{stepName}</span>
+                                {status === 'error' && <span className="text-destructive text-xs ml-4">Failed</span>}
+                            </li>
+                        ))}
+                    </ul>
+                    {generationStatus === 'error' && error && (
+                         <Alert variant="destructive" className="mt-6">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertTitle>Error Details</AlertTitle>
+                            <AlertDescription className="font-code text-xs">{error}</AlertDescription>
+                        </Alert>
+                    )}
+                </CardContent>
+            </Card>
+            {generationStatus === 'error' && (
+                <div className="mt-8">
+                    <Button onClick={handleTryAgain}>
+                        Try Again
+                    </Button>
+                </div>
+            )}
         </div>
     );
   }
@@ -154,3 +236,5 @@ export default function ForgePage() {
     </FormProvider>
   );
 }
+
+    

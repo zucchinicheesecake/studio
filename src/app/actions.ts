@@ -43,102 +43,65 @@ const deriveTechnicalParams = (values: FormValues) => {
 };
 
 
-export async function generateCrypto(values: FormValues): Promise<GenerationResult> {
+export async function generateCrypto(values: FormValues, onStepComplete: (step: string, success: boolean, error?: string) => Promise<void>): Promise<GenerationResult> {
     
     const derivedParams = deriveTechnicalParams(values);
     const fullFormParams = { ...values, ...derivedParams };
 
     const technicalSummary = `**${fullFormParams.coinName} (${fullFormParams.coinAbbreviation})** is a new cryptocurrency protocol driven by the mission: *"${values.missionStatement}"*. It uses the **${values.consensusMechanism}** consensus mechanism. The network is designed for a **${fullFormParams.targetSpacingInMinutes}-minute** block time. This project is tailored for **${values.targetAudience.toLowerCase()}** with a brand voice that is **${values.brandVoice.toLowerCase()}**.`;
 
-    const results = await Promise.allSettled([
-        provideCompilationGuidance({
+    const generationSteps = [
+        { name: 'Investor Pitch Deck', fn: () => generatePitchDeck({ ...values }) },
+        { name: 'Tokenomics Model', fn: () => generateTokenomicsModel({ ...values }) },
+        { name: 'Community Strategy', fn: () => generateCommunityStrategy({ ...values }) },
+        { name: 'Logo Generation', fn: () => generateLogo({ coinName: fullFormParams.coinName, logoDescription: values.logoDescription }) },
+        { name: 'Whitepaper', fn: () => generateWhitepaper({ ...fullFormParams, }) },
+        { name: 'Audio Summary', fn: () => generateAudioSummary({ summary: technicalSummary.replace(/\*\*/g, '').replace(/\*/g, '') }) },
+        { name: 'Landing Page', fn: () => generateLandingPage({ ...fullFormParams, }) },
+        { name: 'Social Campaign', fn: () => generateSocialCampaign({ ...fullFormParams }) },
+        { name: 'Genesis Block', fn: () => generateGenesisBlockCode({ ...derivedParams, timestamp: values.timestamp!, }) },
+        { name: 'Network Config', fn: () => createNetworkConfigurationFile({ ...derivedParams, }) },
+        { name: 'Compilation Guidance', fn: () => provideCompilationGuidance({ coinName: fullFormParams.coinName, consensusMechanism: values.consensusMechanism!, targetSpacing: fullFormParams.targetSpacingInMinutes, }) },
+    ];
+
+    const results: any = {};
+    const errors: { step: string; message: string }[] = [];
+
+    for (const step of generationSteps) {
+        try {
+            const result = await step.fn();
+            results[step.name] = result;
+            await onStepComplete(step.name, true);
+        } catch (e) {
+            const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+            errors.push({ step: step.name, message: errorMessage });
+            await onStepComplete(step.name, false, errorMessage);
+            // Stop further processing if a step fails
+            throw new Error(`Failed at step: ${step.name}. Reason: ${errorMessage}`);
+        }
+    }
+    
+    // This part will only be reached if all above steps succeed
+    const compilationGuidance = results['Compilation Guidance'];
+    const genesisBlock = results['Genesis Block'];
+    const networkConfig = results['Network Config'];
+
+    let nodeSetupInstructions;
+    try {
+        nodeSetupInstructions = await provideNodeSetupMiningInstructions({
             coinName: fullFormParams.coinName,
-            consensusMechanism: values.consensusMechanism!,
-            targetSpacing: fullFormParams.targetSpacingInMinutes,
-        }),
-        generateGenesisBlockCode({
-            ...derivedParams,
-            timestamp: values.timestamp!,
-        }),
-        createNetworkConfigurationFile({
-            ...derivedParams,
-        }),
-        generateLogo({
-            coinName: fullFormParams.coinName,
-            logoDescription: values.logoDescription,
-        }),
-        generateWhitepaper({
-            ...fullFormParams,
-        }),
-        generateAudioSummary({
-            summary: technicalSummary.replace(/\*\*/g, '').replace(/\*/g, ''), // remove markdown for TTS
-        }),
-        generateLandingPage({
-            ...fullFormParams,
-        }),
-        generateSocialCampaign({
-            ...fullFormParams
-        }),
-        generatePitchDeck({ ...values }),
-        generateTokenomicsModel({ ...values }),
-        generateCommunityStrategy({ ...values }),
-    ]);
-
-    const [
-        compilationGuidanceResult, 
-        genesisBlockResult, 
-        networkConfigResult, 
-        logoResult, 
-        whitepaperResult, 
-        audioSummaryResult, 
-        landingPageResult, 
-        socialCampaignResult,
-        pitchDeckResult,
-        tokenomicsModelResult,
-        communityStrategyResult
-    ] = results;
-
-    const failedSteps = results
-        .map((result, index) => (result.status === 'rejected' ? [
-            'Compilation Guidance', 
-            'Genesis Block', 
-            'Network Config', 
-            'Logo Generation',
-            'Whitepaper',
-            'Audio Summary',
-            'Landing Page',
-            'Social Campaign',
-            'Pitch Deck',
-            'Tokenomics Model',
-            'Community Strategy',
-        ][index] : null))
-        .filter(Boolean);
-
-    if (failedSteps.length > 0) {
-        throw new Error(`The following steps failed: ${failedSteps.join(', ')}. Please try again.`);
+            coinSymbol: fullFormParams.coinAbbreviation,
+            genesisBlockCode: genesisBlock.genesisBlockCode,
+            networkParameters: networkConfig.networkConfigurationFile,
+            compilationInstructions: compilationGuidance.compilationInstructions,
+        });
+        await onStepComplete('Node Setup Instructions', true);
+    } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+        await onStepComplete('Node Setup Instructions', false, errorMessage);
+        throw new Error(`Failed at step: Node Setup Instructions. Reason: ${errorMessage}`);
     }
 
-    const compilationGuidance = (compilationGuidanceResult as PromiseFulfillment<any>).value;
-    const genesisBlock = (genesisBlockResult as PromiseFulfillment<any>).value;
-    const networkConfig = (networkConfigResult as PromiseFulfillment<any>).value;
-    const logo = (logoResult as PromiseFulfillment<any>).value;
-    const whitepaper = (whitepaperResult as PromiseFulfillment<any>).value;
-    const audioSummary = (audioSummaryResult as PromiseFulfillment<any>).value;
-    const landingPage = (landingPageResult as PromiseFulfillment<any>).value;
-    const socialCampaign = (socialCampaignResult as PromiseFulfillment<any>).value;
-    const pitchDeck = (pitchDeckResult as PromiseFulfillment<any>).value;
-    const tokenomicsModel = (tokenomicsModelResult as PromiseFulfillment<any>).value;
-    const communityStrategy = (communityStrategyResult as PromiseFulfillment<any>).value;
-
-
-    const nodeSetupInstructions = await provideNodeSetupMiningInstructions({
-        coinName: fullFormParams.coinName,
-        coinSymbol: fullFormParams.coinAbbreviation,
-        genesisBlockCode: genesisBlock.genesisBlockCode,
-        networkParameters: networkConfig.networkConfigurationFile,
-        compilationInstructions: compilationGuidance.compilationInstructions,
-    });
-    
     return {
         formValues: values,
         technicalSummary,
@@ -146,16 +109,17 @@ export async function generateCrypto(values: FormValues): Promise<GenerationResu
         networkConfigurationFile: networkConfig.networkConfigurationFile,
         compilationInstructions: compilationGuidance.compilationInstructions,
         nodeSetupInstructions: nodeSetupInstructions.instructions,
-        logoDataUri: logo.logoDataUri,
-        whitepaperContent: whitepaper.whitepaperContent,
-        audioDataUri: audioSummary.audioDataUri,
-        landingPageCode: landingPage.landingPageCode,
-        pitchDeckContent: pitchDeck.pitchDeckContent,
-        tokenomicsModelContent: tokenomicsModel.tokenomicsModelContent,
-        communityStrategyContent: communityStrategy.communityStrategyContent,
-        ...socialCampaign,
+        logoDataUri: results['Logo Generation'].logoDataUri,
+        whitepaperContent: results['Whitepaper'].whitepaperContent,
+        audioDataUri: results['Audio Summary'].audioDataUri,
+        landingPageCode: results['Landing Page'].landingPageCode,
+        pitchDeckContent: results['Investor Pitch Deck'].pitchDeckContent,
+        tokenomicsModelContent: results['Tokenomics Model'].tokenomicsModelContent,
+        communityStrategyContent: results['Community Strategy'].communityStrategyContent,
+        ...results['Social Campaign'],
     };
 }
+
 
 export async function explainConcept(concept: string): Promise<string> {
     try {
@@ -269,3 +233,5 @@ type PromiseFulfillment<T> = {
     status: 'fulfilled';
     value: T;
 };
+
+    
